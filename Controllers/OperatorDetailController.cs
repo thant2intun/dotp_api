@@ -250,16 +250,8 @@ namespace DOTP_BE.Controllers
         [HttpPost("OperatorLicenseAttach")]
         public async Task<IActionResult> AddOperatorLicenseAttach([FromForm] OperatorLicenseAttachVM operatorLicenseAttachVM)
         {
-            //car attached file
-            string transactionId = "";
-            string chalenNumber = "";
-            if (operatorLicenseAttachVM.CarAttachedFiles != null)
-                (transactionId, chalenNumber) = await _iopeartorDetail.VehicleAttach(operatorLicenseAttachVM);
-
-            // licenseOnly att Update
-            bool okLU = await _iopeartorDetail.UpdateLicenseAttach(operatorLicenseAttachVM, transactionId);
-            return Ok(new { transactionId, chalenNumber, operatorLicenseAttachVM.licenseNumberLong , DateTime.Now});
-            //return Ok(operatorLicenseAttachVM);
+            (bool, bool) response = await _iopeartorDetail.ExtendOperatorLicenseProcess(operatorLicenseAttachVM);
+            return Ok(response);
         }
 
         //ok pdf

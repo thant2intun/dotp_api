@@ -2,8 +2,8 @@
 {
     public class OperatorLicenseAttachVM
     {
-        public string? Transaction_Id { get; set; } //from frontend
-        public string? ChalenNumber { get; set; } //from frontend
+        //public string? Transaction_Id { get; set; } //from frontend
+        //public string? ChalenNumber { get; set; } //from frontend
         public string licenseNumberLong { get; set; }
         //public string LicenseHolderType { get; set; }
         //public string OperatorName { get; set; }
@@ -23,6 +23,7 @@
         ////public int? VehicleId { get; set; } // for transaction(to get vehicle weight Id) //al cause logic change can get From Vehicl By Transaction iD
         //public int applicant_Id { get; set; }
         //public int selectedExtenYear { get; set; }
+        public bool? TakeNewRecord { get; set; }
 
 
         public List<IFormFile> AttachFile_NRC { get; set; }
