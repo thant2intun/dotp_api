@@ -3085,6 +3085,92 @@ namespace DOTP_BE.Repositories
                 }
                 #endregion
 
+                #region *** for AddNewCar ***
+                if(dto.FormMode == ConstantValue.AddNewCar_FM && dto.AddNewCars != null)
+                {
+                    var vehiclForAddNewCar = await _context.Vehicles
+                        .Where(x => x.LicenseNumberLong == dto.LicenseNumberLong &&
+                                                  x.NRC_Number == dto.NRC_Number)
+                        .OrderByDescending(x => x.ApplyDate)
+                        .FirstOrDefaultAsync();
+                    if (vehiclForAddNewCar != null)
+                    {
+                        foreach (var item in dto.AddNewCars)
+                        {
+                            var newCar = new CreateCar();
+                            newCar.VehicleNumber = item.vehicleNumber;
+                            newCar.VehicleBrand = item.vehicleBrand;
+                            newCar.VehicleType = item.vehicleType;
+                            newCar.VehicleLocation = item.vehicleLocation;
+                            newCar.VehicleOwnerName = item.vehicleOwnerName;
+                            newCar.VehicleOwnerNRC = item.vehicleOwnerNRC;
+                            newCar.VehicleOwnerAddress = item.vehicleOwnerAddress;
+                            newCar.IsDeleted = false;
+                            newCar.CreatedDate = DateTime.Now;
+                            newCar.VehicleWeight = item.vehicleWeight;
+
+                            await _context.CreateCars.AddAsync(newCar);
+                            await _context.SaveChangesAsync();
+
+                            string pathOwnerBookFiles = string.Empty;
+                            string pathAttachedFiles1 = string.Empty;
+
+                            string vehicleFolderName = "VehicleId_" + newCar.CreateCarId;
+                            string vehicleDateFolerName = Path.Combine("Vehicle_AttachedFiles", DateTime.Now.ToString("yyyyMMdd"), vehicleFolderName);
+                            string vehicleSavePath = Path.Combine(rootPath, vehicleDateFolerName);
+                            string vehicleLateFolderNameR = vehicleDateFolerName.Replace("\\", "/");
+
+                            try
+                            {
+                                if (!Directory.Exists(vehicleSavePath))
+                                    Directory.CreateDirectory(vehicleSavePath);
+                            }
+                            catch (Exception e) { Console.WriteLine(e.ToString()); }
+
+                            // Save OwnerBook
+                            if (item.OwnerBookFiles != null)
+                            {
+                                bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(item.OwnerBookFiles, vehicleSavePath + "\\OwnerBook.pdf");
+                                if (oky)
+                                    pathOwnerBookFiles = vehicleLateFolderNameR + "/OwnerBook.pdf";
+                            }
+
+                            // Save AttachedFile1
+                            if (item.AttachedFiles1 != null)
+                            {
+                                bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(item.AttachedFiles1, vehicleSavePath + "\\CarAttached1.pdf");
+                                if (oky)
+                                    pathAttachedFiles1 = vehicleLateFolderNameR + "/CarAttached1.pdf";
+                            }
+
+                            vehiclForAddNewCar.VehicleId = ConstantValue.Zero;
+                            vehiclForAddNewCar.Transaction_Id = TransactionIdN;
+                            vehiclForAddNewCar.ChalenNumber = ChalenNumberN;
+                            vehiclForAddNewCar.VehicleNumber = item.vehicleNumber;
+                            vehiclForAddNewCar.CertificatePrinted = false;
+                            vehiclForAddNewCar.Part1Printed = false;
+                            vehiclForAddNewCar.Part2Printed = false;
+                            vehiclForAddNewCar.TrianglePrinted = false;
+                            vehiclForAddNewCar.Status = "Pending";
+                            vehiclForAddNewCar.IsCurrent = false;
+                            vehiclForAddNewCar.IsDeleted = false;
+                            vehiclForAddNewCar.FormMode = ConstantValue.AddNewCar_FM;
+                            vehiclForAddNewCar.Triangle = null;
+                            vehiclForAddNewCar.OwnerBook = null;
+                            vehiclForAddNewCar.OwnerBook = pathOwnerBookFiles;
+                            vehiclForAddNewCar.AttachedFile1 = pathAttachedFiles1;
+                            vehiclForAddNewCar.LicenseOnlyId = licenOnlys.LicenseOnlyId;
+                            vehiclForAddNewCar.CreatedBy = "Sooner";
+                            vehiclForAddNewCar.CreatedDate = DateTime.Now;
+                            vehiclForAddNewCar.CreateCarId = newCar.CreateCarId;
+
+                            await _context.Vehicles.AddAsync(vehiclForAddNewCar);
+                            //await _context.SaveChangesAsync();
+                        }
+                    }
+                }
+                #endregion
+
                 await _context.SaveChangesAsync();
                 return (true, false); // (done, not duplicate)
             }

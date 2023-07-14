@@ -4,8 +4,6 @@ namespace DOTP_BE.ViewModel
 {
     public class CommonChangesVM
     {
-        //public string? Transaction_Id { get; set; } //from frontend
-        //public string? ChalenNumber { get; set; } //from frontend
         public LicenseAttachedFilesVM LicenseAttachedFiles { get; set; }
         public string LicenseNumberLong { get; set; }
         public string NRC_Number { get; set; }
@@ -23,6 +21,9 @@ namespace DOTP_BE.ViewModel
 
         //for vehicle owner name change
         public List<ChangeVehicleName_Sub4>? ChangeVehicleOwnerName { get; set; }
+
+        //for Add new car
+        public List<AddNewCar_Sub5>? AddNewCars { get; set; }
     } 
 
     public class ChangeVOwnerAddress_Sub1
@@ -60,5 +61,20 @@ namespace DOTP_BE.ViewModel
         public string VehicleOwnerAddress { get; set; }
         public string VehicleOwnerName { get; set; }
         public string VehicleOwnerNRC { get; set; }
+    }
+
+    public class AddNewCar_Sub5
+    {
+        public string vehicleBrand { get; set; }
+        public string vehicleNumber { get; set; }
+        public string vehicleOwnerName { get; set; }
+        public string vehicleType { get; set; }
+        public string vehicleOwnerAddress { get; set; }
+        public string vehicleLocation { get; set; }
+        public string vehicleWeight { get; set; }
+        public string vehicleOwnerNRC { get; set; }
+        public string expireDate { get; set; }
+        public List<IFormFile> OwnerBookFiles { get; set; }
+        public List<IFormFile> AttachedFiles1 { get; set; }
     }
 }
