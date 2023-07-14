@@ -3073,7 +3073,7 @@ namespace DOTP_BE.Repositories
                         await _context.Vehicles.AddAsync(vehicleObjN);
 
                         //for create car table
-                        vehicleObjN.CreateCar.CreateCarId = ConstantValue.Zero; // for add
+                        //vehicleObjN.CreateCar.CreateCarId = ConstantValue.Zero; // for add
                         vehicleObjN.CreateCar.VehicleOwnerAddress = item.VehicleOwnerAddress;
                         vehicleObjN.CreateCar.VehicleOwnerName = item.VehicleOwnerName;
                         vehicleObjN.CreateCar.VehicleOwnerNRC = item.VehicleOwnerNRC;
