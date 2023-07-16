@@ -1157,30 +1157,7 @@ namespace DOTP_BE.Repositories
 
             return true;
         }
-
-        // ok pdf
-        //public async Task<bool> UpdateLicenseAttach(ToUpdateLicenseOnlyVM toUpdateLDto)
-        //{
-        //    var licenOnlys = await _context.LicenseOnlys.Where(x => x.License_Number == toUpdateLDto.licenseNumberLong && x.NRC_Number == toUpdateLDto.NRC).ToListAsync();
-        //    licenOnlys = licenOnlys.OrderByDescending(x => x.CreatedDate).ToList();
-
-        //    var licenoOnly = licenOnlys[0];
-        //    licenoOnly.Transaction_Id = toUpdateLDto.transactionId;
-        //    licenoOnly.AttachFile_NRC = toUpdateLDto.pathAttachFile_NRC;
-        //    licenoOnly.AttachFile_M10 = toUpdateLDto.pathAttachFile_M10;
-        //    licenoOnly.AttachFile_OperatorLicense = toUpdateLDto.pathAttachFile_OperatorLicense;
-        //    licenoOnly.AttachFile_Part1 = toUpdateLDto.pathAttachFile_Part1;
-        //    licenoOnly.AttachFile_RecommandDoc1 = toUpdateLDto.pathAttachFile_RecommandDoc1;
-        //    licenoOnly.AttachFile_RecommandDoc2 = toUpdateLDto.pathAttachFile_RecommandDoc2;
-        //    licenoOnly.UpdatedDate = DateTime.Now;
-
-        //    _context.LicenseOnlys.Update(licenoOnly);
-        //    await _context.SaveChangesAsync();
-
-        //    return true;
-        //}
-
-        //Task<(string, string, string, List<int>)>
+                
         public async Task<(string, string, string, DateTime)> DecreaseCars(DecreaseCarVMList decreaseCarVMList)
         {
             try
@@ -3167,6 +3144,95 @@ namespace DOTP_BE.Repositories
                             await _context.Vehicles.AddAsync(vehiclForAddNewCar);
                             //await _context.SaveChangesAsync();
                         }
+                    }
+                }
+                #endregion
+
+                #region *** for DecreaseCar ***
+                if (dto.FormMode == ConstantValue.DecreaseCar_FM && dto.DecreaseCars != null)
+                {
+                    foreach (var item in dto.DecreaseCars)
+                    {
+                        //var vehicleObjN = dto.FormMode == ConstantValue.ChangeLOwnerAddress? 
+                        //                                await _context.Vehicles.FindAsync(item) : 
+                        //                                await _context.Vehicles.Include(x => x.CreateCar).FirstAsync(12);
+
+                        var vehicleObjN = await _context.Vehicles.FindAsync(item.VehicleID);
+
+                        if (vehicleObjN == null)
+                            continue;
+
+                        //folder variable
+                        string vehicleFolderName = string.Empty;
+                        string vehicleDateFolerName = string.Empty;
+                        string vehicleSavePath = string.Empty;
+                        string vehicleLateFolderNameR = string.Empty;
+
+                        //file path variable
+                        string ownerBookFile = string.Empty;
+                        string triangelFile = string.Empty;
+                        string pathAttachedFile2 = string.Empty;
+
+                        if (item.NewOwnerBook != null || item.NewTriangle != null || item.NewAttachedFile2 != null)
+                        {
+                            //create folder
+                            vehicleFolderName = "VehicleId_" + item.VehicleID;
+                            vehicleDateFolerName = Path.Combine("Vehicle_AttachedFiles", DateTime.Now.ToString("yyyyMMdd"), vehicleFolderName);
+                            vehicleSavePath = Path.Combine(rootPath, vehicleDateFolerName);
+                            vehicleLateFolderNameR = vehicleDateFolerName.Replace("\\", "/");
+
+                            try
+                            {
+                                if (!Directory.Exists(vehicleSavePath))
+                                    Directory.CreateDirectory(vehicleSavePath);
+                            }
+                            catch (Exception e) { Console.WriteLine(e.ToString()); }
+                        }
+
+                        #region ** save DecreaseCar files **
+                        // Save OwnerBook
+                        if (item.NewOwnerBook != null)
+                        {
+                            bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(item.NewOwnerBook, vehicleSavePath + "\\Owner.pdf");
+                            if (oky)
+                                ownerBookFile = vehicleLateFolderNameR + "/Owner.pdf";
+                        }
+
+                        // Save Triangle 
+                        if (item.NewTriangle != null)
+                        {
+                            bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(item.NewTriangle, vehicleSavePath + "\\Triangle.pdf");
+                            if (oky)
+                                triangelFile = vehicleLateFolderNameR + "/Triangle.pdf";
+                        }
+
+                        // Save AttachedFile2
+                        if (item.NewAttachedFile2 != null)
+                        {
+                            bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(item.NewAttachedFile2, vehicleSavePath + "\\AttachedFile2.pdf");
+                            if (oky)
+                                pathAttachedFile2 = vehicleLateFolderNameR + "/AttachedFile2.pdf";
+                        }
+                        #endregion
+
+                        vehicleObjN.VehicleId = ConstantValue.Zero;
+                        vehicleObjN.Transaction_Id = TransactionIdN;
+                        vehicleObjN.ChalenNumber = ChalenNumberN;
+                        vehicleObjN.Status = ConstantValue.Status_Pending;
+                        vehicleObjN.CertificatePrinted = false;
+                        vehicleObjN.Part1Printed = false;
+                        vehicleObjN.Part2Printed = false;
+                        vehicleObjN.TrianglePrinted = false;
+                        vehicleObjN.IsCurrent = false;
+                        vehicleObjN.IsDeleted = false;
+                        vehicleObjN.FormMode = dto.FormMode;
+                        vehicleObjN.CreatedDate = DateTime.Now;
+                        vehicleObjN.OwnerBook = ownerBookFile == string.Empty ? vehicleObjN.OwnerBook : ownerBookFile;
+                        vehicleObjN.Triangle = triangelFile == string.Empty ? vehicleObjN.Triangle : triangelFile;
+                        vehicleObjN.AttachedFile2 = pathAttachedFile2 == string.Empty ? vehicleObjN.AttachedFile2 : pathAttachedFile2;
+                        vehicleObjN.LicenseOnlyId = licenOnlys.LicenseOnlyId;
+
+                        _context.Vehicles.Add(vehicleObjN);
                     }
                 }
                 #endregion

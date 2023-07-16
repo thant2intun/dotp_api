@@ -24,6 +24,9 @@ namespace DOTP_BE.ViewModel
 
         //for Add new car
         public List<AddNewCar_Sub5>? AddNewCars { get; set; }
+
+        //For decrease car 
+        public List<DecreaseCar_Sub6> DecreaseCars { get; set; }
     } 
 
     public class ChangeVOwnerAddress_Sub1
@@ -76,5 +79,13 @@ namespace DOTP_BE.ViewModel
         public string expireDate { get; set; }
         public List<IFormFile> OwnerBookFiles { get; set; }
         public List<IFormFile> AttachedFiles1 { get; set; }
+    }
+
+    public class DecreaseCar_Sub6
+    {
+        public int VehicleID { get; set; }
+        public List<IFormFile>? NewOwnerBook { get; set; }
+        public List<IFormFile>? NewTriangle { get; set; }
+        public List<IFormFile>? NewAttachedFile2 { get; set; }
     }
 }
