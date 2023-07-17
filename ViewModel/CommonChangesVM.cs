@@ -26,7 +26,7 @@ namespace DOTP_BE.ViewModel
         public List<AddNewCar_Sub5>? AddNewCars { get; set; }
 
         //For decrease car 
-        public List<DecreaseCar_Sub6> DecreaseCars { get; set; }
+        public List<DecreaseCar_Sub6>? DecreaseCars { get; set; }
     } 
 
     public class ChangeVOwnerAddress_Sub1

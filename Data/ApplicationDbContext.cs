@@ -7,10 +7,7 @@ namespace DOTP_BE.Data
     public class ApplicationDbContext:DbContext
     {
 
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            :base(options)
-        {
-        }
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) :base(options) {}
         public DbSet<RegistrationOffice> RegistrationOffices { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<VehicleWeight> VehicleWeights { get; set; }

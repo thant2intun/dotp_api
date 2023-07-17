@@ -125,17 +125,6 @@ namespace DOTP_BE.Controllers
         {
             (bool, string?) oky = await _repo.OperatorLicenseConfirmReject(oLConfirmOrRejectVM);
             return Ok(oky);
-            //if (oky.Item1)
-            //    return Ok(oky);
-            //return BadRequest(oky);
         }
-
-        [HttpPost("DecreaseCar")]
-        public async Task<IActionResult> DecreaseCar([FromForm] ExtenseCarVMList dto)
-        {
-            return Ok(dto);
-        }
-
-
     }
 }

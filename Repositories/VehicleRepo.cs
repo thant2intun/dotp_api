@@ -247,6 +247,7 @@ namespace DOTP_BE.Repositories
             //var ddate = _context.Vehicles.Select(x => x.CreatedDate.Date).First();
             //var fdd = DateTime.Parse(ddate);
             var extendLicenseVMs = await _context.Vehicles.AsNoTracking()
+                                 .Where(x => x.CreatedDate.Date >= fd && x.CreatedDate.Date <= td && x.Status == dto.Status)
                                  .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
                                  .GroupBy(x => x.Transaction_Id)
                                  //.GroupBy(x => new { x.Transaction_Id, x.FormMode })
@@ -263,7 +264,6 @@ namespace DOTP_BE.Repositories
                                      TransactionId = x.First().Transaction_Id,
                                      LicenseTypeId = x.First().LicenseTypeId
                                  })
-                                 .Where(x => x.CreatedDate.Date >= fd && x.CreatedDate.Date <= td)
                                  .ToListAsync();
 
 
@@ -558,8 +558,6 @@ namespace DOTP_BE.Repositories
 
         public async Task<(bool, string?)> OperatorLicenseConfirmReject(OLConfirmOrRejectVM oLConfirmOrRejectVM)
         {
-            
-
             var vehicleObj = await _context.Vehicles.AsNoTracking()
                                                     .Where(x => x.Transaction_Id == oLConfirmOrRejectVM.TransactionId &&
                                                                 x.FormMode == oLConfirmOrRejectVM.FormMode)
@@ -579,12 +577,13 @@ namespace DOTP_BE.Repositories
                     {
                         var existingEntry = await _context.OperatorDetails.AsNoTracking()
                                                           .FirstOrDefaultAsync(x => x.FormMode == ConstantValue.EOPL_FM &&
-                                                                                    x.ApplyDate.Date == DateTime.Now.Date);
+                                                                                    x.ApplyDate.Date == DateTime.Now.Date); //check double ExtendOperatorLicense (we wrok with applydate so it can be wrong)
                         if (existingEntry != null)
                             return (false, "လုပ်ငန်းလိုင်စင်သက်တမ်းတိုးခြင်းသည် တစ်ရက်လျင် တစ်ကြိမ်ထက်ပို၍ လုပ်ခွင့်မပေးပါ။");
                         else
                             doOperatorLicense = true;
                     }
+
                     #region ****** Handle Operator ******
                     //add new operator
                     var operatorDetailDto = await _context.OperatorDetails
