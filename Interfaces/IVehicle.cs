@@ -18,7 +18,7 @@ namespace DOTP_BE.Interfaces
 
         //Task<List<ExtendLicenseVMAdmin>> getVehicleListByStatus(string status);
 
-        Task<ExtendLicenseDashBoardVMAdmin> getVehicleListByStatusAndDate(string status, string fromDate, string toDate);
+        //Task<ExtendLicenseDashBoardVMAdmin> getVehicleListByStatusAndDate(string status, string fromDate, string toDate);
         Task<ExtendLicenseDashBoardVMAdmin> getVehicleListByStatus(ExtenLicenseDbSearchVM dto);
 
         Task<Vehicle> VehicleDetailToCheckById(int id);

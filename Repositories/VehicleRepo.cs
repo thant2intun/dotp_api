@@ -240,17 +240,99 @@ namespace DOTP_BE.Repositories
 
         }
 
+        public async Task<ExtendLicenseDashBoardVMAdmin> getVehicleListByStatusTesting(ExtenLicenseDbSearchVM dto)
+        {
+            var fd = DateTime.Parse(dto.FromDate).Date;
+            var td = DateTime.Parse(dto.ToDate).Date;
+
+            var filteredByDate = await _context.Vehicles.AsNoTracking()
+                .Where(x => x.CreatedDate >= fd && x.CreatedDate <= td)
+                .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
+                .ToListAsync();
+
+            var extendLicenseVMs = filteredByDate
+                                 .Where(x => x.Status.Equals(dto.Status, StringComparison.OrdinalIgnoreCase))
+                                 .GroupBy(x => x.Transaction_Id)
+                                 //.GroupBy(x => new { x.Transaction_Id, x.FormMode })
+                                 .Select(x => new ExtendLicenseVMAdmin
+                                 {
+                                     FormMode = x.Select(g => g.FormMode).Distinct().ToList(),
+                                     LicenseNumberLong = x.First().LicenseNumberLong,
+                                     JourneyTypeLong = x.First().LicenseOnly.JourneyType.JourneyTypeLong,
+                                     TotalCar = x.Count(),
+                                     CreatedDate = x.First().CreatedDate,
+                                     UpdatedDate = x.First().UpdatedDate,
+                                     ExpireDate = x.First().ExpiryDate,
+                                     Status = x.First().Status,
+                                     //Status = x.Select(g => g.Status).Distinct().ToList(),
+                                     TransactionId = x.First().Transaction_Id,
+                                     LicenseTypeId = x.First().LicenseTypeId
+                                 })
+                                 .ToList();
+
+            ExtendLicenseDashBoardVMAdmin result = new ExtendLicenseDashBoardVMAdmin();
+            result.ExtendLicenseVMAdmins = extendLicenseVMs;
+
+
+            #region *** old method ***
+            //ExtendLicenseDashBoardVMAdmin result = new ExtendLicenseDashBoardVMAdmin
+            //{
+            //    PendingCount = extendLicenseVMs.Count(x => x.Status == ConstantValue.Status_Pending),
+            //    ApprovedCount = extendLicenseVMss.Count(c => c.Status == ConstantValue.Status_Approved),
+            //    PaidCount = extendLicenseVMss.Count(c => c.Status == ConstantValue.Status_Paid),
+            //    RejectedCount = extendLicenseVMss.Count(c => c.Status == ConstantValue.Status_Rejected)
+            //};
+
+            //result.ExtendLicenseVMAdmins = extendLicenseVMs.Where(x => x.Status == dto.Status).ToList();
+            ////if (dto.FormMode != null)
+            ////    result.ExtendLicenseVMAdmins = result.ExtendLicenseVMAdmins.Where(x => x.FormMode == dto.FormMode).ToList();
+            //if (dto.JourneyType != 0)
+            //{
+            //    if (dto.JourneyType == 1)
+            //        result.ExtendLicenseVMAdmins = result.ExtendLicenseVMAdmins.Where(x => x.LicenseNumberLong.Contains(ConstantValue.Twin)).ToList();
+            //    else if (dto.JourneyType == 2)
+            //        result.ExtendLicenseVMAdmins = result.ExtendLicenseVMAdmins.Where(x => x.LicenseNumberLong.Contains(ConstantValue.Kyaw)).ToList();
+            //}
+            //if (dto.LicenseType != 0)
+            //{
+            //    if (dto.LicenseType == 1)
+            //        result.ExtendLicenseVMAdmins = result.ExtendLicenseVMAdmins.Where(x => x.LicenseTypeId == 1 ||
+            //                                                                               x.LicenseTypeId == 2 ||
+            //                                                                               x.LicenseTypeId == 3)
+            //                                                                   .ToList();
+            //    else if (dto.LicenseType == 4)
+            //        result.ExtendLicenseVMAdmins = result.ExtendLicenseVMAdmins.Where(x => x.LicenseTypeId == 4)
+            //                                                                   .ToList();
+            //    else if (dto.LicenseType == 5)
+            //        result.ExtendLicenseVMAdmins = result.ExtendLicenseVMAdmins.Where(x => x.LicenseTypeId == 5)
+            //                                                                   .ToList();
+            //    else if (dto.LicenseType == 6)
+            //        result.ExtendLicenseVMAdmins = result.ExtendLicenseVMAdmins.Where(x => x.LicenseTypeId == 6 ||
+            //                                                                               x.LicenseTypeId == 7)
+            //                                                                   .ToList();
+            //    else if (dto.LicenseType == 8)
+            //        result.ExtendLicenseVMAdmins = result.ExtendLicenseVMAdmins.Where(x => x.LicenseTypeId == 8)
+            //                                                                   .ToList();
+            //}
+            #endregion
+           
+            return result;
+        }
+
+
         public async Task<ExtendLicenseDashBoardVMAdmin> getVehicleListByStatus(ExtenLicenseDbSearchVM dto)
         {
             var fd = DateTime.Parse(dto.FromDate).Date;
             var td = DateTime.Parse(dto.ToDate).Date;
-            //var ddate = _context.Vehicles.Select(x => x.CreatedDate.Date).First();
-            //var fdd = DateTime.Parse(ddate);
-            var extendLicenseVMs = await _context.Vehicles.AsNoTracking()
-                                 .Where(x => x.CreatedDate.Date >= fd && x.CreatedDate.Date <= td && x.Status == dto.Status)
-                                 .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
+
+            var filteredByDate = await _context.Vehicles.AsNoTracking()
+                .Where(x => x.CreatedDate >= fd && x.CreatedDate <= td)
+                .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
+                .ToListAsync();
+
+            var extendLicenseVMs = filteredByDate
+                                 .Where(x => x.Status == dto.Status)
                                  .GroupBy(x => x.Transaction_Id)
-                                 //.GroupBy(x => new { x.Transaction_Id, x.FormMode })
                                  .Select(x => new ExtendLicenseVMAdmin
                                  {
                                      FormMode = x.Select(g => g.FormMode).Distinct().ToList(),
@@ -264,20 +346,23 @@ namespace DOTP_BE.Repositories
                                      TransactionId = x.First().Transaction_Id,
                                      LicenseTypeId = x.First().LicenseTypeId
                                  })
-                                 .ToListAsync();
+                                 .ToList();
+
+            int pendingCount = CountByStatus(filteredByDate, ConstantValue.Status_Pending);
+            int approvedCount = CountByStatus(filteredByDate, ConstantValue.Status_Approved);
+            int rejectedCount = CountByStatus(filteredByDate, ConstantValue.Status_Rejected);
+            int paidCount = CountByStatus(filteredByDate, ConstantValue.Status_Paid);
 
 
             ExtendLicenseDashBoardVMAdmin result = new ExtendLicenseDashBoardVMAdmin
             {
-                PendingCount = extendLicenseVMs.Count(x => x.Status == ConstantValue.Status_Pending),
-                ApprovedCount = extendLicenseVMs.Count(c => c.Status == ConstantValue.Status_Approved),
-                PaidCount = extendLicenseVMs.Count(c => c.Status == ConstantValue.Status_Paid),
-                RejectedCount = extendLicenseVMs.Count(c => c.Status == ConstantValue.Status_Rejected)
+                PendingCount = pendingCount,
+                ApprovedCount = approvedCount,
+                PaidCount = paidCount,
+                RejectedCount = rejectedCount,
+                ExtendLicenseVMAdmins = extendLicenseVMs
             };
 
-            result.ExtendLicenseVMAdmins = extendLicenseVMs.Where(x => x.Status == dto.Status).ToList();
-            //if (dto.FormMode != null)
-            //    result.ExtendLicenseVMAdmins = result.ExtendLicenseVMAdmins.Where(x => x.FormMode == dto.FormMode).ToList();
             if (dto.JourneyType != 0)
             {
                 if (dto.JourneyType == 1)
@@ -461,49 +546,51 @@ namespace DOTP_BE.Repositories
 
 
         #region ****** search by Status, From and To Date ******
-        public async Task<ExtendLicenseDashBoardVMAdmin> getVehicleListByStatusAndDate(string status, string fromDate, string toDate)
-        {
-            var fd = DateTime.Parse(fromDate).Date;
-            var td = DateTime.Parse(toDate).Date;
-            //var ddate = _context.Vehicles.Select(x => x.CreatedDate.Date).First();
-            //var fdd = DateTime.Parse(ddate);
-            var extendLicenseVMs = await _context.Vehicles
-                                 .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
-                                 .GroupBy(x => x.Transaction_Id)
-                                 .Select(x => new ExtendLicenseVMAdmin
-                                 {
-                                     //FormMode = x.First().FormMode,
-                                     LicenseNumberLong = x.First().LicenseNumberLong,
-                                     JourneyTypeLong = x.First().LicenseOnly.JourneyType.JourneyTypeLong,
-                                     TotalCar = x.Count(),
-                                     CreatedDate = x.First().CreatedDate.Date,
-                                     UpdatedDate = x.First().UpdatedDate,
-                                     ExpireDate = x.First().ExpiryDate,
-                                     Status = x.First().Status,
-                                     TransactionId = x.First().Transaction_Id
-                                 })
-                                 //.Where(x => x.Status == status &&
-                                 //           (x.FormMode == ConstantValue.EOPL_FM ||z
-                                 //            x.FormMode == ConstantValue.ECL_FM))
-                                 .Where(x => x.CreatedDate >= fd &&
-                                             x.CreatedDate <= td 
-                                             //&&
-                                             //x.FormMode == ConstantValue.EOPL_FM ||
-                                             //x.FormMode == ConstantValue.ECL_FM
-                                             )
-                                 .ToListAsync();
+        //public async Task<ExtendLicenseDashBoardVMAdmin> getVehicleListByStatusAndDate(string status, string fromDate, string toDate)
+        //{
+        //    var fd = DateTime.Parse(fromDate).Date;
+        //    var td = DateTime.Parse(toDate).Date;
+        //    //var ddate = _context.Vehicles.Select(x => x.CreatedDate.Date).First();
+        //    //var fdd = DateTime.Parse(ddate);
+        //    var extendLicenseVMs = await _context.Vehicles
+        //                         .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
+        //                         .GroupBy(x => x.Transaction_Id)
+        //                         .Select(x => new ExtendLicenseVMAdmin
+        //                         {
+        //                             //FormMode = x.First().FormMode,
+        //                             LicenseNumberLong = x.First().LicenseNumberLong,
+        //                             JourneyTypeLong = x.First().LicenseOnly.JourneyType.JourneyTypeLong,
+        //                             TotalCar = x.Count(),
+        //                             CreatedDate = x.First().CreatedDate.Date,
+        //                             UpdatedDate = x.First().UpdatedDate,
+        //                             ExpireDate = x.First().ExpiryDate,
+        //                             Status = x.First().Status,
+        //                             TransactionId = x.First().Transaction_Id
+        //                         })
+        //                         //.Where(x => x.Status == status &&
+        //                         //           (x.FormMode == ConstantValue.EOPL_FM ||z
+        //                         //            x.FormMode == ConstantValue.ECL_FM))
+        //                         .Where(x => x.CreatedDate >= fd &&
+        //                                     x.CreatedDate <= td 
+        //                                     //&&
+        //                                     //x.FormMode == ConstantValue.EOPL_FM ||
+        //                                     //x.FormMode == ConstantValue.ECL_FM
+        //                                     )
+        //                         .ToListAsync();
 
 
-            ExtendLicenseDashBoardVMAdmin result = new ExtendLicenseDashBoardVMAdmin();
-            result.PendingCount = extendLicenseVMs.Count(x => x.Status == ConstantValue.Status_Pending);
-            result.ApprovedCount = extendLicenseVMs.Count(c => c.Status == ConstantValue.Status_Approved);
-            result.PaidCount = extendLicenseVMs.Count(c => c.Status == ConstantValue.Status_Paid);
-            result.RejectedCount = extendLicenseVMs.Count(c => c.Status == ConstantValue.Status_Rejected);
+        //    ExtendLicenseDashBoardVMAdmin result = new ExtendLicenseDashBoardVMAdmin();
+        //    result.PendingCount = extendLicenseVMs.Count(x => x.Status == ConstantValue.Status_Pending);
+        //    result.ApprovedCount = extendLicenseVMs.Count(c => c.Status == ConstantValue.Status_Approved);
+        //    result.PaidCount = extendLicenseVMs.Count(c => c.Status == ConstantValue.Status_Paid);
+        //    result.RejectedCount = extendLicenseVMs.Count(c => c.Status == ConstantValue.Status_Rejected);
 
-            result.ExtendLicenseVMAdmins = extendLicenseVMs.Where(x => x.Status == status).ToList();
+        //    result.ExtendLicenseVMAdmins = extendLicenseVMs.Where(x => x.Status == status).ToList();
 
-            return result;
-        }
+        //    return result;
+        //}
+
+
         #endregion
 
         //public async Task<List<ExtendLicenseVMAdmin>> getVehicleListByStatus(string status)
@@ -1153,5 +1240,13 @@ namespace DOTP_BE.Repositories
         //    }
         //    return true;
         //}        
+
+        private int CountByStatus(IEnumerable<Vehicle> vehicles, string status)
+        {
+            return vehicles
+                .Where(x => x.Status == status)
+                .GroupBy(x => x.Transaction_Id)
+                .Count();
+        }
     }
 }
