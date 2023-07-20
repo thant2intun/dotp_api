@@ -315,23 +315,76 @@ namespace DOTP_BE.Repositories
             //                                                                   .ToList();
             //}
             #endregion
-           
+
             return result;
         }
 
 
-        public async Task<ExtendLicenseDashBoardVMAdmin> getVehicleListByStatus(ExtenLicenseDbSearchVM dto)
+        public async Task<(int, ExtendLicenseDashBoardVMAdmin)> getVehicleListByStatus(ExtenLicenseDbSearchVM dto)
         {
-            var fd = DateTime.Parse(dto.FromDate).Date;
-            var td = DateTime.Parse(dto.ToDate).Date;
+            //var fd = DateTime.Parse(dto.FromDate).Date;
+            //var td = DateTime.Parse(dto.ToDate).Date;
+            if (!DateTime.TryParse(dto.FromDate, out var fd) || !DateTime.TryParse(dto.ToDate, out var td))
+            {
+                // Handle invalid date format
+                // For example, return an error or default values
+                return (0, new ExtendLicenseDashBoardVMAdmin());
+            }
+            fd = fd.Date; //no need for web but for mobile
+            td = td.Date; //no need for web but for mobile
 
             var filteredByDate = await _context.Vehicles.AsNoTracking()
-                .Where(x => x.CreatedDate >= fd && x.CreatedDate <= td)
+                .Where(x => x.CreatedDate >= fd && 
+                            x.CreatedDate <= td &&
+                            x.IsDeleted != true)
                 .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
                 .ToListAsync();
 
+            if (filteredByDate.Count == 0)
+                return (0, new ExtendLicenseDashBoardVMAdmin());
+
+            #region *** Filter by search parameters ***
+            if (!string.IsNullOrWhiteSpace(dto.FormMode))
+                filteredByDate = filteredByDate.Where(x => x.FormMode == dto.FormMode).ToList();
+            if (dto.JourneyType != 0)
+            {
+                if (dto.JourneyType == 1)
+                    filteredByDate = filteredByDate.Where(x => x.LicenseNumberLong.Contains(ConstantValue.Twin)).ToList();
+                else if (dto.JourneyType == 2)
+                    filteredByDate = filteredByDate.Where(x => x.LicenseNumberLong.Contains(ConstantValue.Kyaw)).ToList();
+            }
+            if (dto.LicenseType != 0)
+            {
+                if (dto.LicenseType == 1)
+                    filteredByDate = filteredByDate.Where(x => x.LicenseTypeId == 1 ||
+                                                               x.LicenseTypeId == 2 ||
+                                                               x.LicenseTypeId == 3)
+                                                    .ToList();
+                else if (dto.LicenseType == 4)
+                    filteredByDate = filteredByDate.Where(x => x.LicenseTypeId == 4)
+                                                   .ToList();
+                else if (dto.LicenseType == 5)
+                    filteredByDate = filteredByDate.Where(x => x.LicenseTypeId == 5)
+                                                   .ToList();
+                else if (dto.LicenseType == 6)
+                    filteredByDate = filteredByDate.Where(x => x.LicenseTypeId == 6 ||
+                                                               x.LicenseTypeId == 7)
+                                                   .ToList();
+                else if (dto.LicenseType == 8)
+                    filteredByDate = filteredByDate.Where(x => x.LicenseTypeId == 8)
+                                                   .ToList();
+            }
+            #endregion
+
+            #region *** SQL query ***
+            //select t.Transaction_Id,count(Transaction_Id) T from (SELECT Status,CreatedDate,Transaction_Id
+            //FROM[Dotp_Phase4].[dbo].[Vehicles] where Status = 'Approved') T
+            //group by Transaction_Id
+            #endregion
+
             var extendLicenseVMs = filteredByDate
                                  .Where(x => x.Status == dto.Status)
+                                 .OrderByDescending(x => x.CreatedDate)
                                  .GroupBy(x => x.Transaction_Id)
                                  .Select(x => new ExtendLicenseVMAdmin
                                  {
@@ -346,6 +399,8 @@ namespace DOTP_BE.Repositories
                                      TransactionId = x.First().Transaction_Id,
                                      LicenseTypeId = x.First().LicenseTypeId
                                  })
+                                 .Skip((dto.PageNumber - 1) * dto.PageSize)
+                                 .Take(dto.PageSize)
                                  .ToList();
 
             int pendingCount = CountByStatus(filteredByDate, ConstantValue.Status_Pending);
@@ -353,6 +408,24 @@ namespace DOTP_BE.Repositories
             int rejectedCount = CountByStatus(filteredByDate, ConstantValue.Status_Rejected);
             int paidCount = CountByStatus(filteredByDate, ConstantValue.Status_Paid);
 
+            #region *** Not Use ***
+            int totalCount = 0;
+            switch (dto.Status)
+            {
+                case ConstantValue.Status_Pending:
+                    totalCount = CountByStatus(filteredByDate, ConstantValue.Status_Pending);
+                    break;
+                case ConstantValue.Status_Approved:
+                    totalCount = CountByStatus(filteredByDate, ConstantValue.Status_Approved);
+                    break;
+                case ConstantValue.Status_Rejected:
+                    totalCount = CountByStatus(filteredByDate, ConstantValue.Status_Rejected);
+                    break;
+                case ConstantValue.Status_Paid:
+                    totalCount = CountByStatus(filteredByDate, ConstantValue.Status_Paid);
+                    break;
+            }
+            #endregion
 
             ExtendLicenseDashBoardVMAdmin result = new ExtendLicenseDashBoardVMAdmin
             {
@@ -362,36 +435,7 @@ namespace DOTP_BE.Repositories
                 RejectedCount = rejectedCount,
                 ExtendLicenseVMAdmins = extendLicenseVMs
             };
-
-            if (dto.JourneyType != 0)
-            {
-                if (dto.JourneyType == 1)
-                    result.ExtendLicenseVMAdmins = result.ExtendLicenseVMAdmins.Where(x => x.LicenseNumberLong.Contains(ConstantValue.Twin)).ToList();
-                else if (dto.JourneyType == 2)
-                    result.ExtendLicenseVMAdmins = result.ExtendLicenseVMAdmins.Where(x => x.LicenseNumberLong.Contains(ConstantValue.Kyaw)).ToList();
-            }
-            if (dto.LicenseType != 0)
-            {
-                if (dto.LicenseType == 1)
-                    result.ExtendLicenseVMAdmins = result.ExtendLicenseVMAdmins.Where(x => x.LicenseTypeId == 1 ||
-                                                                                           x.LicenseTypeId == 2 ||
-                                                                                           x.LicenseTypeId == 3)
-                                                                               .ToList();
-                else if (dto.LicenseType == 4)
-                    result.ExtendLicenseVMAdmins = result.ExtendLicenseVMAdmins.Where(x => x.LicenseTypeId == 4)
-                                                                               .ToList();
-                else if (dto.LicenseType == 5)
-                    result.ExtendLicenseVMAdmins = result.ExtendLicenseVMAdmins.Where(x => x.LicenseTypeId == 5)
-                                                                               .ToList();
-                else if (dto.LicenseType == 6)
-                    result.ExtendLicenseVMAdmins = result.ExtendLicenseVMAdmins.Where(x => x.LicenseTypeId == 6 ||
-                                                                                           x.LicenseTypeId == 7)
-                                                                               .ToList();
-                else if (dto.LicenseType == 8)
-                    result.ExtendLicenseVMAdmins = result.ExtendLicenseVMAdmins.Where(x => x.LicenseTypeId == 8)
-                                                                               .ToList();
-            }
-            return result;
+            return (totalCount, result);
         }
 
         #region Currently using 2
@@ -650,7 +694,7 @@ namespace DOTP_BE.Repositories
                                                                 x.FormMode == oLConfirmOrRejectVM.FormMode)
                                                     .ToListAsync();
             if (vehicleObj != null)
-            {   
+            {
                 //if addmin approved
                 if (oLConfirmOrRejectVM.ApprovedOrRejected == ConstantValue.Status_Approved)
                 {
@@ -660,7 +704,7 @@ namespace DOTP_BE.Repositories
 
                     //to prevent more than one time 'ExtendOperatorLicense'
                     bool doOperatorLicense = false;
-                    if(oLConfirmOrRejectVM.FormMode == ConstantValue.EOPL_FM)
+                    if (oLConfirmOrRejectVM.FormMode == ConstantValue.EOPL_FM)
                     {
                         var existingEntry = await _context.OperatorDetails.AsNoTracking()
                                                           .FirstOrDefaultAsync(x => x.FormMode == ConstantValue.EOPL_FM &&
@@ -875,7 +919,7 @@ namespace DOTP_BE.Repositories
                     }
                     else
                     {
-                       //will add other operation
+                        //will add other operation
                     }
                     #endregion
 
@@ -1247,6 +1291,18 @@ namespace DOTP_BE.Repositories
                 .Where(x => x.Status == status)
                 .GroupBy(x => x.Transaction_Id)
                 .Count();
+        }
+
+        public async Task<(int, int, int, List<Vehicle>)> GetVehiclListByPagination(int page, int pageSize)
+        {
+            var vehicles = await _context.Vehicles.AsNoTracking().ToListAsync();
+            int totalCount = vehicles.Count;
+            vehicles = vehicles.OrderBy(x => x.VehicleId)
+                               .Skip((page - 1) * pageSize)
+                               .Take(pageSize)
+                               .ToList();
+
+            return (page, pageSize, totalCount, vehicles);
         }
     }
 }

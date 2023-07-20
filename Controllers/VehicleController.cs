@@ -98,11 +98,9 @@ namespace DOTP_BE.Controllers
         [HttpGet("VehicleListByStatus")]
         public async Task<IActionResult> VehicleListByStatus([FromQuery] ExtenLicenseDbSearchVM dto)
         {
-            var result = await _repo.getVehicleListByStatus(dto);
-            if (result == null)
-                return NotFound();
+            var result = await _repo.getVehicleListByStatus(dto);            
             return Ok(result);
-        }
+        }   
         #endregion
 
         [HttpGet("vehicleDetailToCheckById/{vId}")]
@@ -125,6 +123,20 @@ namespace DOTP_BE.Controllers
         {
             (bool, string?) oky = await _repo.OperatorLicenseConfirmReject(oLConfirmOrRejectVM);
             return Ok(oky);
+        }
+
+        [HttpGet("GetVehiclByPagination/{pageNumber}/{pageSize}")]
+        public async Task<IActionResult> GetVehicleByPagination(int pageNumber, int pageSize)
+        {
+            var res = await _repo.GetVehiclListByPagination(pageNumber, pageSize);
+            return Ok(res);
+        }
+
+
+        [HttpGet("GetVehiclesDataTable")]
+        public async Task<IActionResult> GetVehiclesByModel(ExtenLicenseDbSearchVM dto)
+        {
+            return Ok();
         }
     }
 }

@@ -19,13 +19,13 @@ namespace DOTP_BE.Interfaces
         //Task<List<ExtendLicenseVMAdmin>> getVehicleListByStatus(string status);
 
         //Task<ExtendLicenseDashBoardVMAdmin> getVehicleListByStatusAndDate(string status, string fromDate, string toDate);
-        Task<ExtendLicenseDashBoardVMAdmin> getVehicleListByStatus(ExtenLicenseDbSearchVM dto);
+        Task<(int, ExtendLicenseDashBoardVMAdmin)> getVehicleListByStatus(ExtenLicenseDbSearchVM dto);
 
         Task<Vehicle> VehicleDetailToCheckById(int id);
         Task<bool> UpdateStatusById(int id, string statusDto);
 
         Task<(bool, string?)> OperatorLicenseConfirmReject(OLConfirmOrRejectVM oLConfirmOrRejectVM);
 
-
+        Task<(int, int, int, List<Vehicle>)> GetVehiclListByPagination(int page, int pageSize);
     }
 }

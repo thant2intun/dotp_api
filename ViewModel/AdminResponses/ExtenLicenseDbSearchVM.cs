@@ -8,5 +8,9 @@
         public string? FormMode { get; set; }
         public int? JourneyType { get; set; }
         public int? LicenseType { get; set; }
+
+        //Pagination
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
     }
 }
