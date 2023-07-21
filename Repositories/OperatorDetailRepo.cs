@@ -2705,7 +2705,8 @@ namespace DOTP_BE.Repositories
 
                 var checkTandC = await _context.Vehicles.AsNoTracking()
                         .Where(x => x.LicenseNumberLong == dto.LicenseNumberLong &&
-                                                  x.CreatedDate.Date == DateTime.Now.Date)
+                                    x.CreatedDate.Date == DateTime.Now.Date &&
+                                    x.Status == ConstantValue.Status_Pending) // only for after paid and wanna two transaction_id (no need at the moment)
                         .Select(x => new { x.Transaction_Id, x.ChalenNumber })
                         .FirstOrDefaultAsync();
 
