@@ -334,8 +334,8 @@ namespace DOTP_BE.Repositories
             td = td.Date; //no need for web but for mobile
 
             var filteredByDate = await _context.Vehicles.AsNoTracking()
-                .Where(x => x.CreatedDate >= fd && 
-                            x.CreatedDate <= td &&
+                .Where(x => x.CreatedDate.Date >= fd && 
+                            x.CreatedDate.Date <= td &&
                             x.IsDeleted != true)
                 .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
                 .ToListAsync();

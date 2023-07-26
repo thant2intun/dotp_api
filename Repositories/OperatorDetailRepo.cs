@@ -2737,7 +2737,6 @@ namespace DOTP_BE.Repositories
                 }
                 #endregion
 
-
                 #region *** create for license only folder ***
 
                 string rootPath = _iConfig.GetSection("Upload_FolderPath").Value;
@@ -3238,6 +3237,42 @@ namespace DOTP_BE.Repositories
                 }
                 #endregion
 
+                #region *** for DecreaseCar Over 2 ton ***
+                if (dto.FormMode == ConstantValue.AddNewCar_FM && dto.DecreaseCarsOver2ton != null)
+                {
+                    foreach (var item in dto.DecreaseCarsOver2ton.VehicleIdList)
+                    {
+                        //var vehicleObjN = dto.FormMode == ConstantValue.ChangeLOwnerAddress? 
+                        //                                await _context.Vehicles.FindAsync(item) : 
+                        //                                await _context.Vehicles.Include(x => x.CreateCar).FirstAsync(12);
+
+                        var vehicleObjN = await _context.Vehicles.FindAsync(item);
+
+                        if (vehicleObjN == null)
+                            continue;
+
+                        vehicleObjN.VehicleId = ConstantValue.Zero;
+                        vehicleObjN.Transaction_Id = TransactionIdN;
+                        vehicleObjN.ChalenNumber = ChalenNumberN;
+                        vehicleObjN.Status = ConstantValue.Status_Pending;
+                        vehicleObjN.CertificatePrinted = false;
+                        vehicleObjN.Part1Printed = false;
+                        vehicleObjN.Part2Printed = false;
+                        vehicleObjN.TrianglePrinted = false;
+                        vehicleObjN.IsCurrent = false;
+                        vehicleObjN.IsDeleted = false;
+                        vehicleObjN.FormMode = dto.FormMode;
+                        vehicleObjN.CreatedDate = DateTime.Now;
+                        vehicleObjN.LicenseOnlyId = licenOnlys.LicenseOnlyId;
+                        vehicleObjN.NRC_Number = licenOnlys.NRC_Number;
+                        vehicleObjN.License_Number = licenOnlys.License_Number.Substring(2, licenOnlys.License_Number.IndexOf("(") - 3);
+                        vehicleObjN.LicenseNumberLong = licenOnlys.License_Number;
+
+                        _context.Vehicles.Add(vehicleObjN);
+                    }
+                }
+                #endregion
+
                 await _context.SaveChangesAsync();
                 return (true, false); // (done, not duplicate)
             }
@@ -3245,5 +3280,39 @@ namespace DOTP_BE.Repositories
             return (false, false); //(not done, not duplicate)
         }
 
+        public async Task<(LicenseOnly?, string?)> LicenseDetailForOver2ton(string licenseNumberLong)
+        {
+            var vehicleObj = await _context.Vehicles
+                   .AsNoTracking()
+                   .Where(x => x.LicenseNumberLong == licenseNumberLong)
+                   .Include(x => x.LicenseOnly).ThenInclude(x => x.RegistrationOffice)
+                   .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
+                  .OrderByDescending(x => x.ApplyDate)
+                   .Select(x => new { x.NRC_Number, x.LicenseOnly, x.ExpiryDate})
+                   .FirstOrDefaultAsync();
+                   //.ToListAsync();
+
+            if (vehicleObj == null)
+                return (null, null);
+
+            if (vehicleObj.ExpiryDate.HasValue && vehicleObj.ExpiryDate.Value.Date < DateTime.Now.Date)
+                return (null, "လွဲယူမည့်သူ၏ လုပ်ငန်းလိုင်စင်သည် သက်တမ်းကုန်နေပါသည်။");
+            if (!vehicleObj.ExpiryDate.HasValue)
+                return (null, "လွဲယူမည့်သူ၏ လုပ်ငန်းလိုင်စင် သည် သက်တမ်းကုန်ဆုံးရက် မှားရွှင်းနေပါသည်။");
+
+            if (vehicleObj.LicenseOnly == null)
+            {
+                var licenseOnlyObj = await _context.LicenseOnlys.AsNoTracking()
+                    .Where(x => x.License_Number == licenseNumberLong && x.NRC_Number == vehicleObj.NRC_Number)
+                    .OrderByDescending(x => x.CreatedDate)
+                    .FirstOrDefaultAsync();
+
+                if (licenseOnlyObj != null)
+                    return (null, null);
+                return (licenseOnlyObj, null);
+            }
+            return (vehicleObj.LicenseOnly, null);
+
+        }
     }
 }

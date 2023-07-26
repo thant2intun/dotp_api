@@ -816,5 +816,12 @@ namespace DOTP_BE.Controllers
             return Ok(response);
             //return Ok(dto); // for testing only
         }
+
+        [HttpGet("LicenseDetailForOver2ton/{dto}")]
+        public async Task<IActionResult> LicenseDetailForOver2ton(string dto)
+        {
+            var resp = await _iopeartorDetail.LicenseDetailForOver2ton(dto.Replace("*","/"));
+            return Ok(resp);
+        }
     }
 }
