@@ -17,7 +17,9 @@ namespace DOTP_BE.Interfaces
 
         //Task<bool> UpdateLicenseAttach(ToUpdateLicenseOnlyVM doUpdateLDto); //ok pdf
 
+        Task<(bool, bool)> ExtendOperatorLicenseProcessNotUse(OperatorLicenseAttachVM operatorLicenseAttachVM);
         Task<(bool, bool)> ExtendOperatorLicenseProcess(OperatorLicenseAttachVM operatorLicenseAttachVM);
+
         //Task<string> VehicleAttach(List<CarAttachedFileVM> carAttachedFilelVM);
         //Task<string> VehicleAttach(OperatorLicenseAttachVM carAttachedFilelVM, string rootPath); //ok pdf
 

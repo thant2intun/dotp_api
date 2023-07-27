@@ -91,3 +91,189 @@ D:\DOTP\Testing\New folder (4)\DOTP-API\obj\Debug\net6.0\DOTP_BE.xml
 D:\DOTP\Testing\New folder (4)\DOTP-API\obj\Debug\net6.0\DOTP_BE.pdb
 D:\DOTP\Testing\New folder (4)\DOTP-API\obj\Debug\net6.0\DOTP_BE.genruntimeconfig.cache
 D:\DOTP\Testing\New folder (4)\DOTP-API\obj\Debug\net6.0\ref\DOTP_BE.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\appsettings.Development.json
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\appsettings.json
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\DOTP_BE.exe
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\DOTP_BE.deps.json
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\DOTP_BE.runtimeconfig.json
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\DOTP_BE.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\DOTP_BE.pdb
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\DOTP_BE.xml
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\AutoMapper.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\IronBarCode.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\SixLabors.Fonts.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\SixLabors.ImageSharp.Drawing.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\BitMiracle.LibTiff.NET.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\Humanizer.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\IronSoftware.Drawing.Common.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\itextsharp.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\MailKit.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\System.Web.Cors.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\Microsoft.AspNetCore.JsonPatch.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\Microsoft.Data.SqlClient.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\Microsoft.EntityFrameworkCore.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\Microsoft.EntityFrameworkCore.Design.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\Microsoft.EntityFrameworkCore.Relational.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\Microsoft.EntityFrameworkCore.SqlServer.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\Microsoft.Identity.Client.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\Microsoft.IdentityModel.JsonWebTokens.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\Microsoft.IdentityModel.Logging.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\Microsoft.IdentityModel.Protocols.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\Microsoft.IdentityModel.Tokens.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\Microsoft.OpenApi.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\Microsoft.Win32.SystemEvents.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\MimeKit.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\NETCore.MailKit.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\Newtonsoft.Json.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\Newtonsoft.Json.Bson.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\BouncyCastle.Crypto.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\SixLabors.ImageSharp.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\Swashbuckle.AspNetCore.Swagger.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\System.Configuration.ConfigurationManager.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\System.Drawing.Common.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\System.IdentityModel.Tokens.Jwt.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\System.Runtime.Caching.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\System.Security.Cryptography.ProtectedData.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\System.Security.Permissions.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\System.Windows.Extensions.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\runtimes\linux-x64\native\IronPdfInterop.so
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\runtimes\osx-arm64\native\IronPdfInterop.dylib
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\runtimes\osx-x64\native\IronPdfInterop.dylib
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\runtimes\win-x64\native\IronPdfInterop.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\runtimes\win-x86\native\IronPdfInterop.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\runtimes\unix\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\runtimes\win\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\runtimes\win-arm\native\Microsoft.Data.SqlClient.SNI.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\runtimes\win\lib\netcoreapp3.0\Microsoft.Win32.SystemEvents.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\runtimes\unix\lib\netcoreapp3.0\System.Drawing.Common.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\runtimes\win\lib\netcoreapp3.0\System.Drawing.Common.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\runtimes\win\lib\netstandard2.0\System.Runtime.Caching.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\bin\Debug\net6.0\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\obj\Debug\net6.0\DOTP_BE.csproj.AssemblyReference.cache
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\obj\Debug\net6.0\DOTP_BE.Properties.Resources.resources
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\obj\Debug\net6.0\DOTP_BE.csproj.GenerateResource.cache
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\obj\Debug\net6.0\DOTP_BE.GeneratedMSBuildEditorConfig.editorconfig
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\obj\Debug\net6.0\DOTP_BE.AssemblyInfoInputs.cache
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\obj\Debug\net6.0\DOTP_BE.AssemblyInfo.cs
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\obj\Debug\net6.0\DOTP_BE.csproj.CoreCompileInputs.cache
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\obj\Debug\net6.0\DOTP_BE.MvcApplicationPartsAssemblyInfo.cs
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\obj\Debug\net6.0\DOTP_BE.MvcApplicationPartsAssemblyInfo.cache
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\obj\Debug\net6.0\staticwebassets\msbuild.DOTP_BE.Microsoft.AspNetCore.StaticWebAssets.props
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\obj\Debug\net6.0\staticwebassets\msbuild.build.DOTP_BE.props
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\obj\Debug\net6.0\staticwebassets\msbuild.buildMultiTargeting.DOTP_BE.props
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\obj\Debug\net6.0\staticwebassets\msbuild.buildTransitive.DOTP_BE.props
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\obj\Debug\net6.0\staticwebassets.pack.json
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\obj\Debug\net6.0\staticwebassets.build.json
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\obj\Debug\net6.0\staticwebassets.development.json
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\obj\Debug\net6.0\scopedcss\bundle\DOTP_BE.styles.css
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\obj\Debug\net6.0\DOTP_BE.csproj.CopyComplete
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\obj\Debug\net6.0\DOTP_BE.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\obj\Debug\net6.0\refint\DOTP_BE.dll
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\obj\Debug\net6.0\DOTP_BE.xml
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\obj\Debug\net6.0\DOTP_BE.pdb
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\obj\Debug\net6.0\DOTP_BE.genruntimeconfig.cache
+D:\DOTP\Testing\New folder (4)\Developing\DOTP-API\obj\Debug\net6.0\ref\DOTP_BE.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\appsettings.Development.json
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\appsettings.json
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\DOTP_BE.exe
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\DOTP_BE.deps.json
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\DOTP_BE.runtimeconfig.json
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\DOTP_BE.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\DOTP_BE.pdb
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\DOTP_BE.xml
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\AutoMapper.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\IronBarCode.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\SixLabors.Fonts.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\SixLabors.ImageSharp.Drawing.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\BitMiracle.LibTiff.NET.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\Humanizer.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\IronSoftware.Drawing.Common.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\itextsharp.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\MailKit.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\System.Web.Cors.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\Microsoft.AspNetCore.JsonPatch.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\Microsoft.Data.SqlClient.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\Microsoft.EntityFrameworkCore.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\Microsoft.EntityFrameworkCore.Design.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\Microsoft.EntityFrameworkCore.Relational.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\Microsoft.EntityFrameworkCore.SqlServer.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\Microsoft.Identity.Client.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\Microsoft.IdentityModel.JsonWebTokens.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\Microsoft.IdentityModel.Logging.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\Microsoft.IdentityModel.Protocols.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\Microsoft.IdentityModel.Tokens.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\Microsoft.OpenApi.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\Microsoft.Win32.SystemEvents.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\MimeKit.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\NETCore.MailKit.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\Newtonsoft.Json.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\Newtonsoft.Json.Bson.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\BouncyCastle.Crypto.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\SixLabors.ImageSharp.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\Swashbuckle.AspNetCore.Swagger.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\System.Configuration.ConfigurationManager.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\System.Drawing.Common.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\System.IdentityModel.Tokens.Jwt.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\System.Runtime.Caching.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\System.Security.Cryptography.ProtectedData.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\System.Security.Permissions.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\System.Windows.Extensions.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\runtimes\linux-x64\native\IronPdfInterop.so
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\runtimes\osx-arm64\native\IronPdfInterop.dylib
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\runtimes\osx-x64\native\IronPdfInterop.dylib
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\runtimes\win-x64\native\IronPdfInterop.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\runtimes\win-x86\native\IronPdfInterop.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\runtimes\unix\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\runtimes\win\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\runtimes\win-arm\native\Microsoft.Data.SqlClient.SNI.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\runtimes\win\lib\netcoreapp3.0\Microsoft.Win32.SystemEvents.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\runtimes\unix\lib\netcoreapp3.0\System.Drawing.Common.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\runtimes\win\lib\netcoreapp3.0\System.Drawing.Common.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\runtimes\win\lib\netstandard2.0\System.Runtime.Caching.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\bin\Debug\net6.0\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\obj\Debug\net6.0\DOTP_BE.csproj.AssemblyReference.cache
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\obj\Debug\net6.0\DOTP_BE.Properties.Resources.resources
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\obj\Debug\net6.0\DOTP_BE.csproj.GenerateResource.cache
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\obj\Debug\net6.0\DOTP_BE.GeneratedMSBuildEditorConfig.editorconfig
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\obj\Debug\net6.0\DOTP_BE.AssemblyInfoInputs.cache
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\obj\Debug\net6.0\DOTP_BE.AssemblyInfo.cs
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\obj\Debug\net6.0\DOTP_BE.csproj.CoreCompileInputs.cache
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\obj\Debug\net6.0\DOTP_BE.MvcApplicationPartsAssemblyInfo.cs
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\obj\Debug\net6.0\DOTP_BE.MvcApplicationPartsAssemblyInfo.cache
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\obj\Debug\net6.0\staticwebassets\msbuild.DOTP_BE.Microsoft.AspNetCore.StaticWebAssets.props
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\obj\Debug\net6.0\staticwebassets\msbuild.build.DOTP_BE.props
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\obj\Debug\net6.0\staticwebassets\msbuild.buildMultiTargeting.DOTP_BE.props
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\obj\Debug\net6.0\staticwebassets\msbuild.buildTransitive.DOTP_BE.props
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\obj\Debug\net6.0\staticwebassets.pack.json
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\obj\Debug\net6.0\staticwebassets.build.json
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\obj\Debug\net6.0\staticwebassets.development.json
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\obj\Debug\net6.0\scopedcss\bundle\DOTP_BE.styles.css
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\obj\Debug\net6.0\DOTP_BE.csproj.CopyComplete
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\obj\Debug\net6.0\DOTP_BE.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\obj\Debug\net6.0\refint\DOTP_BE.dll
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\obj\Debug\net6.0\DOTP_BE.xml
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\obj\Debug\net6.0\DOTP_BE.pdb
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\obj\Debug\net6.0\DOTP_BE.genruntimeconfig.cache
+D:\DOTP\Testing\New folder (4)\All In One Row\DOTP-API\obj\Debug\net6.0\ref\DOTP_BE.dll

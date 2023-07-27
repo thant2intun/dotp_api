@@ -247,6 +247,13 @@ namespace DOTP_BE.Controllers
         #endregion
 
         //al_05_05_2023 (Save As PDF)
+        [HttpPost("OperatorLicenseAttachNotUse")]
+        public async Task<IActionResult> AddOperatorLicenseAttachNotUse([FromForm] OperatorLicenseAttachVM operatorLicenseAttachVM)
+        {
+            (bool, bool) response = await _iopeartorDetail.ExtendOperatorLicenseProcess(operatorLicenseAttachVM);
+            return Ok(response);
+        }
+
         [HttpPost("OperatorLicenseAttach")]
         public async Task<IActionResult> AddOperatorLicenseAttach([FromForm] OperatorLicenseAttachVM operatorLicenseAttachVM)
         {

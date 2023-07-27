@@ -27,7 +27,12 @@ namespace DOTP_BE.ViewModel
 
         //For decrease car 
         public List<DecreaseCar_Sub6>? DecreaseCars { get; set; }
-        public DecreaseCarOver2ton_Sub7? DecreaseCarsOver2ton { get; set; }
+        public List<DecreaseCarOver2ton_Sub7>? DecreaseCarsOver2ton { get; set; }
+
+        //public DecreaseCarOver2ton_Sub7? DecreaseCarsOver2ton { get; set; }
+
+        //for Extend Operator License
+        public List<ExtendOperatorLicense_Sub8>? ExtendOperatorLicense { get; set; }
 
     } 
 
@@ -35,6 +40,7 @@ namespace DOTP_BE.ViewModel
     {
         public int CreateCarId { get; set; }
         public string VehicleOwnerAddress { get; set; }
+        public string Township_Name { get; set; } //need to send from FE
     }
 
     public class ChangeLOwnerAddress_Sub2
@@ -93,7 +99,20 @@ namespace DOTP_BE.ViewModel
 
     public class DecreaseCarOver2ton_Sub7
     {
-        public List<int> VehicleIdList { get; set; }
+        //public List<int> VehicleIdList { get; set; }
         //public int RecieverVehicleId { get; set; }
+        public int VehicleID { get; set; }
+        public List<IFormFile>? NewOwnerBook { get; set; }
+        public List<IFormFile>? NewTriangle { get; set; }
+        public List<IFormFile>? NewAttachedFile2 { get; set; }
+    }
+
+    public class ExtendOperatorLicense_Sub8
+    {
+        public int VehicleId { get; set; }
+        public List<IFormFile>? TriangleFiles { get; set; }
+        public List<IFormFile>? OwnerBookFiles { get; set; }
+        public List<IFormFile>? AttachedFiles1 { get; set; }
+        public List<IFormFile>? AttachedFiles2 { get; set; }
     }
 }

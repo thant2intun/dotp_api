@@ -473,7 +473,7 @@ namespace DOTP_BE.Repositories
         }
 
         //public async Task<string> VehicleAttach(List<CarAttachedFileVM> carAttachedFilelVM)
-        public async Task<(bool, bool)> ExtendOperatorLicenseProcess(OperatorLicenseAttachVM dto)
+        public async Task<(bool, bool)> ExtendOperatorLicenseProcessNotUse(OperatorLicenseAttachVM dto)
         {
             if (dto.TakeNewRecord != null && dto.TakeNewRecord == true)
             {
@@ -708,6 +708,261 @@ namespace DOTP_BE.Repositories
             }
             return (false, false); //(not done, not duplicate)
         }
+
+        public async Task<(bool, bool)> ExtendOperatorLicenseProcess(OperatorLicenseAttachVM dto)
+        {
+            if (dto.TakeNewRecord != null && dto.TakeNewRecord == true)
+            {
+                var dataToDelete = await _context.Vehicles.AsNoTracking()
+                    .Where(x => x.LicenseNumberLong == dto.licenseNumberLong &&
+                                x.FormMode == dto.FormMode &&
+                                x.Status == ConstantValue.Status_Pending &&
+                                x.CreatedDate.Date == DateTime.Now.Date)
+                    .ToListAsync();
+                _context.Vehicles.RemoveRange(dataToDelete);
+                //await _context.SaveChangesAsync(); // if with T_id only have one fromMode and delete it cause duplicate then will change new T_id and prevent if something wrong not delete it
+            }
+            else
+            {
+                bool checkFormModeDuplicate = await _context.Vehicles.AsNoTracking()
+                           .AnyAsync(x => x.CreatedDate.Date == DateTime.Now.Date &&
+                                          x.LicenseNumberLong == dto.licenseNumberLong &&
+                                          x.FormMode == dto.FormMode &&
+                                          x.Status == ConstantValue.Status_Pending);
+
+                if (checkFormModeDuplicate)
+                    return (false, true); //duplicate formMode in one single day (not done, duplicate)
+            }
+
+            var licenOnlys = await _context.LicenseOnlys.AsNoTracking()
+                    .Where(x => x.License_Number == dto.licenseNumberLong.Replace("**", "/") &&
+                                x.NRC_Number == dto.NRC)
+                    .OrderByDescending(x => x.CreatedDate)
+                    .FirstOrDefaultAsync();
+
+            if (licenOnlys != null)
+            {
+                #region *** generate new Transaction and Chalen ID ***
+
+                //var checkTandC = await _context.Vehicles.AsNoTracking()
+                //        .FirstOrDefaultAsync(x => x.LicenseNumberLong == dto.licenseNumberLong &&
+                //                                  x.CreatedDate.Date == DateTime.Now.Date);
+
+                var checkTandC = await _context.Vehicles.AsNoTracking()
+                       .Where(x => x.LicenseNumberLong == dto.licenseNumberLong &&
+                                                 x.CreatedDate.Date == DateTime.Now.Date)
+                       .Select(x => new { x.Transaction_Id, x.ChalenNumber })
+                       .FirstOrDefaultAsync();
+
+                string TransactionIdN = string.Empty;
+                string ChalenNumberN = string.Empty;
+
+                if (checkTandC == null)
+                {
+                    //var vehicleObj = await _context.Vehicles.AsNoTracking().ToListAsync();
+                    var vehicleObj = await _context.Vehicles.AsNoTracking().Where(x => x.CreatedDate >= DateTime.Now.Date.AddMonths(-1)).ToListAsync();
+                    //ရှိတမျ data အကုန်ဆွဲ ထုတ်တာထက် လက်ရှိရောက်နေတဲ့ ခုနှစ်ထက် တစ်လလောက် နောက်ဆုတ်ပီး ဆွဲထုတ်တာ ပိုပေါ့ (if there is no operation duing last month it would wrong)
+
+
+                    int tG = vehicleObj.OrderByDescending(x => x.Transaction_Id)
+                                       .Select(x => x.Transaction_Id.Split('_').LastOrDefault())
+                                       .Select(x => int.TryParse(x, out int val) ? val : int.MinValue)
+                                       .FirstOrDefault(); //order by year and then other number
+
+                    int cG = vehicleObj.OrderByDescending(x => x.ChalenNumber)
+                                       .Select(x => x.ChalenNumber.Split('_').LastOrDefault())
+                                       .Select(x => int.TryParse(x, out int val) ? val : int.MinValue)
+                                       .FirstOrDefault();
+
+                    TransactionIdN = new CommonMethod().GenerateT_IdandC_Id("T", ++tG, 9); //generate Id
+                    ChalenNumberN = new CommonMethod().GenerateT_IdandC_Id("C", ++cG, 7); //generate I
+                }
+                else
+                {
+                    TransactionIdN = checkTandC.Transaction_Id;
+                    ChalenNumberN = checkTandC.ChalenNumber;
+                }
+                #endregion
+
+                #region *** create for license only folder ***
+
+                string rootPath = _iConfig.GetSection("Upload_FolderPath").Value;
+                string firstFolderName = new CommonMethod().FilePathNameString(dto.licenseNumberLong);
+                string dateFolderName = Path.Combine("Extention_Care", DateTime.Now.ToString("yyyyMMdd"));
+                string rootFolder = Path.Combine(dateFolderName, firstFolderName);
+                string savePath = Path.Combine(rootPath, rootFolder);
+                string rootFolderR = rootFolder.Replace("\\", "/");
+                try
+                {
+                    if (!Directory.Exists(savePath))
+                        Directory.CreateDirectory(savePath);
+                }
+                catch (Exception e) { Console.WriteLine(e.ToString()); }
+                #endregion
+
+                #region *** Save License Attached Files ***
+
+                string pathAttachFile_NRC = "";
+                if (dto.AttachFile_NRC != null)
+                {
+                    bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(dto.AttachFile_NRC, savePath + "\\NRC.pdf");
+                    if (oky)
+                        pathAttachFile_NRC = rootFolderR + "/NRC.pdf";
+                }
+
+                string pathAttachFile_M10 = "";
+                if (dto.AttachFile_M10 != null)
+                {
+                    bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(dto.AttachFile_M10, savePath + "\\M10.pdf");
+                    if (oky)
+                        pathAttachFile_M10 = rootFolderR + "/M10.pdf";
+                }
+
+                string pathAttachFile_RecommandDoc1 = "";
+                if (dto.AttachFile_RecommandDoc1 != null)
+                {
+                    bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(dto.AttachFile_RecommandDoc1, savePath + "\\Doc1.pdf");
+                    if (oky)
+                        pathAttachFile_RecommandDoc1 = rootFolderR + "/Doc1.pdf";
+                }
+
+                string pathAttachFile_RecommandDoc2 = "";
+                if (dto.AttachFile_RecommandDoc2 != null)
+                {
+                    bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(dto.AttachFile_RecommandDoc2, savePath + "\\Doc2.pdf");
+                    if (oky)
+                        pathAttachFile_RecommandDoc2 = rootFolderR + "/Doc2.pdf";
+                }
+
+                string pathAttachFile_OperatorLicense = "";
+                if (dto.AttachFile_OperatorLicense != null)
+                {
+                    bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(dto.AttachFile_OperatorLicense, savePath + "\\OperatorLicense.pdf");
+                    if (oky)
+                        pathAttachFile_OperatorLicense = rootFolderR + "/OperatorLicense.pdf";
+                }
+
+                string pathAttachFile_Part1 = "";
+                if (dto.AttachFile_Part1 != null)
+                {
+                    bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(dto.AttachFile_Part1, savePath + "\\Part1.pdf");
+                    if (oky)
+                        pathAttachFile_Part1 = rootFolderR + "/Part1.pdf";
+                }
+                #endregion
+
+                Temp_Table tempTable = new Temp_Table();
+
+                #region *** LicenseOnly Process ***
+                //licenOnlys.Transaction_Id = TransactionIdN;
+                //licenOnlys.AttachFile_NRC = pathAttachFile_NRC;
+                //licenOnlys.AttachFile_M10 = pathAttachFile_M10;
+                //licenOnlys.AttachFile_Part1 = pathAttachFile_Part1;
+                //licenOnlys.AttachFile_RecommandDoc1 = pathAttachFile_RecommandDoc1;
+                //licenOnlys.AttachFile_RecommandDoc2 = pathAttachFile_RecommandDoc2;
+                //licenOnlys.AttachFile_OperatorLicense = pathAttachFile_OperatorLicense;
+                //licenOnlys.UpdatedDate = DateTime.Now;
+                //licenOnlys.FormMode = dto.FormMode;
+                //_context.LicenseOnlys.Update(licenOnlys);
+
+                tempTable.LicenseOnlyId = licenOnlys.LicenseOnlyId;
+                tempTable.Transaction_Id = TransactionIdN;
+                tempTable.LicenseNumberLong = licenOnlys.License_Number;
+                tempTable.NRC_Number = licenOnlys.NRC_Number;
+                tempTable.AttachFile_NRC = pathAttachFile_NRC;
+                tempTable.AttachFile_M10 = pathAttachFile_M10;
+                tempTable.AttachFile_Part1 = pathAttachFile_Part1;
+                tempTable.AttachFile_RecommandDoc1 = pathAttachFile_RecommandDoc1;
+                tempTable.AttachFile_RecommandDoc2 = pathAttachFile_RecommandDoc2;
+                tempTable.FormMode = dto.FormMode;
+                tempTable.CreatedDate = DateTime.Now;
+
+                #endregion
+
+                #region *** ExtendOperator record add in Vehicle Table ***
+                foreach (var item in dto.CarAttachedFiles)
+                {
+                    var vehicle = await _context.Vehicles.AsNoTracking().SingleOrDefaultAsync(x => x.VehicleId == item.CreateCarId);
+                    if (vehicle != null)
+                    {
+                        //vehicleWeightIdObj = vehicle.VehicleWeightId; //each license number long of weight are same
+                        //create folder
+                        string vehicleFolderName = "VehicleId_" + item.CreateCarId;
+                        //string dateFolderName = Path.Combine("Vehicle_AttachedFiles", DateTime.Now.ToString("yyyyMMdd"), vehicleFolderName);
+                        string vehicleSavePath = Path.Combine(rootPath, dateFolderName);
+                        string dateFolderNameR = dateFolderName.Replace("\\", "/");
+
+                        try
+                        {
+                            if (!Directory.Exists(vehicleSavePath))
+                                Directory.CreateDirectory(vehicleSavePath);
+                        }
+                        catch (Exception e) { Console.WriteLine(e.ToString()); }
+
+                        // save TriangleFiles
+                        string pathTriangleFiles = string.Empty;
+                        if (item.TriangleFiles != null)
+                        {
+                            bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(item.TriangleFiles, vehicleSavePath + "\\Triangle.pdf");
+                            if (oky)
+                                pathTriangleFiles = dateFolderNameR + "/Triangle.pdf";
+                        }
+
+                        // save OwnerBookFiles
+                        string pathOwnerBookFiles = string.Empty;
+                        if (item.OwnerBookFiles != null)
+                        {
+                            bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(item.OwnerBookFiles, vehicleSavePath + "\\OwnerBook.pdf");
+                            if (oky)
+                                pathOwnerBookFiles = dateFolderNameR + "/OwnerBook.pdf";
+                        }
+
+                        // save AttachedFiles1
+                        string pathAttachedFiles1 = string.Empty;
+                        if (item.AttachedFiles1 != null)
+                        {
+                            bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(item.AttachedFiles1, vehicleSavePath + "\\CarAttached1.pdf");
+                            if (oky)
+                                pathAttachedFiles1 = dateFolderNameR + "/CarAttached1.pdf";
+                        }
+
+                        // save AttachedFiles2
+                        string pathAttachedFiles2 = string.Empty;
+                        if (item.AttachedFiles2 != null)
+                        {
+                            bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(item.AttachedFiles2, vehicleSavePath + "\\CarAttached2.pdf");
+                            if (oky)
+                                pathAttachedFiles2 = dateFolderNameR + "/CarAttached2.pdf";
+                        }
+
+
+                        vehicle.VehicleId = ConstantValue.Zero; //for new insert
+                        vehicle.Transaction_Id = TransactionIdN;
+                        vehicle.ChalenNumber = ChalenNumberN;
+                        vehicle.Triangle = pathTriangleFiles;
+                        vehicle.OwnerBook = pathOwnerBookFiles;
+                        vehicle.AttachedFile1 = pathAttachedFiles1;
+                        vehicle.AttachedFile2 = pathAttachedFiles2;
+                        vehicle.CreatedDate = DateTime.Now;
+                        vehicle.CertificatePrinted = false;
+                        vehicle.Part1Printed = false;
+                        vehicle.Part2Printed = false;
+                        vehicle.TrianglePrinted = false;
+                        vehicle.License_Number = vehicle.LicenseNumberLong.Substring(2, vehicle.LicenseNumberLong.IndexOf("(") - 3);
+                        vehicle.Status = ConstantValue.Status_Pending;
+                        vehicle.FormMode = ConstantValue.EOPL_FM; //form mode for extendoperatorlicense
+                        _context.Vehicles.Add(vehicle);
+                    }
+                }
+                #endregion
+
+                _context.Temp_Tables.Add(tempTable);
+                await _context.SaveChangesAsync();
+                return (true, false); // (done, not duplicate)
+            }
+            return (false, false); //(not done, not duplicate)
+        }
+
 
         //ok pdf
         //public async Task<string> VehicleAttach(OperatorLicenseAttachVM carAttachedFilelVM, string rootPath)
@@ -2694,10 +2949,11 @@ namespace DOTP_BE.Repositories
             }
 
 
-            var licenOnlys = await _context.LicenseOnlys.Where(x => x.License_Number == dto.LicenseNumberLong.Replace("**", "/") &&
-                                                                        x.NRC_Number == dto.NRC_Number)
-                                                            .OrderByDescending(x => x.CreatedDate)
-                                                            .FirstOrDefaultAsync();
+            var licenOnlys = await _context.LicenseOnlys.AsNoTracking()
+                    .Where(x => x.License_Number == dto.LicenseNumberLong.Replace("**", "/") &&
+                                x.NRC_Number == dto.NRC_Number)
+                    .OrderByDescending(x => x.CreatedDate)
+                    .FirstOrDefaultAsync();
 
             if (licenOnlys != null)
             {
@@ -2715,7 +2971,12 @@ namespace DOTP_BE.Repositories
 
                 if (checkTandC == null)
                 {
-                    var vehicleObj = await _context.Vehicles.AsNoTracking().ToListAsync();
+                    //var vehicleObj = await _context.Vehicles.AsNoTracking().ToListAsync();
+
+                    //ရှိတမျ data အကုန်ဆွဲ ထုတ်တာထက် လက်ရှိရောက်နေတဲ့ ခုနှစ်ထက် တစ်လလောက် နောက်ဆုတ်ပီး ဆွဲထုတ်တာ ပိုပေါ့ (if there is no operation duing last month it would wrong)
+                    var vehicleObj = await _context.Vehicles.AsNoTracking()
+                        .Where(x => x.CreatedDate >= DateTime.Now.Date.AddMonths(-1))
+                        .ToListAsync();
 
                     int tG = vehicleObj.OrderByDescending(x => x.Transaction_Id)
                                        .Select(x => x.Transaction_Id.Split('_').LastOrDefault())
@@ -2756,11 +3017,11 @@ namespace DOTP_BE.Repositories
                 #region *** Save License Attached Files ***
 
                 string pathAttachFile_NRC = string.Empty;
-                string AttachFile_M10 = string.Empty;
-                string AttachFile_RecommandDoc1 = string.Empty;
-                string AttachFile_RecommandDoc2 = string.Empty;
-                string AttachFile_OperatorLicense = string.Empty;
-                string AttachFile_Part1 = string.Empty;
+                string pathAttachFile_M10 = string.Empty;
+                string pathAttachFile_RecommandDoc1 = string.Empty;
+                string pathAttachFile_RecommandDoc2 = string.Empty;
+                string pathAttachFile_OperatorLicense = string.Empty;
+                string pathAttachFile_Part1 = string.Empty;
 
                 // Save AttachFile_NRC
                 if (dto.LicenseAttachedFiles.AttachFile_NRC != null)
@@ -2775,7 +3036,7 @@ namespace DOTP_BE.Repositories
                 {
                     bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(dto.LicenseAttachedFiles.AttachFile_M10, licenseOnlySavePath + "\\AttachFile_M10.pdf");
                     if (oky)
-                        AttachFile_M10 = licenseOnlyDateFolderNameR + "/AttachFile_M10.pdf";
+                        pathAttachFile_M10 = licenseOnlyDateFolderNameR + "/AttachFile_M10.pdf";
                 }
 
                 // Save AttachFile_RecommandDoc1
@@ -2783,7 +3044,7 @@ namespace DOTP_BE.Repositories
                 {
                     bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(dto.LicenseAttachedFiles.AttachFile_RecommandDoc1, licenseOnlySavePath + "\\AttachFile_RecommandDoc1.pdf");
                     if (oky)
-                        AttachFile_RecommandDoc1 = licenseOnlyDateFolderNameR + "/AttachFile_RecommandDoc1.pdf";
+                        pathAttachFile_RecommandDoc1 = licenseOnlyDateFolderNameR + "/AttachFile_RecommandDoc1.pdf";
                 }
 
                 // Save AttachFile_RecommandDoc2
@@ -2791,7 +3052,7 @@ namespace DOTP_BE.Repositories
                 {
                     bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(dto.LicenseAttachedFiles.AttachFile_RecommandDoc2, licenseOnlySavePath + "\\AttachFile_RecommandDoc2.pdf");
                     if (oky)
-                        AttachFile_RecommandDoc2 = licenseOnlyDateFolderNameR + "/AttachFile_RecommandDoc2.pdf";
+                        pathAttachFile_RecommandDoc2 = licenseOnlyDateFolderNameR + "/AttachFile_RecommandDoc2.pdf";
                 }
 
                 // Save AttachFile_OperatorLicense
@@ -2799,7 +3060,7 @@ namespace DOTP_BE.Repositories
                 {
                     bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(dto.LicenseAttachedFiles.AttachFile_OperatorLicense, licenseOnlySavePath + "\\AttachFile_OperatorLicense.pdf");
                     if (oky)
-                        AttachFile_OperatorLicense = licenseOnlyDateFolderNameR + "/AttachFile_OperatorLicense.pdf";
+                        pathAttachFile_OperatorLicense = licenseOnlyDateFolderNameR + "/AttachFile_OperatorLicense.pdf";
                 }
 
                 // Save AttachFile_Part1
@@ -2807,58 +3068,106 @@ namespace DOTP_BE.Repositories
                 {
                     bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(dto.LicenseAttachedFiles.AttachFile_Part1, licenseOnlySavePath + "\\AttachFile_Part1.pdf");
                     if (oky)
-                        AttachFile_Part1 = licenseOnlyDateFolderNameR + "/AttachFile_Part1.pdf";
+                        pathAttachFile_Part1 = licenseOnlyDateFolderNameR + "/AttachFile_Part1.pdf";
                 }
                 #endregion
 
+                List<Temp_Table> temp_TablesList = new List<Temp_Table>();
+                Temp_Table tempTable = new Temp_Table();
+
                 #region *** LicenseOnly Process ***
-                licenOnlys.Transaction_Id = TransactionIdN;
-                licenOnlys.AttachFile_NRC = pathAttachFile_NRC;
-                licenOnlys.AttachFile_M10 = AttachFile_M10;
-                licenOnlys.AttachFile_Part1 = AttachFile_Part1;
-                licenOnlys.AttachFile_RecommandDoc1 = AttachFile_RecommandDoc1;
-                licenOnlys.AttachFile_RecommandDoc2 = AttachFile_RecommandDoc2;
-                licenOnlys.AttachFile_OperatorLicense = AttachFile_OperatorLicense;
-                licenOnlys.UpdatedDate = DateTime.Now;
-                licenOnlys.FormMode = dto.FormMode;
+
+                #region **** NOT USE ****
+                //licenOnlys.Transaction_Id = TransactionIdN;
+                //licenOnlys.AttachFile_NRC = pathAttachFile_NRC;
+                //licenOnlys.AttachFile_M10 = AttachFile_M10;
+                //licenOnlys.AttachFile_Part1 = AttachFile_Part1;
+                //licenOnlys.AttachFile_RecommandDoc1 = AttachFile_RecommandDoc1;
+                //licenOnlys.AttachFile_RecommandDoc2 = AttachFile_RecommandDoc2;
+                //licenOnlys.AttachFile_OperatorLicense = AttachFile_OperatorLicense;
+                //licenOnlys.UpdatedDate = DateTime.Now;
+                //licenOnlys.FormMode = dto.FormMode;
+
+                //if (dto.FormMode == ConstantValue.ChangeLOwnerAddress && dto.ChangeLicenseAddress != null) //for license owner address change
+                //{
+                //    licenOnlys.Address = dto.ChangeLicenseAddress.Address;
+                //    licenOnlys.Township_Name = dto.ChangeLicenseAddress.Township_Name;
+                //}
+                //_context.LicenseOnlys.Update(licenOnlys);
+                #endregion
+
+                tempTable.LicenseOnlyId = licenOnlys.LicenseOnlyId;
+                tempTable.Transaction_Id = TransactionIdN;
+                tempTable.ChalenNumber = ChalenNumberN;
+                tempTable.LicenseNumberLong = licenOnlys.License_Number;
+                tempTable.NRC_Number = licenOnlys.NRC_Number;
+                tempTable.AttachFile_NRC = pathAttachFile_NRC;
+                tempTable.AttachFile_M10 = pathAttachFile_M10;
+                tempTable.AttachFile_Part1 = pathAttachFile_Part1;
+                tempTable.AttachFile_RecommandDoc1 = pathAttachFile_RecommandDoc1;
+                tempTable.AttachFile_RecommandDoc2 = pathAttachFile_RecommandDoc2;
+                tempTable.FormMode = dto.FormMode;
+                tempTable.Status = ConstantValue.Status_Pending;
+                tempTable.CreatedDate = DateTime.Now;
 
                 if (dto.FormMode == ConstantValue.ChangeLOwnerAddress && dto.ChangeLicenseAddress != null) //for license owner address change
                 {
-                    licenOnlys.Address = dto.ChangeLicenseAddress.Address;
-                    licenOnlys.Township_Name = dto.ChangeLicenseAddress.Township_Name;
+                    tempTable.L_Address = dto.ChangeLicenseAddress.Address;
+                    tempTable.L_Township_Name = dto.ChangeLicenseAddress.Township_Name;
                 }
-                _context.LicenseOnlys.Update(licenOnlys);
                 #endregion
+
+                //Temp_Table tempCopy = tempTable.DeepCopy();
+
 
                 #region *** for License Address change ***
                 if (dto.FormMode == ConstantValue.ChangeLOwnerAddress && dto.ChangeLicenseAddress != null)
                 {
-                    foreach (var item in dto.ChangeLicenseAddress.vehicleIdList)
+                    foreach (var vehicleId in dto.ChangeLicenseAddress.vehicleIdList)
                     {
-                        //var vehicleObjN = dto.FormMode == ConstantValue.ChangeLOwnerAddress? 
-                        //                                await _context.Vehicles.FindAsync(item) : 
-                        //                                await _context.Vehicles.Include(x => x.CreateCar).FirstAsync(12);
-
-                        var vehicleObjN = await _context.Vehicles.FindAsync(item);
+                        // each vehicleId of data can't be same so you should find for each
+                        var vehicleObjN = await _context.Vehicles.AsNoTracking()
+                            .SingleOrDefaultAsync(x => x.VehicleId == vehicleId);
 
                         if (vehicleObjN == null)
                             continue;
 
-                        vehicleObjN.VehicleId = ConstantValue.Zero;
-                        vehicleObjN.Transaction_Id = TransactionIdN;
-                        vehicleObjN.ChalenNumber = ChalenNumberN;
-                        vehicleObjN.Status = ConstantValue.Status_Pending;
-                        vehicleObjN.CertificatePrinted = false;
-                        vehicleObjN.Part1Printed = false;
-                        vehicleObjN.Part2Printed = false;
-                        vehicleObjN.TrianglePrinted = false;
-                        vehicleObjN.IsCurrent = false;
-                        vehicleObjN.IsDeleted = false;
-                        vehicleObjN.FormMode = dto.FormMode;
-                        vehicleObjN.CreatedDate = DateTime.Now;
-                        vehicleObjN.LicenseOnlyId = licenOnlys.LicenseOnlyId;
+                        Temp_Table temp_sub = tempTable.DeepCopy();
+                        temp_sub.VehicleId = vehicleObjN.VehicleId;
+                        temp_sub.ApplicantId = vehicleObjN.ApplicantId;
+                        temp_sub.VehicleNumber = vehicleObjN.VehicleNumber;
+                        temp_sub.V_VehicleLineTitle = vehicleObjN.VehicleLineTitle;
+                        temp_sub.V_CarryLogisticType = vehicleObjN.CarryLogisticType;
+                        temp_sub.V_VehicleLocation = vehicleObjN.VehicleLocation;
+                        temp_sub.V_VehicleDesiredRoute = vehicleObjN.VehicleDesiredRoute;
+                        temp_sub.RefTransactionId = vehicleObjN.RefTransactionId;
+                        temp_sub.Triangle = vehicleObjN.Triangle;
+                        temp_sub.OwnerBook = vehicleObjN.OwnerBook;
+                        temp_sub.AttachedFile1 = vehicleObjN.AttachedFile1;
+                        temp_sub.AttachedFile2 = vehicleObjN.AttachedFile2;
+                        temp_sub.VehicleWeightId = vehicleObjN.VehicleWeightId;
+                        temp_sub.CreateCarId = vehicleObjN.CreateCarId;
+                        temp_sub.LicenseTypeId = vehicleObjN.LicenseTypeId;
+                        temp_sub.OperatorId = vehicleObjN.OperatorId;                       
 
-                        _context.Vehicles.Add(vehicleObjN);
+                        temp_TablesList.Add(temp_sub);
+                        #region *** Old ***
+                        //vehicleObjN.VehicleId = ConstantValue.Zero;
+                        //vehicleObjN.Transaction_Id = TransactionIdN;
+                        //vehicleObjN.ChalenNumber = ChalenNumberN;
+                        //vehicleObjN.Status = ConstantValue.Status_Pending;
+                        //vehicleObjN.CertificatePrinted = false;
+                        //vehicleObjN.Part1Printed = false;
+                        //vehicleObjN.Part2Printed = false;
+                        //vehicleObjN.TrianglePrinted = false;
+                        //vehicleObjN.IsCurrent = false;
+                        //vehicleObjN.IsDeleted = false;
+                        //vehicleObjN.FormMode = dto.FormMode;
+                        //vehicleObjN.CreatedDate = DateTime.Now;
+                        //vehicleObjN.LicenseOnlyId = licenOnlys.LicenseOnlyId;
+
+                        //await _context.Vehicles.AddAsync(vehicleObjN);
+                        #endregion
                     }
                 }
                 #endregion
@@ -2868,53 +3177,56 @@ namespace DOTP_BE.Repositories
                 {
                     foreach (var item in dto.ChangeVehicleAddress)
                     {
-                        var vehicleObjN = await _context.Vehicles.Include(x => x.CreateCar)
-                                                                 .SingleOrDefaultAsync(x => x.VehicleId == item.CreateCarId);
-                        //var gCreateCar_id = await _context.CreateCars.OrderByDescending(x =>  x.CreateCarId).
+                        var vehicleObjN = await _context.Vehicles.AsNoTracking()
+                            .SingleOrDefaultAsync(x => x.VehicleId == item.CreateCarId);
+                        
                         if (vehicleObjN == null)
                             continue;
 
-                        //var newCar = new CreateCar
-                        //{
-                        //    VehicleOwnerAddress = item.VehicleOwnerAddress,
-                        //    VehicleNumber = vehicleObjN.CreateCar.VehicleNumber,
-                        //    VehicleBrand = vehicleObjN.CreateCar.VehicleBrand,
-                        //    VehicleType = vehicleObjN.CreateCar.VehicleType,
-                        //    CreatedDate = DateTime.Now
-                        //};
-
-                        //for create car table
-                        //vehicleObjN.CreateCarId = ConstantValue.Zero; //when add new
-                        //vehicleObjN.CreateCar.VehicleOwnerAddress = item.VehicleOwnerAddress;
-                        //vehicleObjN.CreateCar.CreatedDate = DateTime.Now; //when add new
-                        //vehicleObjN.CreateCar.UpdatedDate = DateTime.Now;
-                        //var crObj = _context.CreateCars.Add(newCar);
-                        //await _context.CreateCars.AddAsync(vehicleObjN.CreateCar);
-                        //_context.CreateCars.Update(vehicleObjN.CreateCar);
-                        //await _context.SaveChangesAsync();
-
                         //for vehicle table
-                        vehicleObjN.VehicleId = ConstantValue.Zero;
-                        vehicleObjN.Transaction_Id = TransactionIdN;
-                        vehicleObjN.ChalenNumber = ChalenNumberN;
-                        vehicleObjN.Status = ConstantValue.Status_Pending;
-                        vehicleObjN.CertificatePrinted = false;
-                        vehicleObjN.Part1Printed = false;
-                        vehicleObjN.Part2Printed = false;
-                        vehicleObjN.TrianglePrinted = false;
-                        vehicleObjN.IsCurrent = false;
-                        vehicleObjN.IsDeleted = false;
-                        vehicleObjN.FormMode = dto.FormMode;
-                        vehicleObjN.CreatedDate = DateTime.Now;
-                        vehicleObjN.LicenseOnlyId = licenOnlys.LicenseOnlyId;
 
-                        await _context.Vehicles.AddAsync(vehicleObjN);
+                        #region *** Old ***
+                        //vehicleObjN.VehicleId = ConstantValue.Zero;
+                        //vehicleObjN.Transaction_Id = TransactionIdN;
+                        //vehicleObjN.ChalenNumber = ChalenNumberN;
+                        //vehicleObjN.Status = ConstantValue.Status_Pending;
+                        //vehicleObjN.CertificatePrinted = false;
+                        //vehicleObjN.Part1Printed = false;
+                        //vehicleObjN.Part2Printed = false;
+                        //vehicleObjN.TrianglePrinted = false;
+                        //vehicleObjN.IsCurrent = false;
+                        //vehicleObjN.IsDeleted = false;
+                        //vehicleObjN.FormMode = dto.FormMode;
+                        //vehicleObjN.CreatedDate = DateTime.Now;
+                        //vehicleObjN.LicenseOnlyId = licenOnlys.LicenseOnlyId;
+                        //await _context.Vehicles.AddAsync(vehicleObjN);
+                        #endregion
 
-                        //for create car table
-                        vehicleObjN.CreateCar.VehicleOwnerAddress = item.VehicleOwnerAddress;
-                        vehicleObjN.CreateCar.UpdatedDate = DateTime.Now;
-                        _context.CreateCars.Update(vehicleObjN.CreateCar);
+                        Temp_Table temp_sub = tempTable.DeepCopy();
+                        temp_sub.VehicleId = vehicleObjN.VehicleId;
+                        temp_sub.ApplicantId = vehicleObjN.ApplicantId;
+                        temp_sub.V_VehicleNumber = vehicleObjN.VehicleNumber;
+                        temp_sub.V_VehicleLineTitle = vehicleObjN.VehicleLineTitle;
+                        temp_sub.V_CarryLogisticType = vehicleObjN.CarryLogisticType;
+                        temp_sub.V_VehicleLocation = vehicleObjN.VehicleLocation;
+                        temp_sub.V_VehicleDesiredRoute = vehicleObjN.VehicleDesiredRoute;
+                        temp_sub.RefTransactionId = vehicleObjN.RefTransactionId;
+                        temp_sub.Triangle = vehicleObjN.Triangle;
+                        temp_sub.OwnerBook = vehicleObjN.OwnerBook;
+                        temp_sub.AttachedFile1 = vehicleObjN.AttachedFile1;
+                        temp_sub.AttachedFile2 = vehicleObjN.AttachedFile2;
+                        temp_sub.VehicleWeightId = vehicleObjN.VehicleWeightId;
+                        temp_sub.CreateCarId = vehicleObjN.CreateCarId;
+                        temp_sub.LicenseTypeId = vehicleObjN.LicenseTypeId;
+                        temp_sub.OperatorId = vehicleObjN.OperatorId;
 
+
+                        //for create car table 
+                        temp_sub.CreateCarId = vehicleObjN.CreateCarId; // (to get old data)
+                        temp_sub.VehicleOwnerAddress = item.VehicleOwnerAddress; //(new address)
+                        temp_sub.VehicleLocation = item.Township_Name; //(new address)
+
+                        temp_TablesList.Add(temp_sub);
                     }
                 }
                 #endregion
@@ -2924,8 +3236,10 @@ namespace DOTP_BE.Repositories
                 {
                     foreach (var item in dto.ChangeVehicleType)
                     {
-                        var vehicleObjN = await _context.Vehicles.Include(x => x.CreateCar)
-                                                                 .SingleOrDefaultAsync(x => x.VehicleId == item.VehicleId);
+                        var vehicleObjN = await _context.Vehicles.AsNoTracking()
+                            .Include(x => x.CreateCar)
+                            .SingleOrDefaultAsync(x => x.VehicleId == item.VehicleId);
+
                         if (vehicleObjN == null)
                             continue;
 
@@ -2990,35 +3304,36 @@ namespace DOTP_BE.Repositories
                         }
                         #endregion
 
-                        //for vehicle table
-                        vehicleObjN.VehicleId = ConstantValue.Zero;
-                        vehicleObjN.Transaction_Id = TransactionIdN;
-                        vehicleObjN.ChalenNumber = ChalenNumberN;
-                        vehicleObjN.Status = ConstantValue.Status_Pending;
-                        vehicleObjN.CertificatePrinted = false;
-                        vehicleObjN.Part1Printed = false;
-                        vehicleObjN.Part2Printed = false;
-                        vehicleObjN.TrianglePrinted = false;
-                        vehicleObjN.IsCurrent = false;
-                        vehicleObjN.IsDeleted = false;
-                        vehicleObjN.Triangle = triangelFile;
-                        vehicleObjN.OwnerBook = ownerBookFile;
-                        vehicleObjN.AttachedFile1 = pathAttachedFile1;
-                        vehicleObjN.AttachedFile2 = pathAttachedFile2;
-                        vehicleObjN.FormMode = dto.FormMode;
-                        vehicleObjN.CreatedDate = DateTime.Now;
-                        vehicleObjN.LicenseOnlyId = licenOnlys.LicenseOnlyId;
-                        await _context.Vehicles.AddAsync(vehicleObjN);
+                        Temp_Table temp_sub = tempTable.DeepCopy();
+                        temp_sub.VehicleId = vehicleObjN.VehicleId;
+                        temp_sub.ApplicantId = vehicleObjN.ApplicantId;
+                        temp_sub.V_VehicleNumber = vehicleObjN.VehicleNumber;
+                        temp_sub.V_VehicleLineTitle = vehicleObjN.VehicleLineTitle;
+                        temp_sub.V_CarryLogisticType = vehicleObjN.CarryLogisticType;
+                        temp_sub.V_VehicleLocation = vehicleObjN.VehicleLocation;
+                        temp_sub.V_VehicleDesiredRoute = vehicleObjN.VehicleDesiredRoute;
+                        temp_sub.RefTransactionId = vehicleObjN.RefTransactionId;
+                        temp_sub.Triangle = triangelFile;
+                        temp_sub.OwnerBook = ownerBookFile;
+                        temp_sub.AttachedFile1 = pathAttachedFile1;
+                        temp_sub.AttachedFile2 = pathAttachedFile2;
+                        temp_sub.VehicleWeightId = vehicleObjN.VehicleWeightId;
+                        temp_sub.LicenseTypeId = vehicleObjN.LicenseTypeId;
+                        temp_sub.OperatorId = vehicleObjN.OperatorId;
 
-                        //for create car table
-                        //vehicleObjN.CreateCarId = ConstantValue.Zero; //when add new
-                        vehicleObjN.CreateCar.VehicleType = item.VehicleType;
-                        vehicleObjN.CreateCar.VehicleBrand = item.VehicleBrand;
-                        vehicleObjN.CreateCar.VehicleWeight = item.VehicleWeight;
-                        vehicleObjN.CreateCar.CreatedDate = DateTime.Now; //when add new
-                        vehicleObjN.CreateCar.UpdatedDate = DateTime.Now;
-                        //_context.CreateCars.Add(vehicleObjN.CreateCar);
-                        _context.CreateCars.Update(vehicleObjN.CreateCar);
+                        //for create car table 
+                        temp_sub.CreateCarId = vehicleObjN.CreateCarId; // (to get old data)
+
+                        temp_sub.Old_VehicleType = vehicleObjN.CreateCar.VehicleType;
+                        temp_sub.VehicleType = item.VehicleType; //(new )
+
+                        temp_sub.Old_VehicleBrand = vehicleObjN.CreateCar.VehicleBrand;
+                        temp_sub.VehicleBrand = item.VehicleBrand; //(new )
+
+                        temp_sub.Old_VehicleWeight = vehicleObjN.CreateCar.VehicleWeight;
+                        temp_sub.VehicleWeight = item.VehicleWeight; //(new )
+
+                        temp_TablesList.Add(temp_sub);
                     }
                 }
                 #endregion
@@ -3028,122 +3343,166 @@ namespace DOTP_BE.Repositories
                 {
                     foreach (var item in dto.ChangeVehicleOwnerName)
                     {
-                        var vehicleObjN = await _context.Vehicles.Include(x => x.CreateCar)
-                                                                 .SingleOrDefaultAsync(x => x.VehicleId == item.VehicleId);
+                        var vehicleObjN = await _context.Vehicles.AsNoTracking()
+                            .Include(x => x.CreateCar)
+                            .SingleOrDefaultAsync(x => x.VehicleId == item.VehicleId);
+
                         if (vehicleObjN == null)
                             continue;
 
-                        //for vehicle table
-                        vehicleObjN.VehicleId = ConstantValue.Zero;
-                        vehicleObjN.Transaction_Id = TransactionIdN;
-                        vehicleObjN.ChalenNumber = ChalenNumberN;
-                        vehicleObjN.Status = ConstantValue.Status_Pending;
-                        vehicleObjN.CertificatePrinted = false;
-                        vehicleObjN.Part1Printed = false;
-                        vehicleObjN.Part2Printed = false;
-                        vehicleObjN.TrianglePrinted = false;
-                        vehicleObjN.IsCurrent = false;
-                        vehicleObjN.IsDeleted = false;
-                        vehicleObjN.FormMode = dto.FormMode;
-                        vehicleObjN.CreatedDate = DateTime.Now;
-                        vehicleObjN.LicenseOnlyId = licenOnlys.LicenseOnlyId;
-                        await _context.Vehicles.AddAsync(vehicleObjN);
-
                         //for create car table
-                        //vehicleObjN.CreateCar.CreateCarId = ConstantValue.Zero; // for add
-                        vehicleObjN.CreateCar.VehicleOwnerAddress = item.VehicleOwnerAddress;
-                        vehicleObjN.CreateCar.VehicleOwnerName = item.VehicleOwnerName;
-                        vehicleObjN.CreateCar.VehicleOwnerNRC = item.VehicleOwnerNRC;
-                        vehicleObjN.CreateCar.CreatedDate = DateTime.Now;
-                        vehicleObjN.CreateCar.UpdatedDate = DateTime.Now;
-                        //_context.CreateCars.Add(vehicleObjN.CreateCar);
-                        _context.CreateCars.Update(vehicleObjN.CreateCar);
+                        #region *** old not used ***
+                        ////vehicleObjN.CreateCar.CreateCarId = ConstantValue.Zero; // for add
+                        //vehicleObjN.CreateCar.VehicleOwnerAddress = item.VehicleOwnerAddress;
+                        //vehicleObjN.CreateCar.VehicleOwnerName = item.VehicleOwnerName;
+                        //vehicleObjN.CreateCar.VehicleOwnerNRC = item.VehicleOwnerNRC;
+                        //vehicleObjN.CreateCar.CreatedDate = DateTime.Now;
+                        //vehicleObjN.CreateCar.UpdatedDate = DateTime.Now;
+                        ////_context.CreateCars.Add(vehicleObjN.CreateCar);
+                        //_context.CreateCars.Update(vehicleObjN.CreateCar);
+                        #endregion                        
+
+                        Temp_Table temp_sub = tempTable.DeepCopy();
+                        temp_sub.VehicleId = vehicleObjN.VehicleId;
+                        temp_sub.ApplicantId = vehicleObjN.ApplicantId;
+                        temp_sub.V_VehicleNumber = vehicleObjN.VehicleNumber;
+                        temp_sub.V_VehicleLineTitle = vehicleObjN.VehicleLineTitle;
+                        temp_sub.V_CarryLogisticType = vehicleObjN.CarryLogisticType;
+                        temp_sub.V_VehicleLocation = vehicleObjN.VehicleLocation;
+                        temp_sub.V_VehicleDesiredRoute = vehicleObjN.VehicleDesiredRoute;
+                        temp_sub.RefTransactionId = vehicleObjN.RefTransactionId;
+                        temp_sub.Triangle = vehicleObjN.Triangle;
+                        temp_sub.OwnerBook = vehicleObjN.OwnerBook;
+                        temp_sub.AttachedFile1 = vehicleObjN.AttachedFile1;
+                        temp_sub.AttachedFile2 = vehicleObjN.AttachedFile2;
+                        temp_sub.VehicleWeightId = vehicleObjN.VehicleWeightId;
+                        temp_sub.CreateCarId = vehicleObjN.CreateCarId;
+                        temp_sub.LicenseTypeId = vehicleObjN.LicenseTypeId;
+                        temp_sub.OperatorId = vehicleObjN.OperatorId;
+
+                        //for create car table 
+                        temp_sub.Old_VehicleOwnerAddress = vehicleObjN.CreateCar.VehicleOwnerAddress;
+                        temp_sub.VehicleOwnerAddress = item.VehicleOwnerAddress; //(new)
+
+                        temp_sub.Old_VehicleOwnerName = vehicleObjN.CreateCar.VehicleOwnerName;
+                        temp_sub.VehicleOwnerName = item.VehicleOwnerName;
+
+                        temp_sub.Old_VehicleOwnerNRC = vehicleObjN.CreateCar.VehicleOwnerNRC;
+                        temp_sub.VehicleOwnerNRC = item.VehicleOwnerNRC;
+
+                        temp_TablesList.Add(temp_sub);
                     }
                 }
                 #endregion
 
                 #region *** for AddNewCar ***
-                if(dto.FormMode == ConstantValue.AddNewCar_FM && dto.AddNewCars != null)
+                if (dto.FormMode == ConstantValue.AddNewCar_FM && dto.AddNewCars != null)
                 {
-                    var vehiclForAddNewCar = await _context.Vehicles
-                        .Where(x => x.LicenseNumberLong == dto.LicenseNumberLong &&
-                                                  x.NRC_Number == dto.NRC_Number)
-                        .OrderByDescending(x => x.ApplyDate)
+
+                    int applicantId = await _context.Vehicles.AsNoTracking()
+                        .Where(x => x.LicenseNumberLong == dto.LicenseNumberLong && x.NRC_Number == dto.NRC_Number)
+                        .Select(x => x.ApplicantId)
                         .FirstOrDefaultAsync();
-                    if (vehiclForAddNewCar != null)
+
+
+                    foreach (var item in dto.AddNewCars)
                     {
-                        foreach (var item in dto.AddNewCars)
+                        #region *** Old not use ***
+                        //var newCar = new CreateCar();
+                        //newCar.VehicleNumber = item.vehicleNumber;
+                        //newCar.VehicleBrand = item.vehicleBrand;
+                        //newCar.VehicleType = item.vehicleType;
+                        //newCar.VehicleLocation = item.vehicleLocation;
+                        //newCar.VehicleOwnerName = item.vehicleOwnerName;
+                        //newCar.VehicleOwnerNRC = item.vehicleOwnerNRC;
+                        //newCar.VehicleOwnerAddress = item.vehicleOwnerAddress;
+                        //newCar.IsDeleted = false;
+                        //newCar.CreatedDate = DateTime.Now;
+                        //newCar.VehicleWeight = item.vehicleWeight;
+
+                        //await _context.CreateCars.AddAsync(newCar);
+                        //await _context.SaveChangesAsync();
+                        //Vehicle newVehicle = new Vehicle
+                        //{
+                        //    Transaction_Id = TransactionIdN,
+                        //    ChalenNumber = ChalenNumberN,
+                        //    NRC_Number = dto.NRC_Number,
+                        //    ApplicantId = applicantId,
+                        //    License_Number = dto.LicenseNumberLong.Substring(2, dto.LicenseNumberLong.IndexOf("(") - 3),
+                        //    LicenseNumberLong = dto.LicenseNumberLong,
+                        //    VehicleNumber = item.vehicleNumber,
+                        //    VehicleLocation = item.vehicleLocation,
+                        //    Status = ConstantValue.Status_Pending,
+                        //    CertificatePrinted = false,
+                        //    Part1Printed = false,
+                        //    Part2Printed = false,
+                        //    TrianglePrinted = false,
+                        //    ApplyDate = DateTime.Now,
+                        //    ExpiryDate = DateTime.Now,
+                        //    FormMode = dto.FormMode,
+                        //    RefTransactionId = 0,
+                        //    OwnerBook = pathOwnerBookFiles,
+                        //    AttachedFile1 = pathAttachedFiles1,
+                        //    LicenseOnlyId = licenOnlys.LicenseOnlyId,
+                        //    CreatedDate = DateTime.Now,
+                        //    CreateCarId = newCar.CreateCarId
+                        //};
+                        //await _context.Vehicles.AddAsync(newVehicle);
+                        #endregion
+
+
+                        #region *** save attached file for CreateNew ***
+                        string pathOwnerBookFiles = string.Empty;
+                        string pathAttachedFiles1 = string.Empty;
+
+                        string vehicleFolderName = "VehicleId_" + item.vehicleNumber;
+                        string vehicleDateFolerName = Path.Combine("Vehicle_AttachedFiles", DateTime.Now.ToString("yyyyMMdd"), vehicleFolderName);
+                        string vehicleSavePath = Path.Combine(rootPath, vehicleDateFolerName);
+                        string vehicleLateFolderNameR = vehicleDateFolerName.Replace("\\", "/");
+
+                        try
                         {
-                            var newCar = new CreateCar();
-                            newCar.VehicleNumber = item.vehicleNumber;
-                            newCar.VehicleBrand = item.vehicleBrand;
-                            newCar.VehicleType = item.vehicleType;
-                            newCar.VehicleLocation = item.vehicleLocation;
-                            newCar.VehicleOwnerName = item.vehicleOwnerName;
-                            newCar.VehicleOwnerNRC = item.vehicleOwnerNRC;
-                            newCar.VehicleOwnerAddress = item.vehicleOwnerAddress;
-                            newCar.IsDeleted = false;
-                            newCar.CreatedDate = DateTime.Now;
-                            newCar.VehicleWeight = item.vehicleWeight;
-
-                            await _context.CreateCars.AddAsync(newCar);
-                            await _context.SaveChangesAsync();
-
-                            string pathOwnerBookFiles = string.Empty;
-                            string pathAttachedFiles1 = string.Empty;
-
-                            string vehicleFolderName = "VehicleId_" + newCar.CreateCarId;
-                            string vehicleDateFolerName = Path.Combine("Vehicle_AttachedFiles", DateTime.Now.ToString("yyyyMMdd"), vehicleFolderName);
-                            string vehicleSavePath = Path.Combine(rootPath, vehicleDateFolerName);
-                            string vehicleLateFolderNameR = vehicleDateFolerName.Replace("\\", "/");
-
-                            try
-                            {
-                                if (!Directory.Exists(vehicleSavePath))
-                                    Directory.CreateDirectory(vehicleSavePath);
-                            }
-                            catch (Exception e) { Console.WriteLine(e.ToString()); }
-
-                            // Save OwnerBook
-                            if (item.OwnerBookFiles != null)
-                            {
-                                bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(item.OwnerBookFiles, vehicleSavePath + "\\OwnerBook.pdf");
-                                if (oky)
-                                    pathOwnerBookFiles = vehicleLateFolderNameR + "/OwnerBook.pdf";
-                            }
-
-                            // Save AttachedFile1
-                            if (item.AttachedFiles1 != null)
-                            {
-                                bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(item.AttachedFiles1, vehicleSavePath + "\\CarAttached1.pdf");
-                                if (oky)
-                                    pathAttachedFiles1 = vehicleLateFolderNameR + "/CarAttached1.pdf";
-                            }
-
-                            vehiclForAddNewCar.VehicleId = ConstantValue.Zero;
-                            vehiclForAddNewCar.Transaction_Id = TransactionIdN;
-                            vehiclForAddNewCar.ChalenNumber = ChalenNumberN;
-                            vehiclForAddNewCar.VehicleNumber = item.vehicleNumber;
-                            vehiclForAddNewCar.CertificatePrinted = false;
-                            vehiclForAddNewCar.Part1Printed = false;
-                            vehiclForAddNewCar.Part2Printed = false;
-                            vehiclForAddNewCar.TrianglePrinted = false;
-                            vehiclForAddNewCar.Status = "Pending";
-                            vehiclForAddNewCar.IsCurrent = false;
-                            vehiclForAddNewCar.IsDeleted = false;
-                            vehiclForAddNewCar.FormMode = ConstantValue.AddNewCar_FM;
-                            vehiclForAddNewCar.Triangle = null;
-                            vehiclForAddNewCar.OwnerBook = null;
-                            vehiclForAddNewCar.OwnerBook = pathOwnerBookFiles;
-                            vehiclForAddNewCar.AttachedFile1 = pathAttachedFiles1;
-                            vehiclForAddNewCar.LicenseOnlyId = licenOnlys.LicenseOnlyId;
-                            vehiclForAddNewCar.CreatedBy = "Sooner";
-                            vehiclForAddNewCar.CreatedDate = DateTime.Now;
-                            vehiclForAddNewCar.CreateCarId = newCar.CreateCarId;
-
-                            await _context.Vehicles.AddAsync(vehiclForAddNewCar);
-                            //await _context.SaveChangesAsync();
+                            if (!Directory.Exists(vehicleSavePath))
+                                Directory.CreateDirectory(vehicleSavePath);
                         }
+                        catch (Exception e) { Console.WriteLine(e.ToString()); }
+
+                        // Save OwnerBook
+                        if (item.OwnerBookFiles != null)
+                        {
+                            bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(item.OwnerBookFiles, vehicleSavePath + "\\OwnerBook.pdf");
+                            if (oky)
+                                pathOwnerBookFiles = vehicleLateFolderNameR + "/OwnerBook.pdf";
+                        }
+
+                        // Save AttachedFile1
+                        if (item.AttachedFiles1 != null)
+                        {
+                            bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(item.AttachedFiles1, vehicleSavePath + "\\CarAttached1.pdf");
+                            if (oky)
+                                pathAttachedFiles1 = vehicleLateFolderNameR + "/CarAttached1.pdf";
+                        }
+                        #endregion
+
+                        Temp_Table temp_sub = tempTable.DeepCopy();
+                        temp_sub.ApplicantId = applicantId;
+                        temp_sub.V_VehicleNumber = item.vehicleNumber;
+                        temp_sub.V_VehicleLocation = item.vehicleLocation;
+                        temp_sub.OwnerBook = pathOwnerBookFiles;
+                        temp_sub.AttachedFile1 = pathAttachedFiles1;
+
+                        //for create car table 
+                        temp_sub.CreateCarId = ConstantValue.Zero;
+                        temp_sub.VehicleNumber = item.vehicleNumber;
+                        temp_sub.VehicleBrand = item.vehicleBrand;
+                        temp_sub.VehicleType = item.vehicleType;
+                        temp_sub.VehicleLocation = item.vehicleLocation;
+                        temp_sub.VehicleOwnerName = item.vehicleOwnerName;
+                        temp_sub.VehicleOwnerNRC = item.vehicleOwnerNRC;
+                        temp_sub.VehicleOwnerAddress = item.vehicleOwnerAddress;
+                        temp_sub.VehicleWeight = item.vehicleWeight;
+
+                        temp_TablesList.Add(temp_sub);
                     }
                 }
                 #endregion
@@ -3153,11 +3512,8 @@ namespace DOTP_BE.Repositories
                 {
                     foreach (var item in dto.DecreaseCars)
                     {
-                        //var vehicleObjN = dto.FormMode == ConstantValue.ChangeLOwnerAddress? 
-                        //                                await _context.Vehicles.FindAsync(item) : 
-                        //                                await _context.Vehicles.Include(x => x.CreateCar).FirstAsync(12);
-
-                        var vehicleObjN = await _context.Vehicles.FindAsync(item.VehicleID);
+                        var vehicleObjN = await _context.Vehicles.AsNoTracking()
+                            .SingleOrDefaultAsync(x => x.VehicleId == item.VehicleID);
 
                         if (vehicleObjN == null)
                             continue;
@@ -3215,24 +3571,25 @@ namespace DOTP_BE.Repositories
                         }
                         #endregion
 
-                        vehicleObjN.VehicleId = ConstantValue.Zero;
-                        vehicleObjN.Transaction_Id = TransactionIdN;
-                        vehicleObjN.ChalenNumber = ChalenNumberN;
-                        vehicleObjN.Status = ConstantValue.Status_Pending;
-                        vehicleObjN.CertificatePrinted = false;
-                        vehicleObjN.Part1Printed = false;
-                        vehicleObjN.Part2Printed = false;
-                        vehicleObjN.TrianglePrinted = false;
-                        vehicleObjN.IsCurrent = false;
-                        vehicleObjN.IsDeleted = false;
-                        vehicleObjN.FormMode = dto.FormMode;
-                        vehicleObjN.CreatedDate = DateTime.Now;
-                        vehicleObjN.OwnerBook = ownerBookFile == string.Empty ? vehicleObjN.OwnerBook : ownerBookFile;
-                        vehicleObjN.Triangle = triangelFile == string.Empty ? vehicleObjN.Triangle : triangelFile;
-                        vehicleObjN.AttachedFile2 = pathAttachedFile2 == string.Empty ? vehicleObjN.AttachedFile2 : pathAttachedFile2;
-                        vehicleObjN.LicenseOnlyId = licenOnlys.LicenseOnlyId;
-
-                        _context.Vehicles.Add(vehicleObjN);
+              
+                        Temp_Table temp_sub = tempTable.DeepCopy();
+                        temp_sub.VehicleId = vehicleObjN.VehicleId;
+                        temp_sub.ApplicantId = vehicleObjN.ApplicantId;
+                        temp_sub.V_VehicleNumber = vehicleObjN.VehicleNumber;
+                        temp_sub.V_VehicleLineTitle = vehicleObjN.VehicleLineTitle;
+                        temp_sub.V_CarryLogisticType = vehicleObjN.CarryLogisticType;
+                        temp_sub.V_VehicleLocation = vehicleObjN.VehicleLocation;
+                        temp_sub.V_VehicleDesiredRoute = vehicleObjN.VehicleDesiredRoute;
+                        temp_sub.RefTransactionId = vehicleObjN.RefTransactionId;
+                        temp_sub.Triangle = triangelFile == string.Empty ? vehicleObjN.Triangle : triangelFile;
+                        temp_sub.OwnerBook = ownerBookFile == string.Empty ? vehicleObjN.OwnerBook : ownerBookFile;
+                        temp_sub.AttachedFile1 = vehicleObjN.AttachedFile1;
+                        temp_sub.AttachedFile2 = pathAttachedFile2 == string.Empty ? vehicleObjN.AttachedFile2 : pathAttachedFile2;
+                        temp_sub.VehicleWeightId = vehicleObjN.VehicleWeightId;
+                        temp_sub.CreateCarId = vehicleObjN.CreateCarId;
+                        temp_sub.LicenseTypeId = vehicleObjN.LicenseTypeId;
+                        temp_sub.OperatorId = vehicleObjN.OperatorId;
+                        temp_TablesList.Add(temp_sub);
                     }
                 }
                 #endregion
@@ -3240,39 +3597,176 @@ namespace DOTP_BE.Repositories
                 #region *** for DecreaseCar Over 2 ton ***
                 if (dto.FormMode == ConstantValue.AddNewCar_FM && dto.DecreaseCarsOver2ton != null)
                 {
-                    foreach (var item in dto.DecreaseCarsOver2ton.VehicleIdList)
+                    foreach (var item in dto.DecreaseCarsOver2ton)
                     {
-                        //var vehicleObjN = dto.FormMode == ConstantValue.ChangeLOwnerAddress? 
-                        //                                await _context.Vehicles.FindAsync(item) : 
-                        //                                await _context.Vehicles.Include(x => x.CreateCar).FirstAsync(12);
-
-                        var vehicleObjN = await _context.Vehicles.FindAsync(item);
+                        var vehicleObjN = await _context.Vehicles.AsNoTracking()
+                            .SingleOrDefaultAsync(x => x.VehicleId == item.VehicleID);
 
                         if (vehicleObjN == null)
                             continue;
 
-                        vehicleObjN.VehicleId = ConstantValue.Zero;
-                        vehicleObjN.Transaction_Id = TransactionIdN;
-                        vehicleObjN.ChalenNumber = ChalenNumberN;
-                        vehicleObjN.Status = ConstantValue.Status_Pending;
-                        vehicleObjN.CertificatePrinted = false;
-                        vehicleObjN.Part1Printed = false;
-                        vehicleObjN.Part2Printed = false;
-                        vehicleObjN.TrianglePrinted = false;
-                        vehicleObjN.IsCurrent = false;
-                        vehicleObjN.IsDeleted = false;
-                        vehicleObjN.FormMode = dto.FormMode;
-                        vehicleObjN.CreatedDate = DateTime.Now;
-                        vehicleObjN.LicenseOnlyId = licenOnlys.LicenseOnlyId;
-                        vehicleObjN.NRC_Number = licenOnlys.NRC_Number;
-                        vehicleObjN.License_Number = licenOnlys.License_Number.Substring(2, licenOnlys.License_Number.IndexOf("(") - 3);
-                        vehicleObjN.LicenseNumberLong = licenOnlys.License_Number;
+                        //folder variable
+                        string vehicleFolderName = string.Empty;
+                        string vehicleDateFolerName = string.Empty;
+                        string vehicleSavePath = string.Empty;
+                        string vehicleLateFolderNameR = string.Empty;
 
-                        _context.Vehicles.Add(vehicleObjN);
+                        //file path variable
+                        string ownerBookFile = string.Empty;
+                        string triangelFile = string.Empty;
+                        string pathAttachedFile2 = string.Empty;
+
+                        if (item.NewOwnerBook != null || item.NewTriangle != null || item.NewAttachedFile2 != null)
+                        {
+                            //create folder
+                            vehicleFolderName = "VehicleId_" + item.VehicleID;
+                            vehicleDateFolerName = Path.Combine("Vehicle_AttachedFiles", DateTime.Now.ToString("yyyyMMdd"), vehicleFolderName);
+                            vehicleSavePath = Path.Combine(rootPath, vehicleDateFolerName);
+                            vehicleLateFolderNameR = vehicleDateFolerName.Replace("\\", "/");
+
+                            try
+                            {
+                                if (!Directory.Exists(vehicleSavePath))
+                                    Directory.CreateDirectory(vehicleSavePath);
+                            }
+                            catch (Exception e) { Console.WriteLine(e.ToString()); }
+                        }
+
+                        #region ** save DecreaseCar files **
+                        // Save OwnerBook
+                        if (item.NewOwnerBook != null)
+                        {
+                            bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(item.NewOwnerBook, vehicleSavePath + "\\Owner.pdf");
+                            if (oky)
+                                ownerBookFile = vehicleLateFolderNameR + "/Owner.pdf";
+                        }
+
+                        // Save Triangle 
+                        if (item.NewTriangle != null)
+                        {
+                            bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(item.NewTriangle, vehicleSavePath + "\\Triangle.pdf");
+                            if (oky)
+                                triangelFile = vehicleLateFolderNameR + "/Triangle.pdf";
+                        }
+
+                        // Save AttachedFile2
+                        if (item.NewAttachedFile2 != null)
+                        {
+                            bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(item.NewAttachedFile2, vehicleSavePath + "\\AttachedFile2.pdf");
+                            if (oky)
+                                pathAttachedFile2 = vehicleLateFolderNameR + "/AttachedFile2.pdf";
+                        }
+                        #endregion
+
+                        Temp_Table temp_sub = tempTable.DeepCopy();
+                        temp_sub.VehicleId = vehicleObjN.VehicleId;
+                        temp_sub.ApplicantId = vehicleObjN.ApplicantId;
+                        temp_sub.V_VehicleNumber = vehicleObjN.VehicleNumber;
+                        temp_sub.V_VehicleLineTitle = vehicleObjN.VehicleLineTitle;
+                        temp_sub.V_CarryLogisticType = vehicleObjN.CarryLogisticType;
+                        temp_sub.V_VehicleLocation = vehicleObjN.VehicleLocation;
+                        temp_sub.V_VehicleDesiredRoute = vehicleObjN.VehicleDesiredRoute;
+                        temp_sub.RefTransactionId = vehicleObjN.RefTransactionId;
+                        temp_sub.Triangle = triangelFile == string.Empty ? vehicleObjN.Triangle : triangelFile;
+                        temp_sub.OwnerBook = ownerBookFile == string.Empty ? vehicleObjN.OwnerBook : ownerBookFile;
+                        temp_sub.AttachedFile1 = vehicleObjN.AttachedFile1;
+                        temp_sub.AttachedFile2 = pathAttachedFile2 == string.Empty ? vehicleObjN.AttachedFile2 : pathAttachedFile2;
+                        temp_sub.VehicleWeightId = vehicleObjN.VehicleWeightId;
+                        temp_sub.CreateCarId = vehicleObjN.CreateCarId;
+                        temp_sub.LicenseTypeId = vehicleObjN.LicenseTypeId;
+                        temp_sub.OperatorId = vehicleObjN.OperatorId;
+
+                        temp_TablesList.Add(temp_sub);
                     }
                 }
                 #endregion
 
+                #region *** for ExtendOperator License ***
+                if(dto.FormMode == ConstantValue.EOPL_FM && dto.ExtendOperatorLicense != null)
+                {
+                    foreach (var item in dto.ExtendOperatorLicense)
+                    {
+                        var vehicleObjN = await _context.Vehicles.AsNoTracking().SingleOrDefaultAsync(x => x.VehicleId == item.VehicleId);
+                        if (vehicleObjN != null)
+                        {
+                            #region *** Save Vehicle Attached Files ***
+                            //vehicleWeightIdObj = vehicle.VehicleWeightId; //each license number long of weight are same
+                            //create folder
+                            string vehicleFolderName = "VehicleId_" + item.VehicleId;
+                            string dateFolderName = Path.Combine("Vehicle_AttachedFiles", DateTime.Now.ToString("yyyyMMdd"), vehicleFolderName);
+                            string vehicleSavePath = Path.Combine(rootPath, dateFolderName);
+                            string dateFolderNameR = dateFolderName.Replace("\\", "/");
+
+                            try
+                            {
+                                if (!Directory.Exists(vehicleSavePath))
+                                    Directory.CreateDirectory(vehicleSavePath);
+                            }
+                            catch (Exception e) { Console.WriteLine(e.ToString()); }
+
+                            // save TriangleFiles
+                            string pathTriangleFiles = string.Empty;
+                            if (item.TriangleFiles != null)
+                            {
+                                bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(item.TriangleFiles, vehicleSavePath + "\\Triangle.pdf");
+                                if (oky)
+                                    pathTriangleFiles = dateFolderNameR + "/Triangle.pdf";
+                            }
+
+                            // save OwnerBookFiles
+                            string pathOwnerBookFiles = string.Empty;
+                            if (item.OwnerBookFiles != null)
+                            {
+                                bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(item.OwnerBookFiles, vehicleSavePath + "\\OwnerBook.pdf");
+                                if (oky)
+                                    pathOwnerBookFiles = dateFolderNameR + "/OwnerBook.pdf";
+                            }
+
+                            // save AttachedFiles1
+                            string pathAttachedFiles1 = string.Empty;
+                            if (item.AttachedFiles1 != null)
+                            {
+                                bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(item.AttachedFiles1, vehicleSavePath + "\\CarAttached1.pdf");
+                                if (oky)
+                                    pathAttachedFiles1 = dateFolderNameR + "/CarAttached1.pdf";
+                            }
+
+                            // save AttachedFiles2
+                            string pathAttachedFiles2 = string.Empty;
+                            if (item.AttachedFiles2 != null)
+                            {
+                                bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(item.AttachedFiles2, vehicleSavePath + "\\CarAttached2.pdf");
+                                if (oky)
+                                    pathAttachedFiles2 = dateFolderNameR + "/CarAttached2.pdf";
+                            }
+                            #endregion
+
+
+                            Temp_Table temp_sub = tempTable.DeepCopy();
+                            temp_sub.VehicleId = vehicleObjN.VehicleId;
+                            temp_sub.ApplicantId = vehicleObjN.ApplicantId;
+                            temp_sub.V_VehicleNumber = vehicleObjN.VehicleNumber;
+                            temp_sub.V_VehicleLineTitle = vehicleObjN.VehicleLineTitle;
+                            temp_sub.V_CarryLogisticType = vehicleObjN.CarryLogisticType;
+                            temp_sub.V_VehicleLocation = vehicleObjN.VehicleLocation;
+                            temp_sub.V_VehicleDesiredRoute = vehicleObjN.VehicleDesiredRoute;
+                            temp_sub.RefTransactionId = vehicleObjN.RefTransactionId;
+                            temp_sub.Triangle = pathTriangleFiles;
+                            temp_sub.OwnerBook = pathOwnerBookFiles;
+                            temp_sub.AttachedFile1 = pathAttachedFiles1;
+                            temp_sub.AttachedFile2 = pathAttachedFiles2;
+                            temp_sub.VehicleWeightId = vehicleObjN.VehicleWeightId;
+                            temp_sub.CreateCarId = vehicleObjN.CreateCarId;
+                            temp_sub.LicenseTypeId = vehicleObjN.LicenseTypeId;
+                            temp_sub.OperatorId = vehicleObjN.OperatorId;
+
+                            temp_TablesList.Add(temp_sub);
+                        }
+                    }
+                }
+                #endregion
+
+                await _context.Temp_Tables.AddRangeAsync(temp_TablesList);
                 await _context.SaveChangesAsync();
                 return (true, false); // (done, not duplicate)
             }
@@ -3314,5 +3808,23 @@ namespace DOTP_BE.Repositories
             return (vehicleObj.LicenseOnly, null);
 
         }
+
+        //public Temp_Table DeepCopy(Temp_Table dto)
+        //{
+        //    return new Temp_Table
+        //    {
+        //        LicenseOnlyId = dto.LicenseOnlyId,
+        //        Transaction_Id = dto.Transaction_Id,
+        //        LicenseNumberLong = dto.LicenseNumberLong,
+        //        NRC_Number = dto.NRC_Number,
+        //        AttachFile_NRC = dto.AttachFile_NRC,
+        //        AttachFile_M10 = dto.AttachFile_M10,
+        //        AttachFile_Part1 = dto.AttachFile_Part1,
+        //        AttachFile_RecommandDoc1 = dto.AttachFile_RecommandDoc1,
+        //        AttachFile_RecommandDoc2 = dto.AttachFile_RecommandDoc2,
+        //        FormMode = dto.FormMode,
+        //        CreatedDate = dto.CreatedDate
+        //    };
+        //}
     }
 }

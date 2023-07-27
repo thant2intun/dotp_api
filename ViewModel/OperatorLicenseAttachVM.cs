@@ -18,7 +18,7 @@
         //public int OtherRegistrationOffice_Id { get; set; }
         //public DateTime IssueDate { get; set; }
         //public bool? IsClosed { get; set; }
-        public string? FormMode { get; set; }
+        public string FormMode { get; set; }
         //public bool? IsDeleted { get; set; }
         ////public int? VehicleId { get; set; } // for transaction(to get vehicle weight Id) //al cause logic change can get From Vehicl By Transaction iD
         //public int applicant_Id { get; set; }

@@ -4,7 +4,6 @@ using DOTP_BE.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -12,10 +11,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DOTP_BE.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230614105705_TT_14-06-23")]
-    partial class TT_140623
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -778,6 +776,264 @@ namespace DOTP_BE.Migrations
                     b.ToTable("Roles");
                 });
 
+            modelBuilder.Entity("DOTP_BE.Model.Temp_Table", b =>
+                {
+                    b.Property<int>("Temp_Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Temp_Id"), 1L, 1);
+
+                    b.Property<int>("ApplicantId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AttachFile_M10")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AttachFile_NRC")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AttachFile_OperatorLicense")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AttachFile_Part1")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AttachFile_RecommandDoc1")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AttachFile_RecommandDoc2")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AttachFile_RecommandDoc3")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AttachFile_RecommandDoc4")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AttachFile_RecommandDoc5")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AttachedFile1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AttachedFile2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("C_IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("C_PersonInformationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ChalenNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("CreateCarId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FormMode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L_Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L_AllowBusinessTitle")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L_Fax")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("L_IsClosed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("L_IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("L_OtherRegistrationOffice_Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("L_Phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L_Township_Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LicenseNumberLong")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("LicenseOnlyId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LicenseTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NRC_Number")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("O_Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("O_AllowBusinessTitle")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("O_ApplyDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("O_ApplyLicenseType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("O_DesiredRoute")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("O_Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("O_ExpiredDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("O_Fax")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("O_IsClosed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("O_IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("O_JourneyType_Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("O_NRC")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("O_Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("O_Phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("O_RegistrationOffice_Id")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("O_TotalCar")
+                        .HasColumnType("int");
+
+                    b.Property<string>("O_Township")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Old_VehicleBrand")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Old_VehicleOwnerAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Old_VehicleOwnerNRC")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Old_VehicleOwnerName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Old_VehicleType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Old_VehicleWeight")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("OperatorId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OperatorName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OwnerBook")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RefTransactionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Transaction_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Triangle")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("V_CarryLogisticType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("V_Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("V_VehicleDesiredRoute")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("V_VehicleLineTitle")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("V_VehicleLocation")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("V_VehicleNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VehicleBrand")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("VehicleId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("VehicleLocation")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VehicleNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VehicleOwnerAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VehicleOwnerNRC")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VehicleOwnerName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VehicleType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VehicleWeight")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("VehicleWeightId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Temp_Id");
+
+                    b.ToTable("Temp_Tables");
+                });
+
             modelBuilder.Entity("DOTP_BE.Model.Township", b =>
                 {
                     b.Property<int>("TownshipId")
@@ -1166,9 +1422,8 @@ namespace DOTP_BE.Migrations
                     b.Property<DateTime>("ApplyDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ApplyLicenseType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("ApplyLicenseType")
+                        .HasColumnType("int");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");

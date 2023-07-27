@@ -12,5 +12,6 @@ namespace DOTP_BE.Model
         public string Township_Name { get; set; }
 
         public List<LicenseOnly> LicenseOnlys { get; set; }
+        //public List<Temp_Table> Temp_Tables { get; set; }
     }
 }

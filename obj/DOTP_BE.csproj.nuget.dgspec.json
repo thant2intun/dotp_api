@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\DOTP\\Testing\\New folder (4)\\DOTP-API\\DOTP_BE.csproj": {}
+    "D:\\DOTP\\Testing\\New folder (4)\\All In One Row\\DOTP-API\\DOTP_BE.csproj": {}
   },
   "projects": {
-    "D:\\DOTP\\Testing\\New folder (4)\\DOTP-API\\DOTP_BE.csproj": {
+    "D:\\DOTP\\Testing\\New folder (4)\\All In One Row\\DOTP-API\\DOTP_BE.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\DOTP\\Testing\\New folder (4)\\DOTP-API\\DOTP_BE.csproj",
+        "projectUniqueName": "D:\\DOTP\\Testing\\New folder (4)\\All In One Row\\DOTP-API\\DOTP_BE.csproj",
         "projectName": "DOTP_BE",
-        "projectPath": "D:\\DOTP\\Testing\\New folder (4)\\DOTP-API\\DOTP_BE.csproj",
+        "projectPath": "D:\\DOTP\\Testing\\New folder (4)\\All In One Row\\DOTP-API\\DOTP_BE.csproj",
         "packagesPath": "C:\\Users\\SecureLink\\.nuget\\packages\\",
-        "outputPath": "D:\\DOTP\\Testing\\New folder (4)\\DOTP-API\\obj\\",
+        "outputPath": "D:\\DOTP\\Testing\\New folder (4)\\All In One Row\\DOTP-API\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\SecureLink\\AppData\\Roaming\\NuGet\\NuGet.Config",

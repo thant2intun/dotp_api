@@ -33,6 +33,7 @@ namespace DOTP_BE.Model
         public List<LicenseOnly> LicenseOnlys { get; set; }
         public List<User> Users { get; set; }
         public List<OperatorDetail> OperatorDetails { get; set; }
+        //public List<Temp_Table> Temp_Tables { get; set; }
 
     }
 }
