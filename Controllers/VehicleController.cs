@@ -107,7 +107,7 @@ namespace DOTP_BE.Controllers
         [HttpGet("VehicleListByStatus")]
         public async Task<IActionResult> VehicleListByStatus([FromQuery] ExtenLicenseDbSearchVM dto)
         {
-            var result = await _repo.getVehicleListByStatus(dto);            
+            var result = await _repo.getVehicleListByStatus(dto);   
             return Ok(result);
         }
 

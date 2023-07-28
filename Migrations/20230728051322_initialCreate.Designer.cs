@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DOTP_BE.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230727175129_updateColumn")]
-    partial class updateColumn
+    [Migration("20230728051322_initialCreate")]
+    partial class initialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -853,9 +853,6 @@ namespace DOTP_BE.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("L_Address")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("L_AllowBusinessTitle")
                         .HasColumnType("nvarchar(max)");
 
@@ -868,13 +865,22 @@ namespace DOTP_BE.Migrations
                     b.Property<bool?>("L_IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<string>("L_N_Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L_N_Township_Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L_O_Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L_O_Township_Name")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("L_OtherRegistrationOffice_Id")
                         .HasColumnType("int");
 
                     b.Property<string>("L_Phone")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("L_Township_Name")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LicenseNumberLong")
@@ -1005,6 +1011,9 @@ namespace DOTP_BE.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("V_VehicleNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("V_VehicleType")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("VehicleBrand")
