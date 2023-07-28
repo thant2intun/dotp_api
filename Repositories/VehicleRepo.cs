@@ -24,39 +24,78 @@ namespace DOTP_BE.Repositories
             return result;
         }
 
-        public async Task<List<Vehicle>> getVehicleById(string formMode, string transactionId, string status)
+        public async Task<List<Temp_Table>> getVehicleById(string formMode, string transactionId, string status)
         {
-            var vehicles = await _context.Vehicles.AsNoTracking()
-                                        .Include(x => x.OperatorDetail)
-                                        .Include(x => x.CreateCar)
-                                        .Include(x => x.VehicleWeight)
-                                        .Include(x => x.LicenseOnly).ThenInclude(x => x.RegistrationOffice)
-                                        .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
-                                        .Where(s => s.Transaction_Id == transactionId &&
-                                                    s.Status == status &&
-                                                    s.FormMode == formMode)
-                                        .ToListAsync();
-            if (vehicles.Count > 0 && vehicles[0].LicenseOnly == null) //for licenseOnly include
-            {
-                vehicles[0].LicenseOnly = await _context.LicenseOnlys.AsNoTracking()
-                                                        .Where(x => x.License_Number == vehicles[0].LicenseNumberLong)
-                                                        .FirstAsync();
-            }
-
-            //can't filter by Transaction_Id cause after admin approved new operator record with that transaction will add,
-            //here operator will not have and data yet so with only NRC Number
-            ////if can use include then don't need this one
-            //if (vehicles.Count > 0 && vehicles[0].OperatorDetail == null)
+            //if(status == ConstantValue.Status_Pending)
             //{
-            //    //operatorDetail is use for only (email in extendOperatorLicense) currently found
-            //    var opObj = await _context.OperatorDetails.AsNoTracking()
-            //                                              .Where(x => x.NRC == vehicles[0].NRC_Number)
-            //                                              //.Select(x => x.Email)
-            //                                              .FirstAsync();
-            //    vehicles.ForEach(x => x.OperatorDetail = opObj); // include operator to every(OperatorDetail)
+                var vehicles = await _context.Temp_Tables
+                    .AsNoTracking()
+                    //.Include(x => x.OperatorDetail)
+                    .Include(x => x.CreateCar)
+                    //.Include(x => x.VehicleWeight)
+                    .Include(x => x.LicenseOnly).ThenInclude(x => x.RegistrationOffice)
+                    .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
+                    .Where(s => s.Transaction_Id == transactionId &&
+                                                   s.Status == status &&
+                                                   s.FormMode == formMode)
+                    .ToListAsync();
+                if (vehicles.Count > 0 && vehicles[0].LicenseOnly == null) //for licenseOnly include
+                {
+                    vehicles[0].LicenseOnly = await _context.LicenseOnlys.AsNoTracking()
+                                                            .Where(x => x.License_Number == vehicles[0].LicenseNumberLong)
+                                                            .FirstAsync();
+                }
+
+                //can't filter by Transaction_Id cause after admin approved new operator record with that transaction will add,
+                //here operator will not have and data yet so with only NRC Number
+                ////if can use include then don't need this one
+                //if (vehicles.Count > 0 && vehicles[0].OperatorDetail == null)
+                //{
+                //    //operatorDetail is use for only (email in extendOperatorLicense) currently found
+                //    var opObj = await _context.OperatorDetails.AsNoTracking()
+                //                                              .Where(x => x.NRC == vehicles[0].NRC_Number)
+                //                                              //.Select(x => x.Email)
+                //                                              .FirstAsync();
+                //    vehicles.ForEach(x => x.OperatorDetail = opObj); // include operator to every(OperatorDetail)
+                //}
+                return vehicles;
             //}
-            return vehicles;
+           
         }
+
+        //public async Task<List<Vehicle>> getVehicleById(string formMode, string transactionId, string status)
+        //{
+        //    var vehicles = await _context.Vehicles.AsNoTracking()
+        //                                .Include(x => x.OperatorDetail)
+        //                                .Include(x => x.CreateCar)
+        //                                .Include(x => x.VehicleWeight)
+        //                                .Include(x => x.LicenseOnly).ThenInclude(x => x.RegistrationOffice)
+        //                                .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
+        //                                .Where(s => s.Transaction_Id == transactionId &&
+        //                                            s.Status == status &&
+        //                                            s.FormMode == formMode)
+        //                                .ToListAsync();
+        //    if (vehicles.Count > 0 && vehicles[0].LicenseOnly == null) //for licenseOnly include
+        //    {
+        //        vehicles[0].LicenseOnly = await _context.LicenseOnlys.AsNoTracking()
+        //                                                .Where(x => x.License_Number == vehicles[0].LicenseNumberLong)
+        //                                                .FirstAsync();
+        //    }
+
+        //    //can't filter by Transaction_Id cause after admin approved new operator record with that transaction will add,
+        //    //here operator will not have and data yet so with only NRC Number
+        //    ////if can use include then don't need this one
+        //    //if (vehicles.Count > 0 && vehicles[0].OperatorDetail == null)
+        //    //{
+        //    //    //operatorDetail is use for only (email in extendOperatorLicense) currently found
+        //    //    var opObj = await _context.OperatorDetails.AsNoTracking()
+        //    //                                              .Where(x => x.NRC == vehicles[0].NRC_Number)
+        //    //                                              //.Select(x => x.Email)
+        //    //                                              .FirstAsync();
+        //    //    vehicles.ForEach(x => x.OperatorDetail = opObj); // include operator to every(OperatorDetail)
+        //    //}
+        //    return vehicles;
+        //}
 
         public async Task<List<Vehicle>> getVehicleById(string transactionId, string status)
         {
@@ -333,10 +372,9 @@ namespace DOTP_BE.Repositories
             fd = fd.Date; //no need for web but for mobile
             td = td.Date; //no need for web but for mobile
 
-            var filteredByDate = await _context.Vehicles.AsNoTracking()
+            var filteredByDate = await _context.Temp_Tables.AsNoTracking()
                 .Where(x => x.CreatedDate.Date >= fd && 
-                            x.CreatedDate.Date <= td &&
-                            x.IsDeleted != true)
+                            x.CreatedDate.Date <= td)
                 .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
                 .ToListAsync();
 
@@ -394,7 +432,7 @@ namespace DOTP_BE.Repositories
                                      TotalCar = x.Count(),
                                      CreatedDate = x.First().CreatedDate,
                                      UpdatedDate = x.First().UpdatedDate,
-                                     ExpireDate = x.First().ExpiryDate,
+                                     ExpireDate = DateTime.Now,
                                      Status = x.First().Status,
                                      TransactionId = x.First().Transaction_Id,
                                      LicenseTypeId = x.First().LicenseTypeId
@@ -437,6 +475,125 @@ namespace DOTP_BE.Repositories
             };
             return (totalCount, result);
         }
+
+        //public async Task<(int, ExtendLicenseDashBoardVMAdmin)> getVehicleListByStatusNOTUSE(ExtenLicenseDbSearchVM dto)
+        //{
+        //    //var fd = DateTime.Parse(dto.FromDate).Date;
+        //    //var td = DateTime.Parse(dto.ToDate).Date;
+        //    if (!DateTime.TryParse(dto.FromDate, out var fd) || !DateTime.TryParse(dto.ToDate, out var td))
+        //    {
+        //        // Handle invalid date format
+        //        // For example, return an error or default values
+        //        return (0, new ExtendLicenseDashBoardVMAdmin());
+        //    }
+        //    fd = fd.Date; //no need for web but for mobile
+        //    td = td.Date; //no need for web but for mobile
+
+        //    var filteredByDate = await _context.Vehicles.AsNoTracking()
+        //        .Where(x => x.CreatedDate.Date >= fd &&
+        //                    x.CreatedDate.Date <= td &&
+        //                    x.IsDeleted != true)
+        //        .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
+        //        .ToListAsync();
+
+        //    if (filteredByDate.Count == 0)
+        //        return (0, new ExtendLicenseDashBoardVMAdmin());
+
+        //    #region *** Filter by search parameters ***
+        //    if (!string.IsNullOrWhiteSpace(dto.FormMode))
+        //        filteredByDate = filteredByDate.Where(x => x.FormMode == dto.FormMode).ToList();
+        //    if (dto.JourneyType != 0)
+        //    {
+        //        if (dto.JourneyType == 1)
+        //            filteredByDate = filteredByDate.Where(x => x.LicenseNumberLong.Contains(ConstantValue.Twin)).ToList();
+        //        else if (dto.JourneyType == 2)
+        //            filteredByDate = filteredByDate.Where(x => x.LicenseNumberLong.Contains(ConstantValue.Kyaw)).ToList();
+        //    }
+        //    if (dto.LicenseType != 0)
+        //    {
+        //        if (dto.LicenseType == 1)
+        //            filteredByDate = filteredByDate.Where(x => x.LicenseTypeId == 1 ||
+        //                                                       x.LicenseTypeId == 2 ||
+        //                                                       x.LicenseTypeId == 3)
+        //                                            .ToList();
+        //        else if (dto.LicenseType == 4)
+        //            filteredByDate = filteredByDate.Where(x => x.LicenseTypeId == 4)
+        //                                           .ToList();
+        //        else if (dto.LicenseType == 5)
+        //            filteredByDate = filteredByDate.Where(x => x.LicenseTypeId == 5)
+        //                                           .ToList();
+        //        else if (dto.LicenseType == 6)
+        //            filteredByDate = filteredByDate.Where(x => x.LicenseTypeId == 6 ||
+        //                                                       x.LicenseTypeId == 7)
+        //                                           .ToList();
+        //        else if (dto.LicenseType == 8)
+        //            filteredByDate = filteredByDate.Where(x => x.LicenseTypeId == 8)
+        //                                           .ToList();
+        //    }
+        //    #endregion
+
+        //    #region *** SQL query ***
+        //    //select t.Transaction_Id,count(Transaction_Id) T from (SELECT Status,CreatedDate,Transaction_Id
+        //    //FROM[Dotp_Phase4].[dbo].[Vehicles] where Status = 'Approved') T
+        //    //group by Transaction_Id
+        //    #endregion
+
+        //    var extendLicenseVMs = filteredByDate
+        //                         .Where(x => x.Status == dto.Status)
+        //                         .OrderByDescending(x => x.CreatedDate)
+        //                         .GroupBy(x => x.Transaction_Id)
+        //                         .Select(x => new ExtendLicenseVMAdmin
+        //                         {
+        //                             FormMode = x.Select(g => g.FormMode).Distinct().ToList(),
+        //                             LicenseNumberLong = x.First().LicenseNumberLong,
+        //                             JourneyTypeLong = x.First().LicenseOnly.JourneyType.JourneyTypeLong,
+        //                             TotalCar = x.Count(),
+        //                             CreatedDate = x.First().CreatedDate,
+        //                             UpdatedDate = x.First().UpdatedDate,
+        //                             ExpireDate = x.First().ExpiryDate,
+        //                             Status = x.First().Status,
+        //                             TransactionId = x.First().Transaction_Id,
+        //                             LicenseTypeId = x.First().LicenseTypeId
+        //                         })
+        //                         .Skip((dto.PageNumber - 1) * dto.PageSize)
+        //                         .Take(dto.PageSize)
+        //                         .ToList();
+
+        //    int pendingCount = CountByStatus(filteredByDate, ConstantValue.Status_Pending);
+        //    int approvedCount = CountByStatus(filteredByDate, ConstantValue.Status_Approved);
+        //    int rejectedCount = CountByStatus(filteredByDate, ConstantValue.Status_Rejected);
+        //    int paidCount = CountByStatus(filteredByDate, ConstantValue.Status_Paid);
+
+        //    #region *** Not Use ***
+        //    int totalCount = 0;
+        //    switch (dto.Status)
+        //    {
+        //        case ConstantValue.Status_Pending:
+        //            totalCount = CountByStatus(filteredByDate, ConstantValue.Status_Pending);
+        //            break;
+        //        case ConstantValue.Status_Approved:
+        //            totalCount = CountByStatus(filteredByDate, ConstantValue.Status_Approved);
+        //            break;
+        //        case ConstantValue.Status_Rejected:
+        //            totalCount = CountByStatus(filteredByDate, ConstantValue.Status_Rejected);
+        //            break;
+        //        case ConstantValue.Status_Paid:
+        //            totalCount = CountByStatus(filteredByDate, ConstantValue.Status_Paid);
+        //            break;
+        //    }
+        //    #endregion
+
+        //    ExtendLicenseDashBoardVMAdmin result = new ExtendLicenseDashBoardVMAdmin
+        //    {
+        //        PendingCount = pendingCount,
+        //        ApprovedCount = approvedCount,
+        //        PaidCount = paidCount,
+        //        RejectedCount = rejectedCount,
+        //        ExtendLicenseVMAdmins = extendLicenseVMs
+        //    };
+        //    return (totalCount, result);
+        //}
+
 
         #region Currently using 2
         //public async Task<ExtendLicenseDashBoardVMAdmin> getVehicleListByStatus(ExtenLicenseDbSearchVM dto)
@@ -1083,7 +1240,8 @@ namespace DOTP_BE.Repositories
         #endregion
         public async Task<(bool, string?)> OperatorLicenseConfirmReject(OLConfirmOrRejectVM oLConfirmOrRejectVM)
         {
-            var vehicleObj = await _context.Vehicles.AsNoTracking()
+            var vehicleObj = await _context.Temp_Tables.AsNoTracking()
+                .Include(x => x.Vehicle)
                                                     .Where(x => x.Transaction_Id == oLConfirmOrRejectVM.TransactionId &&
                                                                 x.FormMode == oLConfirmOrRejectVM.FormMode)
                                                     .ToListAsync();
@@ -1092,8 +1250,65 @@ namespace DOTP_BE.Repositories
                 //if addmin approved
                 if (oLConfirmOrRejectVM.ApprovedOrRejected == ConstantValue.Status_Approved)
                 {
+                    //for presentation
+                    var checkTandC = await _context.Vehicles.AsNoTracking()
+                        .Where(x => x.LicenseNumberLong == vehicleObj[0].LicenseNumberLong &&
+                                    x.CreatedDate.Date == DateTime.Now.Date)
+                        .Select(x => new { x.Transaction_Id, x.ChalenNumber })
+                        .FirstOrDefaultAsync();
+
+                    string TransactionIdN = string.Empty;
+                    string ChalenNumberN = string.Empty;
+                    if (checkTandC == null)
+                    {
+                        var vehicleObjTC = await _context.Vehicles.AsNoTracking().ToListAsync();
+
+                        int tG = vehicleObjTC.OrderByDescending(x => x.Transaction_Id)
+                                           .Select(x => x.Transaction_Id.Split('_').LastOrDefault())
+                                           .Select(x => int.TryParse(x, out int val) ? val : int.MinValue)
+                                           .FirstOrDefault(); //order by year and then other number
+
+                        int cG = vehicleObjTC.OrderByDescending(x => x.ChalenNumber)
+                                           .Select(x => x.ChalenNumber.Split('_').LastOrDefault())
+                                           .Select(x => int.TryParse(x, out int val) ? val : int.MinValue)
+                                           .FirstOrDefault();
+
+                        TransactionIdN = new CommonMethod().GenerateT_IdandC_Id("T", ++tG, 9); //generate Id
+                        ChalenNumberN = new CommonMethod().GenerateT_IdandC_Id("C", ++cG, 7); //generate I
+                    }
+                    else
+                    {
+                        TransactionIdN = checkTandC.Transaction_Id;
+                        ChalenNumberN = checkTandC.ChalenNumber;
+                    }
+
                     // to check formmod(all changes are the same)
                     string[] changesGroupd = { "Decrease Car", "ChangeVehicleOwnerAddress", "ChangeLicenseOwnerAddress", "ChangeVehicleType", "ChangeVehicleOwnerName" };
+
+                    #region *** Save Vehicle ***
+                    foreach(var item in vehicleObj)
+                    {
+                        item.Vehicle.VehicleId = ConstantValue.Zero;
+                        item.Vehicle.Transaction_Id = TransactionIdN;
+                        item.Vehicle.ChalenNumber = ChalenNumberN;
+                        item.Vehicle.Status = ConstantValue.Status_Pending;
+                        item.Vehicle.CertificatePrinted = false;
+                        item.Vehicle.Part1Printed = false;
+                        item.Vehicle.Part2Printed = false;
+                        item.Vehicle.TrianglePrinted = false;
+                        item.Vehicle.IsCurrent = false;
+                        item.Vehicle.IsDeleted = false;
+                        item.Vehicle.FormMode = oLConfirmOrRejectVM.FormMode;
+                        item.Vehicle.CreatedDate = DateTime.Now;
+                        item.Vehicle.Triangle = item.Triangle;
+                        item.Vehicle.OwnerBook = item.OwnerBook;
+                        item.Vehicle.AttachedFile1 = item.AttachedFile1;
+                        item.Vehicle.AttachedFile2  = item.AttachedFile2;
+                        item.Vehicle.LicenseOnlyId = item.LicenseOnlyId;
+
+                        await _context.Vehicles.AddAsync(item.Vehicle);
+                    }
+                    #endregion
 
 
                     //to prevent 'ExtendOperatorLicense' formMode more than one time in single day 
@@ -1117,7 +1332,7 @@ namespace DOTP_BE.Repositories
                     if (operatorDetailDto != null)
                     {
                         operatorDetailDto.OperatorId = ConstantValue.Zero;
-                        operatorDetailDto.Transaction_Id = vehicleObj[0].Transaction_Id;
+                        operatorDetailDto.Transaction_Id = TransactionIdN;
                         operatorDetailDto.ApplyDate = DateTime.Now;
                         //operatorDetailDto.ExpiredDate = operatorDetailDto.ExpiredDate.Value.AddYears(1);
                         operatorDetailDto.ExpiredDate = operatorDetailDto.ExpiredDate.HasValue ? operatorDetailDto.ExpiredDate.Value.AddYears(1) : DateTime.Now.AddYears(1);
@@ -1295,21 +1510,250 @@ namespace DOTP_BE.Repositories
                     #endregion
                 }
                 //vehicle's status update
-                foreach (var item in vehicleObj)
-                {
-                    item.Status = oLConfirmOrRejectVM.ApprovedOrRejected;
-                    item.Notes = oLConfirmOrRejectVM.Remark;
-                    item.ApplyDate = DateTime.Now;
-                    item.UpdatedDate = DateTime.Now;
-                }
-                _context.Vehicles.UpdateRange(vehicleObj);
+                //foreach (var item in vehicleObj)
+                //{
+                //    item.Status = oLConfirmOrRejectVM.ApprovedOrRejected;
+                //    item.Notes = oLConfirmOrRejectVM.Remark;
+                //    item.ApplyDate = DateTime.Now;
+                //    item.UpdatedDate = DateTime.Now;
+                //}
+                //_context.Vehicles.UpdateRange(vehicleObj);
 
                 await _context.SaveChangesAsync();
                 return (true, null);
             }
             return (false, "Vehilce Object not found");
         }
+      
+        //public async Task<(bool, string?)> OperatorLicenseConfirmReject(OLConfirmOrRejectVM oLConfirmOrRejectVM)
+        //{
+        //    var vehicleObj = await _context.Vehicles.AsNoTracking()
+        //                                            .Where(x => x.Transaction_Id == oLConfirmOrRejectVM.TransactionId &&
+        //                                                        x.FormMode == oLConfirmOrRejectVM.FormMode)
+        //                                            .ToListAsync();
+        //    if (vehicleObj != null)
+        //    {
+        //        //if addmin approved
+        //        if (oLConfirmOrRejectVM.ApprovedOrRejected == ConstantValue.Status_Approved)
+        //        {
+        //            // to check formmod(all changes are the same)
+        //            string[] changesGroupd = { "Decrease Car", "ChangeVehicleOwnerAddress", "ChangeLicenseOwnerAddress", "ChangeVehicleType", "ChangeVehicleOwnerName" };
 
+
+        //            //to prevent 'ExtendOperatorLicense' formMode more than one time in single day 
+        //            if (oLConfirmOrRejectVM.FormMode == ConstantValue.EOPL_FM)
+        //            {
+        //                var existingEntry = await _context.OperatorDetails.AsNoTracking()
+        //                                                  .FirstOrDefaultAsync(x => x.FormMode == ConstantValue.EOPL_FM &&
+        //                                                                            x.ApplyDate.Date == DateTime.Now.Date); //check double ExtendOperatorLicense (we wrok with applydate so it can be wrong)
+        //                if (existingEntry != null)
+        //                    return (false, "လုပ်ငန်းလိုင်စင်သက်တမ်းတိုးခြင်းသည် တစ်ရက်လျင် တစ်ကြိမ်ထက်ပို၍ လုပ်ခွင့်မပေးပါ။");
+        //            }
+
+        //            #region ****** Handle Operator ******
+        //            //add new operator
+        //            var operatorDetailDto = await _context.OperatorDetails
+        //                                                  .Where(x => x.NRC == vehicleObj[0].NRC_Number &&
+        //                                                              x.ApplyLicenseType == vehicleObj[0].LicenseTypeId &&
+        //                                                              x.FormMode == ConstantValue.CreateNew_FM || x.FormMode == ConstantValue.EOPL_FM)
+        //                                                  .OrderByDescending(x => x.ApplyDate) //to get the update one
+        //                                                  .FirstOrDefaultAsync();
+        //            if (operatorDetailDto != null)
+        //            {
+        //                operatorDetailDto.OperatorId = ConstantValue.Zero;
+        //                operatorDetailDto.Transaction_Id = vehicleObj[0].Transaction_Id;
+        //                operatorDetailDto.ApplyDate = DateTime.Now;
+        //                //operatorDetailDto.ExpiredDate = operatorDetailDto.ExpiredDate.Value.AddYears(1);
+        //                operatorDetailDto.ExpiredDate = operatorDetailDto.ExpiredDate.HasValue ? operatorDetailDto.ExpiredDate.Value.AddYears(1) : DateTime.Now.AddYears(1);
+        //                operatorDetailDto.TotalCar = vehicleObj.Count;
+        //                operatorDetailDto.Notes = FormModeHelper.formModeIndexMap.ContainsKey(oLConfirmOrRejectVM.FormMode) ? FormModeHelper.formModeIndexMap[oLConfirmOrRejectVM.FormMode] : "";
+        //                operatorDetailDto.IsClosed = true;
+        //                operatorDetailDto.FormMode = oLConfirmOrRejectVM.FormMode;
+        //                operatorDetailDto.VehicleId = vehicleObj[0].VehicleId;
+        //                operatorDetailDto.UpdatedDate = DateTime.Now;
+        //                operatorDetailDto.CreatedBy = "Admin Name";
+
+        //                _context.OperatorDetails.Add(operatorDetailDto);
+        //            }
+        //            #endregion
+
+        //            #region ****** Handle Transaction ******
+        //            var feesObj = await _context.Fees.AsNoTracking()
+        //                                       .Where(x => x.JourneyTypeId == (vehicleObj[0].LicenseNumberLong.Contains(ConstantValue.Twin) ? ConstantValue.One : ConstantValue.Two) &&
+        //                                                   x.VehicleWeightId == vehicleObj[0].VehicleWeightId)
+        //                                       .FirstOrDefaultAsync();
+
+        //            //check transaction_id already exit or not
+        //            //bool alreadyExit = await _context.Transactions.AsNoTracking().AnyAsync(x => x.Transaction_Id == vehicleObj[0].Transaction_Id);
+
+        //            //checking form Mode
+        //            #region *** for 'ExtendOperatorLicense' FormMode ***
+        //            if (oLConfirmOrRejectVM.FormMode == ConstantValue.EOPL_FM && feesObj != null)
+        //            {
+        //                //check transaction_id already exit or not
+        //                var tObj = await _context.Transactions.FirstOrDefaultAsync(x => x.Transaction_Id == oLConfirmOrRejectVM.TransactionId);
+        //                if (tObj != null)
+        //                {
+        //                    tObj.RegistrationFees += vehicleObj.Count * feesObj.RegistrationFees;
+        //                    tObj.RegistrationCharges += feesObj.RegistrationCharges;
+        //                    tObj.CertificateFees += feesObj.CertificateFees;
+        //                    tObj.PartOneFees += feesObj.PartOneFees;
+        //                    tObj.PartTwoFees += feesObj.PartTwoFees; //null able (to check again)
+        //                    tObj.TriangleFees += feesObj.TriangleFees; //null able (to check again)
+        //                    tObj.ModifiedCharges += ConstantValue.Zero;
+        //                    tObj.TotalCars += vehicleObj.Count;
+        //                    tObj.Total_WithoutCertificate += feesObj.RegistrationCharges + ConstantValue.twoThousand;
+        //                    tObj.Total += tObj.RegistrationFees + tObj.RegistrationCharges + tObj.CertificateFees + tObj.PartOneFees +
+        //                                                    tObj.PartTwoFees + tObj.TriangleFees;
+        //                    tObj.UpdatedDate = DateTime.Now;
+        //                    _context.Transactions.Update(tObj);
+        //                }
+        //                else
+        //                {
+        //                    var tObjN = new Transaction()
+        //                    {
+        //                        Transaction_Id = vehicleObj[0].Transaction_Id,
+        //                        ChalenNumber = vehicleObj[0].ChalenNumber,
+        //                        NRC_Number = vehicleObj[0].NRC_Number,
+        //                        RegistrationFees = vehicleObj.Count * feesObj.RegistrationFees,
+        //                        RegistrationCharges = feesObj.RegistrationCharges,
+        //                        CertificateFees = feesObj.CertificateFees,
+        //                        PartOneFees = feesObj.PartOneFees,
+        //                        PartTwoFees = feesObj.PartTwoFees,
+        //                        TriangleFees = feesObj.TriangleFees,
+        //                        ModifiedCharges = ConstantValue.Zero,
+        //                        TotalCars = vehicleObj.Count,
+        //                        Total_WithoutCertificate = feesObj.RegistrationCharges + ConstantValue.twoThousand,
+        //                        Total = (vehicleObj.Count * feesObj.RegistrationFees) + feesObj.RegistrationCharges + feesObj.CertificateFees + feesObj.PartOneFees +
+        //                                                    feesObj.PartTwoFees + feesObj.TriangleFees,
+        //                        Status = ConstantValue.Status_Pending,
+        //                        CreatedDate = DateTime.Now
+        //                    };
+        //                    _context.Transactions.Add(tObjN);
+        //                }
+
+        //            }
+        //            #endregion
+
+        //            #region *** for 'Common Changes' FormMode ***
+        //            else if (changesGroupd.Contains(oLConfirmOrRejectVM.FormMode) && feesObj != null)
+        //            {
+        //                //check transaction_id already exit or not
+
+        //                var tObj = await _context.Transactions.FirstOrDefaultAsync(x => x.Transaction_Id == oLConfirmOrRejectVM.TransactionId);
+        //                if (tObj != null)
+        //                {
+        //                    //already check vehicleObj != null so count star from 1
+        //                    int mofifiedCharges = vehicleObj.Count >= ConstantValue.Two ? ConstantValue.thirtyThousand : ConstantValue.tenThousand;
+        //                    tObj.RegistrationCharges += ConstantValue.oneThousand;
+        //                    tObj.ModifiedCharges += mofifiedCharges;
+        //                    tObj.TotalCars += vehicleObj.Count;
+        //                    tObj.Total_WithoutCertificate += ConstantValue.oneThousand + ConstantValue.twoThousand; // oneThousand is for RegistrationCharges
+        //                    tObj.Total += ConstantValue.oneThousand + mofifiedCharges; // oneThousand is for RegistrationCharges
+        //                    tObj.UpdatedDate = DateTime.Now;
+        //                    _context.Transactions.Update(tObj);
+        //                }
+        //                else
+        //                {
+        //                    //already check vehicleObj != null so count star from 1
+        //                    int mofifiedCharges = vehicleObj.Count >= ConstantValue.Two ? ConstantValue.thirtyThousand : ConstantValue.tenThousand;
+        //                    var tObjN = new Transaction()
+        //                    {
+        //                        Transaction_Id = vehicleObj[0].Transaction_Id,
+        //                        ChalenNumber = vehicleObj[0].ChalenNumber,
+        //                        NRC_Number = vehicleObj[0].NRC_Number,
+        //                        RegistrationFees = ConstantValue.Zero,
+        //                        RegistrationCharges = ConstantValue.oneThousand,
+        //                        CertificateFees = ConstantValue.Zero,
+        //                        PartOneFees = ConstantValue.Zero,
+        //                        PartTwoFees = ConstantValue.Zero,
+        //                        TriangleFees = ConstantValue.Zero,
+        //                        ModifiedCharges = mofifiedCharges,
+        //                        TotalCars = vehicleObj.Count,
+        //                        Total_WithoutCertificate = ConstantValue.oneThousand + ConstantValue.twoThousand,
+        //                        Total = ConstantValue.oneThousand + mofifiedCharges,
+        //                        Status = ConstantValue.Status_Pending,
+        //                        CreatedDate = DateTime.Now
+        //                    };
+        //                    _context.Transactions.Add(tObjN);
+        //                }
+        //            }
+        //            #endregion
+
+        //            #region *** for 'Add New Car' FormMode ***
+        //            else if ((oLConfirmOrRejectVM.FormMode == ConstantValue.AddNewCar_FM || oLConfirmOrRejectVM.FormMode == ConstantValue.ECL_FM) && feesObj != null)
+        //            {
+        //                //check transaction_id already exit or not
+        //                //bool alreadyExit = await _context.Transactions.AsNoTracking().AnyAsync(x => x.Transaction_Id == vehicleObj[0].Transaction_Id);
+        //                var tObj = await _context.Transactions.FirstOrDefaultAsync(x => x.Transaction_Id == oLConfirmOrRejectVM.TransactionId);
+        //                if (tObj != null)
+        //                {
+        //                    int mofifiedCharges = vehicleObj.Count >= ConstantValue.Two ? ConstantValue.thirtyThousand : ConstantValue.tenThousand;
+        //                    int partTwoFeesDto = vehicleObj.Count > feesObj.MaxCars ? (feesObj.PartTwoFees * vehicleObj.Count) : feesObj.PartTwoFees;
+        //                    int triangleDto = vehicleObj.Count > feesObj.MaxCars ? (feesObj.TriangleFees * vehicleObj.Count) : feesObj.TriangleFees;
+
+        //                    tObj.RegistrationFees += feesObj.RegistrationFees * vehicleObj.Count;
+        //                    tObj.RegistrationCharges += feesObj.RegistrationCharges;
+        //                    tObj.PartTwoFees += partTwoFeesDto;
+        //                    tObj.TriangleFees += triangleDto;
+        //                    tObj.ModifiedCharges += mofifiedCharges;
+        //                    tObj.TotalCars += vehicleObj.Count;
+        //                    tObj.Total_WithoutCertificate += feesObj.RegistrationCharges + ConstantValue.twoThousand;
+        //                    tObj.Total += (feesObj.RegistrationFees * vehicleObj.Count) + feesObj.RegistrationCharges + partTwoFeesDto + triangleDto + mofifiedCharges;
+        //                    tObj.UpdatedDate = DateTime.Now;
+        //                    _context.Transactions.Update(tObj);
+        //                }
+        //                else
+        //                {
+        //                    int mofifiedCharges = vehicleObj.Count >= ConstantValue.Two ? ConstantValue.thirtyThousand : ConstantValue.tenThousand;
+        //                    int partTwoFeesDto = vehicleObj.Count > feesObj.MaxCars ? (feesObj.PartTwoFees * vehicleObj.Count) : feesObj.PartTwoFees;
+        //                    int triangleDto = vehicleObj.Count > feesObj.MaxCars ? (feesObj.TriangleFees * vehicleObj.Count) : feesObj.TriangleFees;
+
+        //                    var tObjN = new Transaction()
+        //                    {
+        //                        Transaction_Id = vehicleObj[0].Transaction_Id,
+        //                        ChalenNumber = vehicleObj[0].ChalenNumber,
+        //                        NRC_Number = vehicleObj[0].NRC_Number,
+        //                        RegistrationFees = feesObj.RegistrationFees * vehicleObj.Count,
+        //                        RegistrationCharges = feesObj.RegistrationCharges,
+        //                        CertificateFees = ConstantValue.Zero,
+        //                        PartOneFees = ConstantValue.Zero,
+        //                        PartTwoFees = partTwoFeesDto,
+        //                        TriangleFees = triangleDto,
+        //                        ModifiedCharges = mofifiedCharges,
+        //                        TotalCars = vehicleObj.Count,
+        //                        Total_WithoutCertificate = feesObj.RegistrationCharges + ConstantValue.twoThousand,
+        //                        Total = (feesObj.RegistrationFees * vehicleObj.Count) + feesObj.RegistrationCharges + partTwoFeesDto + triangleDto + mofifiedCharges,
+        //                        Status = ConstantValue.Status_Pending,
+        //                        CreatedDate = DateTime.Now
+        //                    };
+        //                    _context.Transactions.Add(tObjN);
+        //                }
+        //            }
+        //            else
+        //            {
+        //                //will add other operation
+        //            }
+        //            #endregion
+
+        //            #endregion
+        //        }
+        //        //vehicle's status update
+        //        foreach (var item in vehicleObj)
+        //        {
+        //            item.Status = oLConfirmOrRejectVM.ApprovedOrRejected;
+        //            item.Notes = oLConfirmOrRejectVM.Remark;
+        //            item.ApplyDate = DateTime.Now;
+        //            item.UpdatedDate = DateTime.Now;
+        //        }
+        //        _context.Vehicles.UpdateRange(vehicleObj);
+
+        //        await _context.SaveChangesAsync();
+        //        return (true, null);
+        //    }
+        //    return (false, "Vehilce Object not found");
+        //}
+     
         #region without fromMode (not use)
         //public async Task<bool> OperatorLicenseConfirmReject(OLConfirmOrRejectVM oLConfirmOrRejectVM)
         //{
@@ -1516,7 +1960,7 @@ namespace DOTP_BE.Repositories
         //    return true;
         //}        
 
-        private int CountByStatus(IEnumerable<Vehicle> vehicles, string status)
+        private int CountByStatus(IEnumerable<Temp_Table> vehicles, string status)
         {
             return vehicles
                 .Where(x => x.Status == status)

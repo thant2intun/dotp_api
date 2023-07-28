@@ -200,96 +200,6 @@ namespace DOTP_BE.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Temp_Tables",
-                columns: table => new
-                {
-                    Temp_Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    LicenseOnlyId = table.Column<int>(type: "int", nullable: false),
-                    Transaction_Id = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ChalenNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LicenseNumberLong = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NRC_Number = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    L_Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L_Township_Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L_Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L_Fax = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L_AllowBusinessTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L_OtherRegistrationOffice_Id = table.Column<int>(type: "int", nullable: true),
-                    L_IsClosed = table.Column<bool>(type: "bit", nullable: true),
-                    FormMode = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    L_IsDeleted = table.Column<bool>(type: "bit", nullable: true),
-                    AttachFile_NRC = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AttachFile_M10 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AttachFile_OperatorLicense = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AttachFile_Part1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AttachFile_RecommandDoc1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AttachFile_RecommandDoc2 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AttachFile_RecommandDoc3 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AttachFile_RecommandDoc4 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AttachFile_RecommandDoc5 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OperatorId = table.Column<int>(type: "int", nullable: true),
-                    OperatorName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    O_AllowBusinessTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    O_Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    O_ApplyDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    O_RegistrationOffice_Id = table.Column<int>(type: "int", nullable: true),
-                    O_NRC = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    O_Township = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    O_Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    O_Fax = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    O_Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    O_ExpiredDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    O_JourneyType_Id = table.Column<int>(type: "int", nullable: true),
-                    O_TotalCar = table.Column<int>(type: "int", nullable: true),
-                    O_DesiredRoute = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    O_Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    O_ApplyLicenseType = table.Column<int>(type: "int", nullable: true),
-                    O_IsClosed = table.Column<bool>(type: "bit", nullable: true),
-                    O_IsDeleted = table.Column<bool>(type: "bit", nullable: true),
-                    VehicleId = table.Column<int>(type: "int", nullable: false),
-                    ApplicantId = table.Column<int>(type: "int", nullable: false),
-                    V_VehicleNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    V_VehicleLineTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    V_CarryLogisticType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    V_VehicleLocation = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    V_VehicleDesiredRoute = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    V_Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RefTransactionId = table.Column<int>(type: "int", nullable: false),
-                    Triangle = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OwnerBook = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AttachedFile1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AttachedFile2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    VehicleWeightId = table.Column<int>(type: "int", nullable: false),
-                    LicenseTypeId = table.Column<int>(type: "int", nullable: false),
-                    CreateCarId = table.Column<int>(type: "int", nullable: true),
-                    VehicleNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Old_VehicleBrand = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    VehicleBrand = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Old_VehicleType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    VehicleType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Old_VehicleWeight = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    VehicleWeight = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    VehicleLocation = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Old_VehicleOwnerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    VehicleOwnerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    VehicleOwnerNRC = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Old_VehicleOwnerNRC = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Old_VehicleOwnerAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    VehicleOwnerAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    C_IsDeleted = table.Column<bool>(type: "bit", nullable: true),
-                    C_PersonInformationId = table.Column<int>(type: "int", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Temp_Tables", x => x.Temp_Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Townships",
                 columns: table => new
                 {
@@ -725,6 +635,114 @@ namespace DOTP_BE.Migrations
                         principalColumn: "VehicleId");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Temp_Tables",
+                columns: table => new
+                {
+                    Temp_Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    LicenseOnlyId = table.Column<int>(type: "int", nullable: false),
+                    Transaction_Id = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ChalenNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LicenseNumberLong = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NRC_Number = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    L_Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    L_Township_Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    L_Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    L_Fax = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    L_AllowBusinessTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    L_OtherRegistrationOffice_Id = table.Column<int>(type: "int", nullable: true),
+                    L_IsClosed = table.Column<bool>(type: "bit", nullable: true),
+                    FormMode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    L_IsDeleted = table.Column<bool>(type: "bit", nullable: true),
+                    AttachFile_NRC = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AttachFile_M10 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AttachFile_OperatorLicense = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AttachFile_Part1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AttachFile_RecommandDoc1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AttachFile_RecommandDoc2 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AttachFile_RecommandDoc3 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AttachFile_RecommandDoc4 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AttachFile_RecommandDoc5 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OperatorId = table.Column<int>(type: "int", nullable: true),
+                    OperatorName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    O_AllowBusinessTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    O_Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    O_ApplyDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    O_RegistrationOffice_Id = table.Column<int>(type: "int", nullable: true),
+                    O_NRC = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    O_Township = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    O_Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    O_Fax = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    O_Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    O_ExpiredDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    O_JourneyType_Id = table.Column<int>(type: "int", nullable: true),
+                    O_TotalCar = table.Column<int>(type: "int", nullable: true),
+                    O_DesiredRoute = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    O_Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    O_ApplyLicenseType = table.Column<int>(type: "int", nullable: true),
+                    O_IsClosed = table.Column<bool>(type: "bit", nullable: true),
+                    O_IsDeleted = table.Column<bool>(type: "bit", nullable: true),
+                    VehicleId = table.Column<int>(type: "int", nullable: false),
+                    ApplicantId = table.Column<int>(type: "int", nullable: false),
+                    V_VehicleNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    V_VehicleLineTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    V_CarryLogisticType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    V_VehicleLocation = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    V_VehicleDesiredRoute = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    V_Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RefTransactionId = table.Column<int>(type: "int", nullable: false),
+                    Triangle = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OwnerBook = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AttachedFile1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AttachedFile2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    VehicleWeightId = table.Column<int>(type: "int", nullable: false),
+                    LicenseTypeId = table.Column<int>(type: "int", nullable: false),
+                    CreateCarId = table.Column<int>(type: "int", nullable: true),
+                    VehicleNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Old_VehicleBrand = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    VehicleBrand = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Old_VehicleType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    VehicleType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Old_VehicleWeight = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    VehicleWeight = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Old_VehicleLocation = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    VehicleLocation = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Old_VehicleOwnerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    VehicleOwnerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    VehicleOwnerNRC = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Old_VehicleOwnerNRC = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Old_VehicleOwnerAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    VehicleOwnerAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    C_IsDeleted = table.Column<bool>(type: "bit", nullable: true),
+                    C_PersonInformationId = table.Column<int>(type: "int", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Temp_Tables", x => x.Temp_Id);
+                    table.ForeignKey(
+                        name: "FK_Temp_Tables_CreateCars_CreateCarId",
+                        column: x => x.CreateCarId,
+                        principalTable: "CreateCars",
+                        principalColumn: "CreateCarId");
+                    table.ForeignKey(
+                        name: "FK_Temp_Tables_LicenseOnlys_LicenseOnlyId",
+                        column: x => x.LicenseOnlyId,
+                        principalTable: "LicenseOnlys",
+                        principalColumn: "LicenseOnlyId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Temp_Tables_Vehicles_VehicleId",
+                        column: x => x.VehicleId,
+                        principalTable: "Vehicles",
+                        principalColumn: "VehicleId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_CreateCars_PersonInformationId",
                 table: "CreateCars",
@@ -786,6 +804,21 @@ namespace DOTP_BE.Migrations
                 name: "IX_PersonInformations_TownshipId",
                 table: "PersonInformations",
                 column: "TownshipId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Temp_Tables_CreateCarId",
+                table: "Temp_Tables",
+                column: "CreateCarId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Temp_Tables_LicenseOnlyId",
+                table: "Temp_Tables",
+                column: "LicenseOnlyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Temp_Tables_VehicleId",
+                table: "Temp_Tables",
+                column: "VehicleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_NRCId",

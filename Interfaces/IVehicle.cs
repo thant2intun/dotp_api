@@ -8,7 +8,9 @@ namespace DOTP_BE.Interfaces
 
     {
         Task<List<Vehicle>> getVehicleList();
-        Task<List<Vehicle>> getVehicleById(string formMode, string transactionId, string status);
+        Task<List<Temp_Table>> getVehicleById(string formMode, string transactionId, string status);
+        //Task<List<Vehicle>> getVehicleById(string formMode, string transactionId, string status);
+
 
         Task<List<Vehicle>> getVehicleById(string transactionId, string status);
         //Task<(Vehicle, List<Vehicle>)> getVehicleById(int transactionId);
@@ -20,6 +22,8 @@ namespace DOTP_BE.Interfaces
 
         //Task<ExtendLicenseDashBoardVMAdmin> getVehicleListByStatusAndDate(string status, string fromDate, string toDate);
         Task<(int, ExtendLicenseDashBoardVMAdmin)> getVehicleListByStatus(ExtenLicenseDbSearchVM dto);
+        //Task<(int, ExtendLicenseDashBoardVMAdmin)> getVehicleListByStatusNOTUSE(ExtenLicenseDbSearchVM dto);
+
 
         Task<Vehicle> VehicleDetailToCheckById(int id);
         Task<bool> UpdateStatusById(int id, string statusDto);

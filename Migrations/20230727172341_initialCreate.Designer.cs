@@ -4,6 +4,7 @@ using DOTP_BE.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DOTP_BE.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230727172341_initialCreate")]
+    partial class initialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -844,11 +846,11 @@ namespace DOTP_BE.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("ExpiryDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("FormMode")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L_Address")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("L_AllowBusinessTitle")
@@ -863,22 +865,13 @@ namespace DOTP_BE.Migrations
                     b.Property<bool?>("L_IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<string>("L_N_Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("L_N_Township_Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("L_O_Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("L_O_Township_Name")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int?>("L_OtherRegistrationOffice_Id")
                         .HasColumnType("int");
 
                     b.Property<string>("L_Phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L_Township_Name")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LicenseNumberLong")
@@ -1009,9 +1002,6 @@ namespace DOTP_BE.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("V_VehicleNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("V_VehicleType")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("VehicleBrand")

@@ -10,13 +10,16 @@ namespace DOTP_BE.Model
 
         #region *** LicenseOnly ***
         public int LicenseOnlyId { get; set; }
+        public LicenseOnly LicenseOnly { get; set; }
         public string Transaction_Id { get; set; } //string before 07/02/2023
         public string ChalenNumber { get; set; }
         public string Status { get;set; }
         public string LicenseNumberLong { get; set; }
         public string NRC_Number { get; set; } // all NRC Number is the same
-        public string? L_Address { get; set; }
-        public string? L_Township_Name { get; set; }
+        public string? L_O_Address { get; set; }
+        public string? L_N_Address { get; set; }
+        public string? L_O_Township_Name { get; set; }
+        public string? L_N_Township_Name { get; set; }
         public string? L_Phone { get; set; }
         public string? L_Fax { get; set; }
         public string? L_AllowBusinessTitle { get; set; }
@@ -33,10 +36,13 @@ namespace DOTP_BE.Model
         public string? AttachFile_RecommandDoc3 { get; set; }
         public string? AttachFile_RecommandDoc4 { get; set; }
         public string? AttachFile_RecommandDoc5 { get; set; }
+        //public int RegistrationOfficeId { get; set; }
+        //public RegistrationOffice RegistrationOffice { get; set; }
         #endregion
 
         #region *** OperatorDetail ***
         public int? OperatorId { get; set; }
+        //public OperatorDetail OperatorDetail { get; set; }
         public string? OperatorName { get; set; }
         public string? O_AllowBusinessTitle { get; set; }
         public string? O_Address { get; set; }
@@ -60,6 +66,7 @@ namespace DOTP_BE.Model
 
         #region *** Vehicle ***
         public int VehicleId { get; set; }
+        public Vehicle Vehicle { get; set; }
         public int ApplicantId { get; set; }
         public string? V_VehicleNumber { get; set; } //From CreateCar
         public string? V_VehicleLineTitle { get; set; }
@@ -73,12 +80,16 @@ namespace DOTP_BE.Model
         public string? AttachedFile1 { get; set; }
         public string? AttachedFile2 { get; set; }
         public int VehicleWeightId { get; set; }
+        public string? V_VehicleType { get; set; }
+
         public int LicenseTypeId { get; set; }
+        public DateTime? ExpiryDate { get; set; }
 
         #endregion
 
         #region *** CreateCar ***
         public int? CreateCarId { get; set; }
+        public CreateCar CreateCar { get; set; }
         public string? VehicleNumber { get; set; }
         public string? Old_VehicleBrand { get; set; }
         public string? VehicleBrand { get; set; }
@@ -86,6 +97,8 @@ namespace DOTP_BE.Model
         public string? VehicleType { get; set; }
         public string? Old_VehicleWeight { get; set; }
         public string? VehicleWeight { get; set; }
+        public string? Old_VehicleLocation { get; set; }
+
         public string? VehicleLocation { get; set; }
         public string? Old_VehicleOwnerName { get; set; }
         public string? VehicleOwnerName { get; set; }
@@ -100,6 +113,7 @@ namespace DOTP_BE.Model
         #endregion
 
         public DateTime CreatedDate { get; set; }
+
         public string? CreatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
 
@@ -119,8 +133,11 @@ namespace DOTP_BE.Model
                 AttachFile_RecommandDoc2 = this.AttachFile_RecommandDoc2,
                 FormMode = this.FormMode,
                 CreatedDate = this.CreatedDate,
-                L_Address = this.L_Address,
-                L_Township_Name = this.L_Township_Name,
+                L_O_Address = this.L_O_Address,
+                L_N_Address = this.L_N_Address,
+                L_O_Township_Name= this.L_O_Township_Name,
+                L_N_Township_Name  = this.L_N_Township_Name,
+                ExpiryDate = this.ExpiryDate,
                 Status = this.Status,
             };
         }

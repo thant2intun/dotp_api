@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DOTP_BE.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230727094824_initialCreate")]
-    partial class initialCreate
+    [Migration("20230727175129_updateColumn")]
+    partial class updateColumn
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -846,6 +846,9 @@ namespace DOTP_BE.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("ExpiryDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("FormMode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -942,6 +945,9 @@ namespace DOTP_BE.Migrations
                     b.Property<string>("Old_VehicleBrand")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Old_VehicleLocation")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Old_VehicleOwnerAddress")
                         .HasColumnType("nvarchar(max)");
 
@@ -1032,6 +1038,12 @@ namespace DOTP_BE.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Temp_Id");
+
+                    b.HasIndex("CreateCarId");
+
+                    b.HasIndex("LicenseOnlyId");
+
+                    b.HasIndex("VehicleId");
 
                     b.ToTable("Temp_Tables");
                 });
@@ -1602,6 +1614,31 @@ namespace DOTP_BE.Migrations
                     b.Navigation("NRC");
 
                     b.Navigation("Township");
+                });
+
+            modelBuilder.Entity("DOTP_BE.Model.Temp_Table", b =>
+                {
+                    b.HasOne("DOTP_BE.Model.CreateCar", "CreateCar")
+                        .WithMany()
+                        .HasForeignKey("CreateCarId");
+
+                    b.HasOne("DOTP_BE.Model.LicenseOnly", "LicenseOnly")
+                        .WithMany()
+                        .HasForeignKey("LicenseOnlyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DOTP_BE.Model.Vehicle", "Vehicle")
+                        .WithMany()
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreateCar");
+
+                    b.Navigation("LicenseOnly");
+
+                    b.Navigation("Vehicle");
                 });
 
             modelBuilder.Entity("DOTP_BE.Model.User", b =>

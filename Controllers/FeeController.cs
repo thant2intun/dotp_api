@@ -23,6 +23,7 @@ namespace DOTP_BE.Controllers
             var fees = await _repo.getFeeList();
             return Ok(fees);
         }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetFeeById([FromRoute] int id)
         {
@@ -33,6 +34,7 @@ namespace DOTP_BE.Controllers
             }
             return Ok(fee);
         }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] FeeVM feeVM)
         {
@@ -61,6 +63,5 @@ namespace DOTP_BE.Controllers
             _repo.Delete(id);
             return Ok();
         }
-
     }
 }

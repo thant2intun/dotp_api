@@ -37,6 +37,15 @@ namespace DOTP_BE.Controllers
             return Ok(vehicles);
         }
 
+        //[HttpGet("{formMode}/{transactionId}/{status}")]
+        //public async Task<IActionResult> GetVehicleById([FromRoute] string formMode, string transactionId, string status)
+        //{
+        //    var vehicles = await _repo.getVehicleById(formMode, transactionId, status);
+        //    if (vehicles == null)
+        //        return NotFound();
+        //    return Ok(vehicles);
+        //}
+
         [HttpGet("{transactionId}/{status}")]
         public async Task<IActionResult> GetVehicleById([FromRoute] string transactionId, string status)
          {
@@ -100,7 +109,14 @@ namespace DOTP_BE.Controllers
         {
             var result = await _repo.getVehicleListByStatus(dto);            
             return Ok(result);
-        }   
+        }
+
+        [HttpGet("VehicleListByStatusNOTUSE")]
+        public async Task<IActionResult> VehicleListByStatusNOTUSE([FromQuery] ExtenLicenseDbSearchVM dto)
+        {
+            var result = await _repo.getVehicleListByStatus(dto);
+            return Ok(result);
+        }
         #endregion
 
         [HttpGet("vehicleDetailToCheckById/{vId}")]

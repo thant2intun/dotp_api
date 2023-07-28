@@ -2107,7 +2107,7 @@ namespace DOTP_BE.Repositories
 
 
 
-                #region license update
+                #region *** license update ***
                 LicenseOnly newLicenseOnly = new LicenseOnly();
                 string rootPath = _iConfig.GetSection("Upload_FolderPath").Value;
                 string pathAttachFile_NRC = string.Empty;
@@ -2927,18 +2927,18 @@ namespace DOTP_BE.Repositories
         {
             if (dto.TakeNewRecord != null && dto.TakeNewRecord == true)
             {
-                var dataToDelete = await _context.Vehicles.AsNoTracking()
+                var dataToDelete = await _context.Temp_Tables.AsNoTracking()
                     .Where(x => x.LicenseNumberLong == dto.LicenseNumberLong &&
                                 x.FormMode == dto.FormMode &&
                                 x.Status == ConstantValue.Status_Pending &&
                                 x.CreatedDate.Date == DateTime.Now.Date)
                     .ToListAsync();
-                _context.Vehicles.RemoveRange(dataToDelete);
+                _context.Temp_Tables.RemoveRange(dataToDelete);
                 //await _context.SaveChangesAsync(); // if with T_id only have one fromMode and delete it cause duplicate then will change new T_id and prevent if something wrong not delete it
             }
             else
             {
-                bool checkFormModeDuplicate = await _context.Vehicles.AsNoTracking()
+                bool checkFormModeDuplicate = await _context.Temp_Tables.AsNoTracking()
                            .AnyAsync(x => x.LicenseNumberLong == dto.LicenseNumberLong &&
                                           x.FormMode == dto.FormMode &&
                                           x.Status == ConstantValue.Status_Pending &&
@@ -2959,7 +2959,7 @@ namespace DOTP_BE.Repositories
             {
                 #region *** generate new Transaction and Chalen ID ***
 
-                var checkTandC = await _context.Vehicles.AsNoTracking()
+                var checkTandC = await _context.Temp_Tables.AsNoTracking()
                         .Where(x => x.LicenseNumberLong == dto.LicenseNumberLong &&
                                     x.CreatedDate.Date == DateTime.Now.Date &&
                                     x.Status == ConstantValue.Status_Pending) // only for after paid and wanna two transaction_id (no need at the moment)
@@ -2974,7 +2974,7 @@ namespace DOTP_BE.Repositories
                     //var vehicleObj = await _context.Vehicles.AsNoTracking().ToListAsync();
 
                     //ရှိတမျ data အကုန်ဆွဲ ထုတ်တာထက် လက်ရှိရောက်နေတဲ့ ခုနှစ်ထက် တစ်လလောက် နောက်ဆုတ်ပီး ဆွဲထုတ်တာ ပိုပေါ့ (if there is no operation duing last month it would wrong)
-                    var vehicleObj = await _context.Vehicles.AsNoTracking()
+                    var vehicleObj = await _context.Temp_Tables.AsNoTracking()
                         .Where(x => x.CreatedDate >= DateTime.Now.Date.AddMonths(-1))
                         .ToListAsync();
 
@@ -3109,11 +3109,14 @@ namespace DOTP_BE.Repositories
                 tempTable.FormMode = dto.FormMode;
                 tempTable.Status = ConstantValue.Status_Pending;
                 tempTable.CreatedDate = DateTime.Now;
+                tempTable.ExpiryDate = DateTime.Now;
 
                 if (dto.FormMode == ConstantValue.ChangeLOwnerAddress && dto.ChangeLicenseAddress != null) //for license owner address change
                 {
-                    tempTable.L_Address = dto.ChangeLicenseAddress.Address;
-                    tempTable.L_Township_Name = dto.ChangeLicenseAddress.Township_Name;
+                    tempTable.L_O_Address = licenOnlys.Address;
+                    tempTable.L_O_Township_Name = licenOnlys.Township_Name;
+                    tempTable.L_N_Address = dto.ChangeLicenseAddress.Address;
+                    tempTable.L_N_Township_Name = dto.ChangeLicenseAddress.Township_Name;
                 }
                 #endregion
 
@@ -3178,6 +3181,7 @@ namespace DOTP_BE.Repositories
                     foreach (var item in dto.ChangeVehicleAddress)
                     {
                         var vehicleObjN = await _context.Vehicles.AsNoTracking()
+                            .Include(x => x.CreateCar)
                             .SingleOrDefaultAsync(x => x.VehicleId == item.CreateCarId);
                         
                         if (vehicleObjN == null)
@@ -3223,7 +3227,9 @@ namespace DOTP_BE.Repositories
 
                         //for create car table 
                         temp_sub.CreateCarId = vehicleObjN.CreateCarId; // (to get old data)
+                        temp_sub.Old_VehicleOwnerAddress = vehicleObjN.CreateCar.VehicleOwnerAddress;
                         temp_sub.VehicleOwnerAddress = item.VehicleOwnerAddress; //(new address)
+                        temp_sub.Old_VehicleLocation = vehicleObjN.CreateCar.VehicleLocation;
                         temp_sub.VehicleLocation = item.Township_Name; //(new address)
 
                         temp_TablesList.Add(temp_sub);
@@ -3238,6 +3244,7 @@ namespace DOTP_BE.Repositories
                     {
                         var vehicleObjN = await _context.Vehicles.AsNoTracking()
                             .Include(x => x.CreateCar)
+                            .Include(x => x.VehicleWeight)
                             .SingleOrDefaultAsync(x => x.VehicleId == item.VehicleId);
 
                         if (vehicleObjN == null)
@@ -3320,9 +3327,11 @@ namespace DOTP_BE.Repositories
                         temp_sub.VehicleWeightId = vehicleObjN.VehicleWeightId;
                         temp_sub.LicenseTypeId = vehicleObjN.LicenseTypeId;
                         temp_sub.OperatorId = vehicleObjN.OperatorId;
+                        temp_sub.V_VehicleType = vehicleObjN.VehicleWeight.VehicleType;
 
                         //for create car table 
                         temp_sub.CreateCarId = vehicleObjN.CreateCarId; // (to get old data)
+                        temp_sub.VehicleOwnerName = vehicleObjN.CreateCar.VehicleOwnerName;
 
                         temp_sub.Old_VehicleType = vehicleObjN.CreateCar.VehicleType;
                         temp_sub.VehicleType = item.VehicleType; //(new )
@@ -3485,14 +3494,16 @@ namespace DOTP_BE.Repositories
                         #endregion
 
                         Temp_Table temp_sub = tempTable.DeepCopy();
+                        temp_sub.VehicleId = 2; //default
                         temp_sub.ApplicantId = applicantId;
                         temp_sub.V_VehicleNumber = item.vehicleNumber;
                         temp_sub.V_VehicleLocation = item.vehicleLocation;
                         temp_sub.OwnerBook = pathOwnerBookFiles;
                         temp_sub.AttachedFile1 = pathAttachedFiles1;
+                        temp_sub.V_VehicleType = "---";
 
                         //for create car table 
-                        temp_sub.CreateCarId = ConstantValue.Zero;
+                        temp_sub.CreateCarId = 13; //default
                         temp_sub.VehicleNumber = item.vehicleNumber;
                         temp_sub.VehicleBrand = item.vehicleBrand;
                         temp_sub.VehicleType = item.vehicleType;
@@ -3513,6 +3524,8 @@ namespace DOTP_BE.Repositories
                     foreach (var item in dto.DecreaseCars)
                     {
                         var vehicleObjN = await _context.Vehicles.AsNoTracking()
+                            .Include(x => x.CreateCar)
+                            .Include(x => x.VehicleWeight)
                             .SingleOrDefaultAsync(x => x.VehicleId == item.VehicleID);
 
                         if (vehicleObjN == null)
@@ -3589,6 +3602,9 @@ namespace DOTP_BE.Repositories
                         temp_sub.CreateCarId = vehicleObjN.CreateCarId;
                         temp_sub.LicenseTypeId = vehicleObjN.LicenseTypeId;
                         temp_sub.OperatorId = vehicleObjN.OperatorId;
+                        temp_sub.V_VehicleType = vehicleObjN.VehicleWeight.VehicleType;
+                        temp_sub.VehicleOwnerAddress = vehicleObjN.CreateCar.VehicleOwnerAddress;
+
                         temp_TablesList.Add(temp_sub);
                     }
                 }
@@ -3675,6 +3691,7 @@ namespace DOTP_BE.Repositories
                         temp_sub.CreateCarId = vehicleObjN.CreateCarId;
                         temp_sub.LicenseTypeId = vehicleObjN.LicenseTypeId;
                         temp_sub.OperatorId = vehicleObjN.OperatorId;
+                        temp_sub.V_VehicleType = "---";
 
                         temp_TablesList.Add(temp_sub);
                     }
@@ -3686,7 +3703,9 @@ namespace DOTP_BE.Repositories
                 {
                     foreach (var item in dto.ExtendOperatorLicense)
                     {
-                        var vehicleObjN = await _context.Vehicles.AsNoTracking().SingleOrDefaultAsync(x => x.VehicleId == item.VehicleId);
+                        var vehicleObjN = await _context.Vehicles.AsNoTracking()
+                            .Include(x => x.VehicleWeight)
+                            .SingleOrDefaultAsync(x => x.VehicleId == item.VehicleId);
                         if (vehicleObjN != null)
                         {
                             #region *** Save Vehicle Attached Files ***
@@ -3759,6 +3778,7 @@ namespace DOTP_BE.Repositories
                             temp_sub.CreateCarId = vehicleObjN.CreateCarId;
                             temp_sub.LicenseTypeId = vehicleObjN.LicenseTypeId;
                             temp_sub.OperatorId = vehicleObjN.OperatorId;
+                            temp_sub.V_VehicleType = vehicleObjN.VehicleWeight.VehicleType;
 
                             temp_TablesList.Add(temp_sub);
                         }
