@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "D:\\DOTP\\Testing\\Fro Presentation\\DOTP-API\\DOTP_BE.csproj": {}
+    "C:\\Users\\ACER\\Desktop\\DOTP(28-7-23)\\DOTP-API\\DOTP_BE.csproj": {}
   },
   "projects": {
-    "D:\\DOTP\\Testing\\Fro Presentation\\DOTP-API\\DOTP_BE.csproj": {
+    "C:\\Users\\ACER\\Desktop\\DOTP(28-7-23)\\DOTP-API\\DOTP_BE.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\DOTP\\Testing\\Fro Presentation\\DOTP-API\\DOTP_BE.csproj",
+        "projectUniqueName": "C:\\Users\\ACER\\Desktop\\DOTP(28-7-23)\\DOTP-API\\DOTP_BE.csproj",
         "projectName": "DOTP_BE",
-        "projectPath": "D:\\DOTP\\Testing\\Fro Presentation\\DOTP-API\\DOTP_BE.csproj",
-        "packagesPath": "C:\\Users\\SecureLink\\.nuget\\packages\\",
-        "outputPath": "D:\\DOTP\\Testing\\Fro Presentation\\DOTP-API\\obj\\",
+        "projectPath": "C:\\Users\\ACER\\Desktop\\DOTP(28-7-23)\\DOTP-API\\DOTP_BE.csproj",
+        "packagesPath": "C:\\Users\\ACER\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ACER\\Desktop\\DOTP(28-7-23)\\DOTP-API\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\SecureLink\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ACER\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -22,8 +26,8 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\sdk\\7.0.302\\Sdks\\Microsoft.NET.Sdk.Web\\library-packs": {},
-          "https://api.nuget.org/v3/index.json": {}
+          "https://api.nuget.org/v3/index.json": {},
+          "https://api/nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net6.0": {
@@ -115,7 +119,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.302\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.102\\RuntimeIdentifierGraph.json"
         }
       }
     }

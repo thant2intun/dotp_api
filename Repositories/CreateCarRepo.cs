@@ -103,6 +103,27 @@ namespace DOTP_BE.Repositories
 
         }
 
+
+        public bool CheckVehicleNumber(string vehicleNumber)
+        {
+            var vehicleNumberChange = vehicleNumber.Replace('*', '/');
+            var vehicleNumberList = _context.CreateCars.Select(x => x.VehicleNumber).ToList();
+            var result = false;
+
+            foreach (var i in vehicleNumberList)
+            {
+                if (i == vehicleNumberChange)
+                {
+                    result = true;
+                    break;
+                }
+            }
+
+
+
+            return result;
+        }
+
         //public async Task<string> NewCarAttach(List<ExtenseCarVM> cars)
         //{
         //    var vehicleObj = await _context.Vehicles.ToListAsync();
