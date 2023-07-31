@@ -361,24 +361,3 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/Migrations/20221213155302_Initail_Catalog_TZT.cs
-/Migrations/20221213155302_Initail_Catalog_TZT.Designer.cs
-<<<<<<< HEAD
-/Migrations/20230116071341_mwl-160123.cs
-/Migrations/20230116071341_mwl-160123.Designer.cs
-/Migrations/20230116075212_mwl--.cs
-/Migrations/20230116075212_mwl--.Designer.cs
-/Migrations/20230116093853_Mwl-16-01-23.cs
-/Migrations/20230116093853_Mwl-16-01-23.Designer.cs
-/Migrations/20230117052436_update_PI_mwl.cs
-/Migrations/20230117052436_update_PI_mwl.Designer.cs
-/Migrations/20230118041818_recall_mwl.cs
-/Migrations/20230118041818_recall_mwl.Designer.cs
-/Migrations/20230207081244_editcolname@vehicle_Mwl.cs
-/Migrations/20230207081244_editcolname@vehicle_Mwl.Designer.cs
-=======
-/Migrations/20230207035245_AL_07_02_2023.cs
-/Migrations/ApplicationDbContextModelSnapshot.cs
-/Migrations/20230207035245_AL_07_02_2023.Designer.cs
-/.gitignore
->>>>>>> 3f046281fed01277d501a106a47564595cb6489e
