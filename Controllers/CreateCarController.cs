@@ -70,6 +70,16 @@ namespace DOTP_BE.Controllers
             return Ok(extenseCarVMLists);
         }
 
+
+        [HttpGet("CheckVehicleNumber/{vehicleNumber}")]
+        public bool CheckVehicleNumber(string vehicleNumber)
+        {
+
+            bool result = _repo.CheckVehicleNumber(vehicleNumber);
+
+            return result;
+        }
+
         //[HttpPost("UpdateCar")]
         //public async Task<IActionResult> UpdateCar([FromForm] OperatorLicenseAttachVM operatorLicenseAttachVM)
         //{
