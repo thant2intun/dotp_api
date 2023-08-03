@@ -1245,7 +1245,8 @@ namespace DOTP_BE.Repositories
                 .Include(x => x.LicenseOnly)
                 .Include(x => x.CreateCar)
                 .Where(x => x.Transaction_Id == oLConfirmOrRejectVM.TransactionId &&
-                            x.FormMode == oLConfirmOrRejectVM.FormMode)
+                            x.FormMode == oLConfirmOrRejectVM.FormMode &&
+                            x.Status == ConstantValue.Status_Pending)
                 .ToListAsync();
             if (vehicleObj.Count > 0)
             {

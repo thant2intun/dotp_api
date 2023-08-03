@@ -154,10 +154,11 @@ namespace DOTP_BE.Repositories
             if (user == null)
                 return null;
 
-            var distNRCs = await _context.OperatorDetails.AsNoTracking().Include(x => x.Vehicle).ThenInclude(x => x.LicenseOnly).ThenInclude(x => x.RegistrationOffice)
-                                                        .Where(x => x.NRC == user.NRC_Number &&
-                                                        (x.FormMode == ConstantValue.CreateNew_FM || x.FormMode == ConstantValue.EOPL_FM))                                                        
-                                                        .ToListAsync(); //get all data 'Creae New' and 'ExtendOperatorLicense'
+            var distNRCs = await _context.OperatorDetails.AsNoTracking()
+                .Include(x => x.Vehicle).ThenInclude(x => x.LicenseOnly).ThenInclude(x => x.RegistrationOffice)                 
+                .Where(x => x.NRC == user.NRC_Number &&
+                            (x.FormMode == ConstantValue.CreateNew_FM || x.FormMode == ConstantValue.EOPL_FM))                                                        
+                .ToListAsync(); //get all data 'Creae New' and 'ExtendOperatorLicense'
 
             distNRCs = distNRCs.GroupBy(d => d.ApplyLicenseType)
                                .Select(g => g.OrderByDescending(d => d.ApplyDate).First())

@@ -9,6 +9,7 @@
         public const int twoThousand = 2000;
         public const int thirtyThousand = 30000;
         public const int tenThousand = 10000;
+        public const string Status_OperationPending = "OperationPending";
         public const string Status_Pending = "Pending";
         public const string Status_Approved = "Approved";
         public const string Status_Rejected = "Rejected";

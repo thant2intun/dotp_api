@@ -2552,7 +2552,6 @@ namespace DOTP_BE.Repositories
 
         //}
         #endregion
-
         #region Commented for to make same T&C from BE
         //public async Task<(string, string, string, DateTime)> CommonChangesProcess(CommonChangesVM dto)
         //{
@@ -3107,7 +3106,8 @@ namespace DOTP_BE.Repositories
                 tempTable.AttachFile_RecommandDoc1 = pathAttachFile_RecommandDoc1;
                 tempTable.AttachFile_RecommandDoc2 = pathAttachFile_RecommandDoc2;
                 tempTable.FormMode = dto.FormMode;
-                tempTable.Status = ConstantValue.Status_Pending;
+                tempTable.Status = ConstantValue.Status_OperationPending;
+                //tempTable.Status = ConstantValue.Status_Pending;
                 tempTable.CreatedDate = DateTime.Now;
                 tempTable.ExpiryDate = DateTime.Now;
 
