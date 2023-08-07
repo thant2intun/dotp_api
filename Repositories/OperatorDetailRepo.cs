@@ -471,7 +471,140 @@ namespace DOTP_BE.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
+        #region TZT 120723 for mobile api
+        public async Task<OperatorDetailMobileVM> getOperatorDetailByNRCAndLicenseNumberLongMobile(OperatorDetailGetRequest opGetReq)
+        {
+            var opVM = new OperatorDetailMobileVM();
+            var opHead = new OperatorDetailHead();
+            var userNrc = await _context.Users.FindAsync(opGetReq.userId);
+            if (userNrc != null)
+            {
+                var operatorDetail = await _context.OperatorDetails.FindAsync(opGetReq.operatorId);
 
+
+                if (operatorDetail != null)
+                {
+                    int addCar = await _context.OperatorDetails.AsNoTracking()
+                                               .Where(x => x.NRC == operatorDetail.NRC &&
+                                                           x.ApplyDate.Date >= operatorDetail.ApplyDate.Date &&
+                                                           x.FormMode == ConstantValue.AddNewCar_FM &&
+                                                           x.ApplyLicenseType == operatorDetail.ApplyLicenseType /*&&*/
+                                                           /*x.IsDeleted == false*/)
+                                               .SumAsync(x => x.TotalCar);
+
+                    int decCar = await _context.OperatorDetails.AsNoTracking()
+                                               .Where(x => x.NRC == operatorDetail.NRC &&
+                                                           x.ApplyDate.Date >= operatorDetail.ApplyDate.Date &&
+                                                           x.FormMode == ConstantValue.DecreaseCar_FM &&
+                                                           x.ApplyLicenseType == operatorDetail.ApplyLicenseType &&
+                                                           x.Transaction_Id != operatorDetail.Transaction_Id)
+                                               .SumAsync(x => x.TotalCar);
+
+
+                    opHead.OperatorName = operatorDetail!.OperatorName;
+                    opHead.TotalCar = operatorDetail.TotalCar + addCar - decCar;
+                    opHead.NRC = operatorDetail.NRC;
+                    opHead.Phone = operatorDetail.Phone;
+                    opHead.Email = operatorDetail.Email;
+                    opHead.Address = operatorDetail.Address;
+                    opHead.ExpiredDate = operatorDetail.ExpiredDate;
+
+                    //for licenOnly table
+                    //opHead.Transaction_Id = operatorDetail.Transaction_Id; (al c)
+                    //opHead.Fax = operatorDetail.Fax; (al c)
+                    opHead.AllowBusinessTitle = operatorDetail.AllowBusinessTitle;
+                    opHead.LicenseOwner = operatorDetail.LicenseOwner;
+                    opHead.Township = operatorDetail.Township;
+                    opHead.RegistrationOffice_Id = operatorDetail.RegistrationOffice_Id;
+                    opHead.CreatedDate = operatorDetail.CreatedDate;
+                    opHead.IsClosed = operatorDetail.IsClosed;
+                    opHead.FormMode = operatorDetail.FormMode;
+                    opHead.IsDeleted = operatorDetail.IsDeleted;
+                    opHead.JourneyType_Id = operatorDetail.JourneyType_Id;
+                    opHead.PersonInformationId = operatorDetail.PersonInformationId;
+                    opHead.CreatedBy = operatorDetail.CreatedBy; //userNrc.Name
+                    opHead.LicenseHolderType = operatorDetail.LicenseHolderType;
+                    opHead.ApplyLicenseType = operatorDetail.ApplyLicenseType;
+                    opHead.Email = operatorDetail.Email;
+                    opHead.VehicleId = operatorDetail.VehicleId;
+                    opHead.applicant_Id = operatorDetail.applicant_Id;
+
+
+                    //get all dec car Vehicle No and filter all that car for total car
+                    var decCarT_Id = await _context.OperatorDetails.AsNoTracking()
+                                                 .Where(x => x.NRC == operatorDetail.NRC &&
+                                                             x.ApplyDate.Date >= operatorDetail.ApplyDate.Date &&
+                                                             x.FormMode == ConstantValue.DecreaseCar_FM &&
+                                                             x.ApplyLicenseType == operatorDetail.ApplyLicenseType /*&&*/
+                                                             /*x.IsDeleted == false*/)
+                                                 .Select(x => x.Transaction_Id)
+                                                 .ToListAsync();
+
+
+                    var vehicleNo = await _context.Vehicles.AsNoTracking()
+                                                  .Where(x => decCarT_Id.Contains(x.Transaction_Id) && x.FormMode == ConstantValue.DecreaseCar_FM)
+                                                  .Select(x => x.VehicleNumber)
+                                                  .ToListAsync();
+
+                    var vehiclesObject = await _context.Vehicles.AsNoTracking()
+                                                       .Include(x => x.CreateCar)
+                                                       .Include(x => x.VehicleWeight)
+                                                       .Include(x => x.LicenseOnly).ThenInclude(x => x.RegistrationOffice)
+                                                       .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
+                                                       .Where(x => x.NRC_Number == userNrc.NRC_Number &&
+                                                                   x.LicenseNumberLong == opGetReq.licenseNumlong &&
+                                                                   x.ApplyDate.Date >= operatorDetail.ApplyDate.Date &&
+                                                                   !vehicleNo.Contains(x.VehicleNumber) &&
+                                                                   x.LicenseTypeId == operatorDetail.ApplyLicenseType &&
+                                                                   //x.FormMode != ConstantValue.DecreaseCar_FM &&
+                                                                   x.Status == ConstantValue.Status_Approved)
+                                                       .ToListAsync();
+
+                    if (vehiclesObject != null)
+                    {
+                        List<CarObject> cars = new List<CarObject>();
+                        foreach (var item in vehiclesObject)
+                        {
+                            var a = (new CarObject
+                            {
+                                //CreateCarId = item.CreateCar.CreateCarId,
+                                CreateCarId = item.VehicleId,
+                                VehicleNumber = item.CreateCar.VehicleNumber,
+                                VehicleBrand = item.CreateCar.VehicleBrand,
+                                VehicleType = item.CreateCar.VehicleType,
+                                VehicleOwnerName = item.CreateCar.VehicleOwnerName,
+                                ExpiredDate = item.ExpiryDate,
+                                //AllowedWeight = item.VehicleWeight.VehicleType,
+
+                                vehicleOwnerAddress = item.CreateCar.VehicleOwnerAddress,
+                                vehicleAddress = item.VehicleLocation,
+                                vehicleWeight = item.CreateCar.VehicleWeight,
+                                vehicleOwnerNRC = item.CreateCar.VehicleOwnerNRC,
+                                OwnerBook = item.OwnerBook,
+                                Triangle = item.Triangle,
+                                AttachedFile1 = item.AttachedFile1,
+                                AttachedFile2 = item.AttachedFile2,
+                                Id = item.CreateCar.CreateCarId,
+                                AllowedWeight = item.CreateCar.VehicleWeight,
+                            });
+                            cars.Add(a);
+                        }
+                        var pageCount = cars.Count() / opGetReq.countPerPage;
+                        opVM.carObjects = cars.Skip((opGetReq.page - 1) * opGetReq.countPerPage)
+                                      .Take(opGetReq.countPerPage)
+                                      .ToList();
+                        opHead.LicenseNumberLong = vehiclesObject[0].LicenseNumberLong;
+                        opHead.OfficeName = vehiclesObject[0].LicenseOnly.RegistrationOffice.OfficeLongName;
+                        opHead.JourneyTypeName = vehiclesObject[0].LicenseOnly.JourneyType.JourneyTypeLong;
+                        opHead.ChalenNumber = vehiclesObject[0].ChalenNumber;
+                        opVM.operatorDetailHead = opHead;
+                        opVM.totalCarCount = cars.Count();
+                    }
+                }
+            }
+            return opVM;
+        }
+        #endregion TZT 120723 for mobile api
         //public async Task<string> VehicleAttach(List<CarAttachedFileVM> carAttachedFilelVM)
         public async Task<(bool, bool)> ExtendOperatorLicenseProcessNotUse(OperatorLicenseAttachVM dto)
         {

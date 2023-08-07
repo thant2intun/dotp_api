@@ -194,6 +194,16 @@ namespace DOTP_BE.Controllers
             }
             return BadRequest(new ResponseMessage() { Status=false,Message="Fail!"});
         }
+        [HttpGet("ExtendsLicenseMobile/{userId}")]
+        public async Task<IActionResult> Extends_LicenseMobile(string userId)
+        {
+            if (userId == null)
+                return BadRequest();
+            var data = await _repo.GetExtendsLicenses(userId);
+            if (data == null)
+                return NotFound(new ResponseMessage() { Status = false, Message = "Record not found!" });
+            return Ok(new { Status = true, Message = "success", Data = data });
+        }
         #endregion
 
         [HttpGet("")]

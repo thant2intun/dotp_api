@@ -12,6 +12,7 @@ namespace DOTP_BE.Interfaces
         Task<bool> Delete(int id);
         Task<bool> Update(int id, OperatorDetailVM operatorDetailVM);
         Task<OperatorDetailVM> getOperatorDetailByNRCAndLicenseNumberLong(int userId, int operatorId, string license_num_long);
+        Task<OperatorDetailMobileVM> getOperatorDetailByNRCAndLicenseNumberLongMobile(OperatorDetailGetRequest opDetailGetReq);//tzt 120723
         Task<bool> AddOperatorLicenseAttach(LicenseOnly licenseOnly);
         Task<bool> UpdateLicenseAttach(OperatorLicenseAttachVM operatorLicenseAttachVM, string transactionId);
 
