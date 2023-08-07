@@ -198,10 +198,11 @@ namespace DOTP_BE.Repositories
                                                .Where(x => x.Transaction_Id == license.Transaction_Id /*&&*/
                                                            /*x.IsDeleted == false*/)
                                                .FirstOrDefaultAsync();
-
+                var license_type = await _context.LicenseTypes.Where(lt => lt.LicenseTypeId == vehicleObj.LicenseTypeId).FirstOrDefaultAsync();
                 result.Add(new ExtendsLicenseVM
                 {
                     OperatorId = license.OperatorId,
+                    LicenseType = license_type.LicenseTypeShort, //added TZT 07Aug23
                     LicenseNumberLong = vehicleObj == null ? null : vehicleObj.LicenseNumberLong,
                     RegistrationOfficeName = vehicleObj == null ? null : vehicleObj.LicenseOnly.RegistrationOffice.OfficeLongName,
                     ExpiryDate = license.ExpiredDate,
