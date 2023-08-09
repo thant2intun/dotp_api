@@ -1,10 +1,9 @@
-﻿using DOTP_BE.Data;
-using DOTP_BE.Helpers;
+﻿using BitMiracle.LibTiff.Classic;
+using DOTP_BE.Data;
 using DOTP_BE.Interfaces;
 using DOTP_BE.Model;
 using DOTP_BE.ViewModel;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
 
 namespace DOTP_BE.Repositories
 {
@@ -75,7 +74,7 @@ namespace DOTP_BE.Repositories
         public bool UpdateCar(List<UpdateCreateCar> createCarVM)
         {
             //createCarVM.ForEach(data => _context.CreateCars.Find(data.createCarId));
-            
+
             if (createCarVM != null)
             {
                 foreach (var item in createCarVM)
@@ -85,7 +84,7 @@ namespace DOTP_BE.Repositories
                     createCar.VehicleType = item.VehicleType;
                     createCar.VehicleWeight = item.VehicleWeight;
                     _context.CreateCars.Update(createCar);
-                    _context.SaveChanges();                    
+                    _context.SaveChanges();
                 }
                 return true;
             };
@@ -103,51 +102,53 @@ namespace DOTP_BE.Repositories
 
         }
 
-
-        public bool CheckVehicleNumber(string vehicleNumber)
-        {
-            var vehicleNumberChange = vehicleNumber.Replace('*', '/');
-            var vehicleNumberList = _context.CreateCars.Select(x => x.VehicleNumber).ToList();
-            var result = false;
-
-            foreach (var i in vehicleNumberList)
-            {
-                if (i == vehicleNumberChange)
-                {
-                    result = true;
-                    break;
-                }
-            }
-
-
-
-            return result;
-        }
-
-        //public async Task<string> NewCarAttach(List<ExtenseCarVM> cars)
+        //public async Task<CreateCar?> CheckVehicleNumber(string vehicleNumber)
         //{
-        //    var vehicleObj = await _context.Vehicles.ToListAsync();
-
-        //    int tG = vehicleObj.OrderByDescending(x=>x.Transaction_Id)
-        //            .Select(x=>x.Transaction_Id.Split('_').LastOrDefault())
-        //            .Select(x=>int.TryParse(x,out int val)?val: int.MinValue)
-        //            .FirstOrDefault();
-
-
-        //    int cG = vehicleObj.OrderByDescending(x => x.ChalenNumber)
-        //             .Select(x => x.ChalenNumber.Split('_').LastOrDefault())
-        //             .Select(x => int.TryParse(x, out int val) ? val : int.MinValue)
-        //             .FirstOrDefault();
-
-
-
-        //    string TransactionIdN = new CommonMethod().GenerateT_IdandC_Id("T", ++tG, 9);
-        //    string ChalenNumberN = new CommonMethod().GenerateT_IdandC_Id("C", ++cG, 6);
-
-
-
-
+        //    //bool found = await _context.Vehicles.AnyAsync(x => x.VehicleNumber == vehicleNumber.Replace('*', '/'));
+        //    vehicleNumber = vehicleNumber.Replace("*", "/");
+        //    var createCar = await _context.CreateCars.FirstOrDefaultAsync(x => x.VehicleNumber == vehicleNumber);
+        //    if (createCar != null && createCar.IsDeleted == false)
+        //        return null;
+        //    else if (createCar != null && createCar.IsDeleted == true)
+        //        return createCar;
+        //    return null;
         //}
 
+        public async Task<(bool, VehicleNumberCheckVM?)> CheckVehicleNumber(string vehicleNumber)
+        {
+            //bool found = await _context.Vehicles.AnyAsync(x => x.VehicleNumber == vehicleNumber.Replace('*', '/'));
+            vehicleNumber = vehicleNumber.Replace("*", "/");
+            var vehicleObj = await _context.Vehicles.AsNoTracking()
+                .Where(x => x.VehicleNumber == vehicleNumber)
+                .OrderByDescending(x => x.CreatedDate)
+                .Include(x => x.CreateCar)
+                .Select(x => new VehicleNumberCheckVM
+                {
+                    VehicleNumber = x.VehicleNumber,
+                    VehicleOwnerName = x.CreateCar.VehicleOwnerName,
+                    VehicleBrand = x.CreateCar.VehicleBrand,
+                    VehicleType = x.CreateCar.VehicleType,
+                    NRC_Number = x.NRC_Number,
+                    ExpiryDate = x.ExpiryDate,
+                    VehicleWeight = x.CreateCar.VehicleWeight,
+                    VehicleOwnerAddress = x.CreateCar.VehicleOwnerAddress,
+                    OwnerBook = x.OwnerBook,
+                    Triangle = x.Triangle,
+                    IsDeleted = x.IsDeleted
+                })
+                .FirstOrDefaultAsync(x => x.VehicleNumber == vehicleNumber);
+
+            if (vehicleObj != null && vehicleObj.IsDeleted == false)
+                return (true, null);
+            else if (vehicleObj != null && vehicleObj.IsDeleted == true)
+                return (true, vehicleObj);
+            return (false, null);
+        }
+
+        public async Task<bool> CheckVehicleNoGoodToSave(string vehicleNumber)
+        {
+            return await _context.CreateCars.AsNoTracking()
+                .AnyAsync(x => x.VehicleNumber == vehicleNumber && x.IsDeleted == true);
+        }
     }
 }

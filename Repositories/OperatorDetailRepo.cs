@@ -2922,7 +2922,7 @@ namespace DOTP_BE.Repositories
 
         #endregion
 
-        public async Task<(bool, bool)> CommonChangesProcess(CommonChangesVM dto)
+        public async Task<(bool, bool, string?)> CommonChangesProcess(CommonChangesVM dto)
         {
             if (dto.TakeNewRecord != null && dto.TakeNewRecord == true)
             {
@@ -2940,11 +2940,11 @@ namespace DOTP_BE.Repositories
                 bool checkFormModeDuplicate = await _context.Temp_Tables.AsNoTracking()
                            .AnyAsync(x => x.LicenseNumberLong == dto.LicenseNumberLong &&
                                           x.FormMode == dto.FormMode &&
-                                          x.Status == ConstantValue.Status_Pending &&
+                                          //x.Status == ConstantValue.Status_Pending &&
                                           x.CreatedDate.Date == DateTime.Now.Date);
 
                 if (checkFormModeDuplicate)
-                    return (false, true); //duplicate formMode in one single day (not done, duplicate)
+                    return (false, true, null); //duplicate formMode in one single day (not done, duplicate)
             }
 
 
@@ -2960,8 +2960,9 @@ namespace DOTP_BE.Repositories
 
                 var checkTandC = await _context.Temp_Tables.AsNoTracking()
                         .Where(x => x.LicenseNumberLong == dto.LicenseNumberLong &&
-                                    x.CreatedDate.Date == DateTime.Now.Date &&
-                                    x.Status == ConstantValue.Status_Pending) // only for after paid and wanna two transaction_id (no need at the moment)
+                                    x.CreatedDate.Date == DateTime.Now.Date 
+                                    //&& x.Status == ConstantValue.Status_Pending // only for after paid and wanna two transaction_id (no need at the moment)
+                                    ) 
                         .Select(x => new { x.Transaction_Id, x.ChalenNumber })
                         .FirstOrDefaultAsync();
 
@@ -3459,7 +3460,6 @@ namespace DOTP_BE.Repositories
                         //await _context.Vehicles.AddAsync(newVehicle);
                         #endregion
 
-
                         #region *** save attached file for CreateNew ***
                         string pathOwnerBookFiles = string.Empty;
                         string pathAttachedFiles1 = string.Empty;
@@ -3498,8 +3498,8 @@ namespace DOTP_BE.Repositories
                         temp_sub.ApplicantId = applicantId;
                         temp_sub.V_VehicleNumber = item.vehicleNumber;
                         temp_sub.V_VehicleLocation = item.vehicleLocation;
-                        temp_sub.OwnerBook = pathOwnerBookFiles;
-                        temp_sub.AttachedFile1 = pathAttachedFiles1;
+                        temp_sub.OwnerBook = item.OldOwnerBookFiles !=null? item.OldOwnerBookFiles : pathOwnerBookFiles;
+                        temp_sub.AttachedFile1 = item.OldAttachedFiles1 != null? item.OldAttachedFiles1 : pathAttachedFiles1;
                         temp_sub.V_VehicleType = "---";
 
                         //for create car table 
@@ -3786,14 +3786,134 @@ namespace DOTP_BE.Repositories
                 }
                 #endregion
 
+                #region *** for ExtendVehicleLicense ***
+                if(dto.FormMode == ConstantValue.EVL_FM && dto.ExtendVehicleLicense != null)
+                {
+                    foreach (var item in dto.ExtendVehicleLicense)
+                    {
+                        var vehicleObjN = await _context.Vehicles.AsNoTracking()
+                            .Include(x => x.VehicleWeight)
+                            .SingleOrDefaultAsync(x => x.VehicleId == item.VehicleId);
+                        if (vehicleObjN != null)
+                        {
+                            #region *** Save Vehicle Attached Files ***
+                            //vehicleWeightIdObj = vehicle.VehicleWeightId; //each license number long of weight are same
+                            //create folder
+                            string vehicleFolderName = "VehicleId_" + item.VehicleId;
+                            string dateFolderName = Path.Combine("Vehicle_AttachedFiles", DateTime.Now.ToString("yyyyMMdd"), vehicleFolderName);
+                            string vehicleSavePath = Path.Combine(rootPath, dateFolderName);
+                            string dateFolderNameR = dateFolderName.Replace("\\", "/");
+
+                            try
+                            {
+                                if (!Directory.Exists(vehicleSavePath))
+                                    Directory.CreateDirectory(vehicleSavePath);
+                            }
+                            catch (Exception e) { Console.WriteLine(e.ToString()); }
+
+                            // save TriangleFiles
+                            string pathTriangleFiles = string.Empty;
+                            if (item.TriangleFiles != null)
+                            {
+                                bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(item.TriangleFiles, vehicleSavePath + "\\Triangle.pdf");
+                                if (oky)
+                                    pathTriangleFiles = dateFolderNameR + "/Triangle.pdf";
+                            }
+
+                            // save OwnerBookFiles
+                            string pathOwnerBookFiles = string.Empty;
+                            if (item.OwnerBookFiles != null)
+                            {
+                                bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(item.OwnerBookFiles, vehicleSavePath + "\\OwnerBook.pdf");
+                                if (oky)
+                                    pathOwnerBookFiles = dateFolderNameR + "/OwnerBook.pdf";
+                            }
+
+                            // save AttachedFiles1
+                            string pathAttachedFiles1 = string.Empty;
+                            if (item.AttachedFiles1 != null)
+                            {
+                                bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(item.AttachedFiles1, vehicleSavePath + "\\CarAttached1.pdf");
+                                if (oky)
+                                    pathAttachedFiles1 = dateFolderNameR + "/CarAttached1.pdf";
+                            }
+
+                            // save AttachedFiles2
+                            string pathAttachedFiles2 = string.Empty;
+                            if (item.AttachedFiles2 != null)
+                            {
+                                bool oky = await CommonMethod.AddOperatorLicenseAttachPDFAsync(item.AttachedFiles2, vehicleSavePath + "\\CarAttached2.pdf");
+                                if (oky)
+                                    pathAttachedFiles2 = dateFolderNameR + "/CarAttached2.pdf";
+                            }
+                            #endregion
+
+
+                            Temp_Table temp_sub = tempTable.DeepCopy();
+                            temp_sub.VehicleId = vehicleObjN.VehicleId;
+                            temp_sub.ApplicantId = vehicleObjN.ApplicantId;
+                            temp_sub.V_VehicleNumber = vehicleObjN.VehicleNumber;
+                            temp_sub.V_VehicleLineTitle = vehicleObjN.VehicleLineTitle;
+                            temp_sub.V_CarryLogisticType = vehicleObjN.CarryLogisticType;
+                            temp_sub.V_VehicleLocation = vehicleObjN.VehicleLocation;
+                            temp_sub.V_VehicleDesiredRoute = vehicleObjN.VehicleDesiredRoute;
+                            temp_sub.RefTransactionId = vehicleObjN.RefTransactionId;
+                            temp_sub.Triangle = pathTriangleFiles;
+                            temp_sub.OwnerBook = pathOwnerBookFiles;
+                            temp_sub.AttachedFile1 = pathAttachedFiles1;
+                            temp_sub.AttachedFile2 = pathAttachedFiles2;
+                            temp_sub.VehicleWeightId = vehicleObjN.VehicleWeightId;
+                            temp_sub.CreateCarId = vehicleObjN.CreateCarId;
+                            temp_sub.LicenseTypeId = vehicleObjN.LicenseTypeId;
+                            temp_sub.OperatorId = vehicleObjN.OperatorId;
+                            temp_sub.V_VehicleType = vehicleObjN.VehicleWeight.VehicleType;
+                            temp_sub.ExpiryDate = vehicleObjN.ExpiryDate !=null? vehicleObjN.ExpiryDate.Value.AddYears(1):DateTime.Now.AddYears(1);
+
+                            temp_TablesList.Add(temp_sub);
+                        }
+                    }
+
+                }
+                #endregion
+
                 await _context.Temp_Tables.AddRangeAsync(temp_TablesList);
                 await _context.SaveChangesAsync();
-                return (true, false); // (done, not duplicate)
+                return (true, false, TransactionIdN); // (done, not duplicate)
             }
 
-            return (false, false); //(not done, not duplicate)
+            return (false, false, null); //(not done, not duplicate)
         }
 
+        public async Task<bool> AllOperationDoneProcess(AllOperationDoneVM dto)
+        {
+            try
+            {
+                var tempAllOprDoneList = await _context.Temp_Tables
+                    .Where(x => x.Transaction_Id == dto.TransactionId &&
+                                x.LicenseNumberLong == dto.LicenseNumberLong &&
+                                dto.FormModes.Contains(x.FormMode))
+                    .ToListAsync();
+
+                foreach (var item in tempAllOprDoneList)
+                {
+                    item.Status = ConstantValue.Status_Pending;
+                }
+
+                ////method 1
+                //_context.Temp_Tables.AttachRange(tempAllOprDoneList);
+                //_context.Entry(tempAllOprDoneList).State = EntityState.Modified;
+                //await _context.SaveChangesAsync();
+
+                //method 2
+                _context.Temp_Tables.UpdateRange(tempAllOprDoneList);
+                await _context.SaveChangesAsync();
+                return true;
+            }catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return false;
+            }
+        }
         public async Task<(LicenseOnly?, string?)> LicenseDetailForOver2ton(string licenseNumberLong)
         {
             var vehicleObj = await _context.Vehicles

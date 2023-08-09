@@ -104,8 +104,8 @@ namespace DOTP_BE.Controllers
 
         #region ****** search by all parameters ******
         //get data fromDate toDate is more light weight than get data without duration(06/07/2023)
-        [HttpGet("VehicleListByStatus")]
-        public async Task<IActionResult> VehicleListByStatus([FromQuery] ExtenLicenseDbSearchVM dto)
+        [HttpPost("VehicleListByStatus")]
+        public async Task<IActionResult> VehicleListByStatus(ExtenLicenseDbSearchVM dto)
         {
             var result = await _repo.getVehicleListByStatus(dto);   
             return Ok(result);

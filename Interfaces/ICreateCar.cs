@@ -17,6 +17,10 @@ namespace DOTP_BE.Interfaces
 
         //Task<string> NewCarAttach(List<ExtenseCarVM> extenseCarVMList);
         bool UpdateCar(List<UpdateCreateCar> updateCreateCarVM);
-        bool CheckVehicleNumber(string vehicleNumber);
+        //Task<CreateCar?> CheckVehicleNumber(string vehicleNumber);
+
+        Task<(bool, VehicleNumberCheckVM?)> CheckVehicleNumber(string vehicleNumber);
+
+        Task<bool> CheckVehicleNoGoodToSave(string vehicleNumber);
     }
 }

@@ -17,7 +17,7 @@ using System.Text;
 
 namespace DOTP_BE.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
     {

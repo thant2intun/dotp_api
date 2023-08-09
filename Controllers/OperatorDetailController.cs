@@ -830,5 +830,12 @@ namespace DOTP_BE.Controllers
             var resp = await _iopeartorDetail.LicenseDetailForOver2ton(dto.Replace("*","/"));
             return Ok(resp);
         }
+
+        [HttpPost("all_operation_done")]
+        public async Task<IActionResult> AllOperationDoneProcess(AllOperationDoneVM allOperationDoneVM)
+        {
+            bool oky = await _iopeartorDetail.AllOperationDoneProcess(allOperationDoneVM);
+            return Ok(allOperationDoneVM);
+        }
     }
 }

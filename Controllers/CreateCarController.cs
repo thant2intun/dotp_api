@@ -72,12 +72,10 @@ namespace DOTP_BE.Controllers
 
 
         [HttpGet("CheckVehicleNumber/{vehicleNumber}")]
-        public bool CheckVehicleNumber(string vehicleNumber)
+        public async Task<IActionResult> CheckVehicleNumber(string vehicleNumber)
         {
-
-            bool result = _repo.CheckVehicleNumber(vehicleNumber);
-
-            return result;
+            var result = await _repo.CheckVehicleNumber(vehicleNumber);
+            return Ok(result);
         }
 
         //[HttpPost("UpdateCar")]
@@ -98,6 +96,13 @@ namespace DOTP_BE.Controllers
         //        return Ok();
         //    }
         //    return BadRequest("CreateCar already exists.");
+        //}
+
+        //[HttpGet("checkVehicleNumberGoodToSaveOrNot")]
+        //public async Task<IActionResult> CheckVehicleNoGoodToSave(string vehicleNumber)
+        //{
+        //    bool oky = await _repo.CheckVehicleNoGoodToSave(vehicleNumber);
+        //    return Ok(oky);
         //}
     }
 }

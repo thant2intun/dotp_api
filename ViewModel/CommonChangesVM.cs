@@ -34,6 +34,8 @@ namespace DOTP_BE.ViewModel
         //for Extend Operator License
         public List<ExtendOperatorLicense_Sub8>? ExtendOperatorLicense { get; set; }
 
+        //for Extend Vehicle License
+        public List<ExtendVehicleLicense_Sub8>? ExtendVehicleLicense { get; set; }
     } 
 
     public class ChangeVOwnerAddress_Sub1
@@ -85,8 +87,10 @@ namespace DOTP_BE.ViewModel
         public string vehicleWeight { get; set; }
         public string vehicleOwnerNRC { get; set; }
         public string expireDate { get; set; }
-        public List<IFormFile> OwnerBookFiles { get; set; }
-        public List<IFormFile> AttachedFiles1 { get; set; }
+        public List<IFormFile>? OwnerBookFiles { get; set; }
+        public string? OldOwnerBookFiles { get; set; }
+        public List<IFormFile>? AttachedFiles1 { get; set; }
+        public string? OldAttachedFiles1 { get; set; }
     }
 
     public class DecreaseCar_Sub6
@@ -114,5 +118,14 @@ namespace DOTP_BE.ViewModel
         public List<IFormFile>? OwnerBookFiles { get; set; }
         public List<IFormFile>? AttachedFiles1 { get; set; }
         public List<IFormFile>? AttachedFiles2 { get; set; }
+    }
+
+    public class ExtendVehicleLicense_Sub8
+    {
+        public int VehicleId { get; set; }
+        public List<IFormFile> TriangleFiles { get; set; }
+        public List<IFormFile> OwnerBookFiles { get; set; }
+        public List<IFormFile> AttachedFiles1 { get; set; }
+        public List<IFormFile> AttachedFiles2 { get; set; }
     }
 }

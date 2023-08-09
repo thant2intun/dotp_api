@@ -1583,7 +1583,7 @@ namespace DOTP_BE.Repositories
                     #endregion
 
                     #region *** for 'Add New Car' FormMode ***
-                    else if ((oLConfirmOrRejectVM.FormMode == ConstantValue.AddNewCar_FM || oLConfirmOrRejectVM.FormMode == ConstantValue.ECL_FM) && feesObj != null)
+                    else if ((oLConfirmOrRejectVM.FormMode == ConstantValue.AddNewCar_FM || oLConfirmOrRejectVM.FormMode == ConstantValue.EVL_FM) && feesObj != null)
                     {
                         //check transaction_id already exit or not
                         //bool alreadyExit = await _context.Transactions.AsNoTracking().AnyAsync(x => x.Transaction_Id == vehicleObj[0].Transaction_Id);

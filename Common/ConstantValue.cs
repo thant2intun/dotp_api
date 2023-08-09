@@ -23,7 +23,7 @@
 
 
         public const string EOPL_FM = "ExtendOperatorLicense"; 
-        public const string ECL_FM = "ExtendCarLicense";
+        public const string EVL_FM = "ExtendVehicleLicense";
         public const string CreateNew_FM = "Create New";
         public const string AddNewCar_FM = "AddNewCar";
         public const string DecreaseCar_FM = "Decrease Car";

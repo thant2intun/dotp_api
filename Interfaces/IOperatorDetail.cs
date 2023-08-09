@@ -40,7 +40,9 @@ namespace DOTP_BE.Interfaces
 
         //commented to make same T&C From BE
         //Task<(string, string, string, DateTime)> CommonChangesProcess(CommonChangesVM dto);
-        Task<(bool, bool)> CommonChangesProcess(CommonChangesVM dto);
+        Task<(bool, bool, string?)> CommonChangesProcess(CommonChangesVM dto);
+
+        Task<bool> AllOperationDoneProcess(AllOperationDoneVM dto);
 
         Task<(LicenseOnly?, string?)> LicenseDetailForOver2ton(string licenseNumberLong);
     }
