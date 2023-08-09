@@ -846,6 +846,59 @@ namespace DOTP_BE.Controllers
         }
         #endregion
 
+        #region tzt 080823
+        [HttpPost("ExtendOperatorMobile")]
+        public async Task<IActionResult> ExtendOperatorMobile([FromForm] CommonChangesVM dto)
+        {
+            if(dto == null)
+            {
+                return BadRequest();
+            }
+            if(dto.FormMode == null || dto.NRC_Number == null || dto.LicenseNumberLong == null)
+            {
+                return BadRequest(new
+                {
+                    Status = false,
+                    Message = "Invalid Request!"
+                });
+            }
+            var response = await _iopeartorDetail.CommonChangesProcess(dto);
+            return Ok(
+                new
+                {
+                    Status = true,
+                    Message = "success"
+                }
+            );
+            
+        }
+        [HttpPost("ExtendVehicleMobile")]
+        public async Task<IActionResult> ExtendVehicleMobile([FromForm] CommonChangesVM dto)
+        {
+            if (dto == null)
+            {
+                return BadRequest();
+            }
+            if (dto.FormMode == null || dto.NRC_Number == null || dto.LicenseNumberLong == null)
+            {
+                return BadRequest(new
+                {
+                    Status = false,
+                    Message = "Invalid Request!"
+                });
+            }
+            var response = await _iopeartorDetail.CommonChangesProcess(dto);
+            return Ok(
+                new
+                {
+                    Status = true,
+                    Message = "success"
+                }
+            );
+            //return Ok(dto); // for testing only
+        }
+        #endregion
+
         [HttpGet("LicenseDetailForOver2ton/{dto}")]
         public async Task<IActionResult> LicenseDetailForOver2ton(string dto)
         {
