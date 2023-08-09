@@ -39,12 +39,15 @@ namespace DOTP_BE.Repositories
                                                    s.Status == status &&
                                                    s.FormMode == formMode)
                     .ToListAsync();
+
                 if (vehicles.Count > 0 && vehicles[0].LicenseOnly == null) //for licenseOnly include
                 {
                     vehicles[0].LicenseOnly = await _context.LicenseOnlys.AsNoTracking()
                                                             .Where(x => x.License_Number == vehicles[0].LicenseNumberLong)
                                                             .FirstAsync();
                 }
+
+
 
                 //can't filter by Transaction_Id cause after admin approved new operator record with that transaction will add,
                 //here operator will not have and data yet so with only NRC Number
@@ -378,39 +381,93 @@ namespace DOTP_BE.Repositories
                 .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
                 .ToListAsync();
 
-            if (filteredByDate.Count == 0)
+            //for other status count
+            var otherStatus = await _context.Vehicles.AsNoTracking()
+                .Where(x => x.CreatedDate.Date >= fd &&
+                            x.CreatedDate.Date <= td)
+                .ToListAsync();
+
+            if (filteredByDate.Count == 0 && otherStatus.Count == 0)
                 return (0, new ExtendLicenseDashBoardVMAdmin());
 
             #region *** Filter by search parameters ***
             if (!string.IsNullOrWhiteSpace(dto.FormMode))
+            {
                 filteredByDate = filteredByDate.Where(x => x.FormMode == dto.FormMode).ToList();
+
+                //for other status
+                otherStatus = otherStatus.Where(x => x.FormMode == dto.FormMode).ToList();
+            }
             if (dto.JourneyType != 0)
             {
                 if (dto.JourneyType == 1)
+                {
                     filteredByDate = filteredByDate.Where(x => x.LicenseNumberLong.Contains(ConstantValue.Twin)).ToList();
+
+                    //for other status
+                    otherStatus = otherStatus.Where(x => x.LicenseNumberLong.Contains(ConstantValue.Twin)).ToList();
+                }
                 else if (dto.JourneyType == 2)
+                {
                     filteredByDate = filteredByDate.Where(x => x.LicenseNumberLong.Contains(ConstantValue.Kyaw)).ToList();
+
+                    //for other status
+                    otherStatus = otherStatus.Where(x => x.LicenseNumberLong.Contains(ConstantValue.Kyaw)).ToList();
+                }
             }
             if (dto.LicenseType != 0)
             {
                 if (dto.LicenseType == 1)
+                {
                     filteredByDate = filteredByDate.Where(x => x.LicenseTypeId == 1 ||
                                                                x.LicenseTypeId == 2 ||
                                                                x.LicenseTypeId == 3)
                                                     .ToList();
+
+                    //for other status
+                    otherStatus = otherStatus.Where(x => x.LicenseTypeId == 1 ||
+                                                               x.LicenseTypeId == 2 ||
+                                                               x.LicenseTypeId == 3)
+                                                    .ToList();
+                }
                 else if (dto.LicenseType == 4)
+                {
                     filteredByDate = filteredByDate.Where(x => x.LicenseTypeId == 4)
                                                    .ToList();
+
+                    //for other status
+                    otherStatus = otherStatus.Where(x => x.LicenseTypeId == 4)
+                                                   .ToList();
+                }
                 else if (dto.LicenseType == 5)
+                {
                     filteredByDate = filteredByDate.Where(x => x.LicenseTypeId == 5)
                                                    .ToList();
+
+                    //for other status
+                    otherStatus = otherStatus.Where(x => x.LicenseTypeId == 5)
+                                                   .ToList();
+                }
                 else if (dto.LicenseType == 6)
+                {
                     filteredByDate = filteredByDate.Where(x => x.LicenseTypeId == 6 ||
                                                                x.LicenseTypeId == 7)
                                                    .ToList();
+
+                    //for other status
+                    otherStatus = otherStatus.Where(x => x.LicenseTypeId == 6 ||
+                                                               x.LicenseTypeId == 7)
+                                                   .ToList();
+                }                    
                 else if (dto.LicenseType == 8)
+                {
                     filteredByDate = filteredByDate.Where(x => x.LicenseTypeId == 8)
                                                    .ToList();
+
+                    //for other status
+                    otherStatus = otherStatus.Where(x => x.LicenseTypeId == 8)
+                                                   .ToList();
+                }                    
             }
             #endregion
 
@@ -442,9 +499,14 @@ namespace DOTP_BE.Repositories
                                  .ToList();
 
             int pendingCount = CountByStatus(filteredByDate, ConstantValue.Status_Pending);
-            int approvedCount = CountByStatus(filteredByDate, ConstantValue.Status_Approved);
-            int rejectedCount = CountByStatus(filteredByDate, ConstantValue.Status_Rejected);
-            int paidCount = CountByStatus(filteredByDate, ConstantValue.Status_Paid);
+            //int approvedCount = CountByStatus(filteredByDate, ConstantValue.Status_Approved);
+            //int rejectedCount = CountByStatus(filteredByDate, ConstantValue.Status_Rejected);
+            //int paidCount = CountByStatus(filteredByDate, ConstantValue.Status_Paid);
+
+            //for other status
+            int approvedCount = CountByStatus_Other(otherStatus, ConstantValue.Status_Approved);
+            int rejectedCount = CountByStatus_Other(otherStatus, ConstantValue.Status_Rejected);
+            int paidCount = CountByStatus_Other(otherStatus, ConstantValue.Status_Paid);
 
             #region *** Not Use ***
             int totalCount = 0;
@@ -467,7 +529,188 @@ namespace DOTP_BE.Repositories
 
             ExtendLicenseDashBoardVMAdmin result = new ExtendLicenseDashBoardVMAdmin
             {
-                PendingCount = pendingCount,
+                PendingCount = extendLicenseVMs.Count(),
+                //PendingCount = pendingCount,
+                ApprovedCount = approvedCount,
+                PaidCount = paidCount,
+                RejectedCount = rejectedCount,
+                ExtendLicenseVMAdmins = extendLicenseVMs
+            };
+            return (totalCount, result);
+        }
+
+        public async Task<(int, ExtendLicenseDashBoardVMAdmin)> getVehicleListByOtherStatus(ExtenLicenseDbSearchVM dto)
+        {
+            //var fd = DateTime.Parse(dto.FromDate).Date;
+            //var td = DateTime.Parse(dto.ToDate).Date;
+            if (!DateTime.TryParse(dto.FromDate, out var fd) || !DateTime.TryParse(dto.ToDate, out var td))
+            {
+                // Handle invalid date format
+                // For example, return an error or default values
+                return (0, new ExtendLicenseDashBoardVMAdmin());
+            }
+            fd = fd.Date; //no need for web but for mobile
+            td = td.Date; //no need for web but for mobile
+
+            //for other status count ('Paid', 'Reject', 'Confirmed')
+            var otherStatus = await _context.Vehicles.AsNoTracking()
+                .Where(x => x.CreatedDate.Date >= fd &&
+                            x.CreatedDate.Date <= td)
+                .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
+                .ToListAsync();
+
+            //only for 'Pending' Status
+            var filteredByDate = await _context.Temp_Tables.AsNoTracking()
+                .Where(x => x.CreatedDate.Date >= fd &&
+                            x.CreatedDate.Date <= td)
+                //.Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
+                .ToListAsync();
+
+
+            if (filteredByDate.Count == 0 && otherStatus.Count == 0)
+                return (0, new ExtendLicenseDashBoardVMAdmin());
+
+            #region *** Filter by search parameters ***
+            if (!string.IsNullOrWhiteSpace(dto.FormMode))
+            {
+                //for other status
+                otherStatus = otherStatus.Where(x => x.FormMode == dto.FormMode).ToList();
+
+                filteredByDate = filteredByDate.Where(x => x.FormMode == dto.FormMode).ToList();
+            }
+            if (dto.JourneyType != 0)
+            {
+                if (dto.JourneyType == 1)
+                {
+                    //for other status
+                    otherStatus = otherStatus.Where(x => x.LicenseNumberLong.Contains(ConstantValue.Twin)).ToList();
+
+                    filteredByDate = filteredByDate.Where(x => x.LicenseNumberLong.Contains(ConstantValue.Twin)).ToList();
+                }
+                else if (dto.JourneyType == 2)
+                {
+                    //for other status
+                    otherStatus = otherStatus.Where(x => x.LicenseNumberLong.Contains(ConstantValue.Kyaw)).ToList();
+
+                    filteredByDate = filteredByDate.Where(x => x.LicenseNumberLong.Contains(ConstantValue.Kyaw)).ToList();
+                }
+            }
+            if (dto.LicenseType != 0)
+            {
+                if (dto.LicenseType == 1)
+                {
+                    //for other status
+                    otherStatus = otherStatus.Where(x => x.LicenseTypeId == 1 ||
+                                                               x.LicenseTypeId == 2 ||
+                                                               x.LicenseTypeId == 3)
+                                                    .ToList();
+
+                    filteredByDate = filteredByDate.Where(x => x.LicenseTypeId == 1 ||
+                                                              x.LicenseTypeId == 2 ||
+                                                              x.LicenseTypeId == 3)
+                                                   .ToList();
+                }
+                else if (dto.LicenseType == 4)
+                {
+                    //for other status
+                    otherStatus = otherStatus.Where(x => x.LicenseTypeId == 4)
+                                                   .ToList();
+
+                    filteredByDate = filteredByDate.Where(x => x.LicenseTypeId == 4)
+                                                  .ToList();
+                }
+                else if (dto.LicenseType == 5)
+                {
+                    //for other status
+                    otherStatus = otherStatus.Where(x => x.LicenseTypeId == 5)
+                                                   .ToList();
+
+                    filteredByDate = filteredByDate.Where(x => x.LicenseTypeId == 5)
+                                                   .ToList();
+                }
+                else if (dto.LicenseType == 6)
+                {
+                    //for other status
+                    otherStatus = otherStatus.Where(x => x.LicenseTypeId == 6 ||
+                                                               x.LicenseTypeId == 7)
+                                                   .ToList();
+
+                    filteredByDate = filteredByDate.Where(x => x.LicenseTypeId == 6 ||
+                                                              x.LicenseTypeId == 7)
+                                                  .ToList();
+                }
+                else if (dto.LicenseType == 8)
+                {
+                    //for other status
+                    otherStatus = otherStatus.Where(x => x.LicenseTypeId == 8)
+                                                   .ToList();
+
+                    filteredByDate = filteredByDate.Where(x => x.LicenseTypeId == 8)
+                                                  .ToList();
+                }
+            }
+            #endregion
+
+            #region *** SQL query ***
+            //select t.Transaction_Id,count(Transaction_Id) T from (SELECT Status,CreatedDate,Transaction_Id
+            //FROM[Dotp_Phase4].[dbo].[Vehicles] where Status = 'Approved') T
+            //group by Transaction_Id
+            #endregion
+
+            var extendLicenseVMs = otherStatus
+                                 .Where(x => x.Status == dto.Status)
+                                 .OrderByDescending(x => x.CreatedDate)
+                                 .GroupBy(x => x.Transaction_Id)
+                                 .Select(x => new ExtendLicenseVMAdmin
+                                 {
+                                     FormMode = x.Select(g => g.FormMode).Distinct().ToList(),
+                                     LicenseNumberLong = x.First().LicenseNumberLong,
+                                     JourneyTypeLong = x.First().LicenseOnly.JourneyType.JourneyTypeLong,
+                                     TotalCar = x.Count(),
+                                     CreatedDate = x.First().CreatedDate,
+                                     UpdatedDate = x.First().UpdatedDate,
+                                     ExpireDate = DateTime.Now,
+                                     Status = x.First().Status,
+                                     TransactionId = x.First().Transaction_Id,
+                                     LicenseTypeId = x.First().LicenseTypeId
+                                 })
+                                 .Skip((dto.PageNumber - 1) * dto.PageSize)
+                                 .Take(dto.PageSize)
+                                 .ToList();
+
+            int pendingCount = CountByStatus(filteredByDate, ConstantValue.Status_Pending);
+            //int approvedCount = CountByStatus(filteredByDate, ConstantValue.Status_Approved);
+            //int rejectedCount = CountByStatus(filteredByDate, ConstantValue.Status_Rejected);
+            //int paidCount = CountByStatus(filteredByDate, ConstantValue.Status_Paid);
+
+            //for other status
+            int approvedCount = CountByStatus_Other(otherStatus, ConstantValue.Status_Approved);
+            int rejectedCount = CountByStatus_Other(otherStatus, ConstantValue.Status_Rejected);
+            int paidCount = CountByStatus_Other(otherStatus, ConstantValue.Status_Paid);
+
+            #region *** Not Use ***
+            int totalCount = 0;
+            switch (dto.Status)
+            {
+                case ConstantValue.Status_Pending:
+                    totalCount = CountByStatus(filteredByDate, ConstantValue.Status_Pending);
+                    break;
+                case ConstantValue.Status_Approved:
+                    totalCount = CountByStatus(filteredByDate, ConstantValue.Status_Approved);
+                    break;
+                case ConstantValue.Status_Rejected:
+                    totalCount = CountByStatus(filteredByDate, ConstantValue.Status_Rejected);
+                    break;
+                case ConstantValue.Status_Paid:
+                    totalCount = CountByStatus(filteredByDate, ConstantValue.Status_Paid);
+                    break;
+            }
+            #endregion
+
+            ExtendLicenseDashBoardVMAdmin result = new ExtendLicenseDashBoardVMAdmin
+            {
+                PendingCount = extendLicenseVMs.Count(),
+                //PendingCount = pendingCount,
                 ApprovedCount = approvedCount,
                 PaidCount = paidCount,
                 RejectedCount = rejectedCount,
@@ -2099,7 +2342,15 @@ namespace DOTP_BE.Repositories
         //    return true;
         //}        
 
-        private int CountByStatus(IEnumerable<Temp_Table> vehicles, string status)
+        private int CountByStatus(IEnumerable<Temp_Table> temp_Tables, string status)
+        {
+            return temp_Tables
+                .Where(x => x.Status == status)
+                .GroupBy(x => x.Transaction_Id)
+                .Count();
+        }
+
+        private int CountByStatus_Other(IEnumerable<Vehicle> vehicles, string status)
         {
             return vehicles
                 .Where(x => x.Status == status)

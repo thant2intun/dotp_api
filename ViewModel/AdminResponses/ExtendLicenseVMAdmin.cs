@@ -11,7 +11,7 @@
 
     public class ExtendLicenseVMAdmin
     {
-        public List<string> FormMode { get; set; }
+        public List<string?> FormMode { get; set; }
         public string LicenseNumberLong { get; set; }
         public string JourneyTypeLong { get; set; }
         public int TotalCar { get; set; }

@@ -111,6 +111,13 @@ namespace DOTP_BE.Controllers
             return Ok(result);
         }
 
+        [HttpPost("VehicleListByOtherStatus")]
+        public async Task<IActionResult> VehicleListByOtherStatus(ExtenLicenseDbSearchVM dto)
+        {
+            var result = await _repo.getVehicleListByOtherStatus(dto);
+            return Ok(result);
+        }
+
         [HttpGet("VehicleListByStatusNOTUSE")]
         public async Task<IActionResult> VehicleListByStatusNOTUSE([FromQuery] ExtenLicenseDbSearchVM dto)
         {

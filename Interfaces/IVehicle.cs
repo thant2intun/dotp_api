@@ -24,6 +24,7 @@ namespace DOTP_BE.Interfaces
         Task<(int, ExtendLicenseDashBoardVMAdmin)> getVehicleListByStatus(ExtenLicenseDbSearchVM dto);
         //Task<(int, ExtendLicenseDashBoardVMAdmin)> getVehicleListByStatusNOTUSE(ExtenLicenseDbSearchVM dto);
 
+        Task<(int, ExtendLicenseDashBoardVMAdmin)> getVehicleListByOtherStatus(ExtenLicenseDbSearchVM otherVM);
 
         Task<Vehicle> VehicleDetailToCheckById(int id);
         Task<bool> UpdateStatusById(int id, string statusDto);

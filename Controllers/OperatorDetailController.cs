@@ -823,6 +823,28 @@ namespace DOTP_BE.Controllers
             return Ok(response);
             //return Ok(dto); // for testing only
         }
+        #region tzt 070723
+        [HttpGet("getOperatorDetailByNRCAndLicenseNumberLongMobile")]
+        public async Task<IActionResult> getOperatorDetailByNRCAndLicenseNumberLongMobile(OperatorDetailGetRequest opDetGetReq)
+        {
+            if (opDetGetReq.userId == 0 || opDetGetReq.licenseNumlong == null)
+                return BadRequest(new { Status = false, Message = "Invalid request parameter" });
+            var op = await _iopeartorDetail.getOperatorDetailByNRCAndLicenseNumberLongMobile(opDetGetReq);
+            if (op.operatorDetailHead == null)
+                return NotFound(new { Status = false, Message = "operator license not found!" });
+
+            return Ok(new
+            {
+                Status = true,
+                Message = "success",
+                TotalCarCount = op.totalCarCount,
+                OperatorDetail = op.operatorDetailHead,
+                CarObjects = op.carObjects,
+                CurrentPage = opDetGetReq.page,
+                PageCount = opDetGetReq.countPerPage
+            });
+        }
+        #endregion
 
         [HttpGet("LicenseDetailForOver2ton/{dto}")]
         public async Task<IActionResult> LicenseDetailForOver2ton(string dto)
