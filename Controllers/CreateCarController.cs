@@ -78,6 +78,48 @@ namespace DOTP_BE.Controllers
             return Ok(result);
         }
 
+        #region 090823
+        [HttpGet("CheckVehicleNumberValidMobile/vehicle-number")]
+        public async Task<IActionResult> CheckVehicleNumberMobile(string vehicleNumber)
+        {
+            if(vehicleNumber == "" || vehicleNumber == null)
+            {
+                return BadRequest(new
+                {
+                    Status = false,
+                    Message = "Invalid Request!"
+                });
+            }
+            var result = await _repo.CheckVehicleNumber(vehicleNumber);
+            if(result.Item1 == true && result.Item2 == null)
+            {
+                return BadRequest(new
+                {
+                    Status = false,
+                    Message = "လုပ်ငန်းလိုင်စင်မှတ်ပုံတင် ပြီးသော ယာဉ်ဖြစ်ပါသည် ပြန်လည်စစ်ဆေးပါ။"
+                });
+            }
+            else if(result.Item1 == true && result.Item2 != null)
+            {
+                return Ok(new
+                {
+                    Status = true,
+                    Message = "Old Vehicle's Data Exist!",
+                    Data = result.Item2
+                });
+            }
+            else
+            {
+                return Ok(new
+                {
+                    Status = true,
+                    Message = "success"
+                });
+            }
+                        
+        }
+        #endregion
+
         //[HttpPost("UpdateCar")]
         //public async Task<IActionResult> UpdateCar([FromForm] OperatorLicenseAttachVM operatorLicenseAttachVM)
         //{

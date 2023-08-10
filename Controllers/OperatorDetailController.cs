@@ -841,8 +841,9 @@ namespace DOTP_BE.Controllers
                 OperatorDetail = op.operatorDetailHead,
                 CarObjects = op.carObjects,
                 CurrentPage = opDetGetReq.page,
-                PageCount = opDetGetReq.countPerPage
-            });
+                PageCount = opDetGetReq.countPerPage,
+                TotalPage = op.totalPage
+            }) ;
         }
         #endregion
 
@@ -898,7 +899,183 @@ namespace DOTP_BE.Controllers
             //return Ok(dto); // for testing only
         }
         #endregion
+        #region TZT_090823
+        [HttpPost("ChangeLOwnerAddressMobile")]
+        public async Task<IActionResult> ChangeLOwnerAddressMobile([FromForm] CommonChangesVM dto)
+        {
+            if (dto == null)
+            {
+                return BadRequest();
+            }
+            if (dto.FormMode == null || dto.NRC_Number == null || dto.LicenseNumberLong == null)
+            {
+                return BadRequest(new
+                {
+                    Status = false,
+                    Message = "Invalid Request!"
+                });
+            }
+            var response = await _iopeartorDetail.CommonChangesProcess(dto);
+            return Ok(
+                new
+                {
+                    Status = true,
+                    Message = "success"
+                }
+            );
+            
+        }
+        [HttpPost("ChangeVehicleAddressMobile")]
+        public async Task<IActionResult> ChangeVehicleAddressMobile([FromForm] CommonChangesVM dto)
+        {
+            if (dto == null)
+            {
+                return BadRequest();
+            }
+            if (dto.FormMode == null || dto.NRC_Number == null || dto.LicenseNumberLong == null)
+            {
+                return BadRequest(new
+                {
+                    Status = false,
+                    Message = "Invalid Request!"
+                });
+            }
+            var response = await _iopeartorDetail.CommonChangesProcess(dto);
+            return Ok(
+                new
+                {
+                    Status = true,
+                    Message = "success"
+                }
+            );
 
+        }
+        [HttpPost("ChangeVehicleTypeMobile")]
+        public async Task<IActionResult> ChangeVehicleTypeMobile([FromForm] CommonChangesVM dto)
+        {
+            if (dto == null)
+            {
+                return BadRequest();
+            }
+            if (dto.FormMode == null || dto.NRC_Number == null || dto.LicenseNumberLong == null)
+            {
+                return BadRequest(new
+                {
+                    Status = false,
+                    Message = "Invalid Request!"
+                });
+            }
+            var response = await _iopeartorDetail.CommonChangesProcess(dto);
+            return Ok(
+                new
+                {
+                    Status = true,
+                    Message = "success"
+                }
+            );
+
+        }
+        [HttpPost("ChangeVehOwnerNameMobile")]
+        public async Task<IActionResult> ChangeVehOwnerNameMobile([FromForm] CommonChangesVM dto)
+        {
+            if (dto == null)
+            {
+                return BadRequest();
+            }
+            if (dto.FormMode == null || dto.NRC_Number == null || dto.LicenseNumberLong == null)
+            {
+                return BadRequest(new
+                {
+                    Status = false,
+                    Message = "Invalid Request!"
+                });
+            }
+            var response = await _iopeartorDetail.CommonChangesProcess(dto);
+            return Ok(
+                new
+                {
+                    Status = true,
+                    Message = "success"
+                }
+            );
+
+        }
+        [HttpPost("AddNewCarMobile")]
+        public async Task<IActionResult> AddNewCarMobile([FromForm] CommonChangesVM dto)
+        {
+            if (dto == null)
+            {
+                return BadRequest();
+            }
+            if (dto.FormMode == null || dto.NRC_Number == null || dto.LicenseNumberLong == null)
+            {
+                return BadRequest(new
+                {
+                    Status = false,
+                    Message = "Invalid Request!"
+                });
+            }
+            var response = await _iopeartorDetail.CommonChangesProcess(dto);
+            return Ok(
+                new
+                {
+                    Status = true,
+                    Message = "success"
+                }
+            );
+
+        }
+        [HttpPost("DecreaseCarMobile")]
+        public async Task<IActionResult> DecreaseCarMobile([FromForm] CommonChangesVM dto)
+        {
+            if (dto == null)
+            {
+                return BadRequest();
+            }
+            if (dto.FormMode == null || dto.NRC_Number == null || dto.LicenseNumberLong == null)
+            {
+                return BadRequest(new
+                {
+                    Status = false,
+                    Message = "Invalid Request!"
+                });
+            }
+            var response = await _iopeartorDetail.CommonChangesProcess(dto);
+            return Ok(
+                new
+                {
+                    Status = true,
+                    Message = "success"
+                }
+            );
+
+        }
+        [HttpGet("LicenseDetailForOver2tonMobile/{dto}")]
+        public async Task<IActionResult> LicenseDetailForOver2tonMobile(string dto)
+        {
+            if (dto == "" || dto == null)
+                return BadRequest();
+            var resp = await _iopeartorDetail.LicenseDetailForOver2ton(dto.Replace("*", "/"));
+            if(resp.Item2 == null)
+            {
+                return Ok(new
+                {
+                    Status = true,
+                    Message = "success",
+                    Data = resp
+                }); ;
+            }
+            else
+            {
+                return BadRequest(new
+                {
+                    Status = false,
+                    Message = resp.Item2
+                }); ;
+            }
+            
+        }
+        #endregion
         [HttpGet("LicenseDetailForOver2ton/{dto}")]
         public async Task<IActionResult> LicenseDetailForOver2ton(string dto)
         {
