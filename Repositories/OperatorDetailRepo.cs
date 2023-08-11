@@ -3080,10 +3080,8 @@ namespace DOTP_BE.Repositories
                 if (checkFormModeDuplicate)
                     return (false, true, null); //duplicate formMode in one single day (not done, duplicate)
             }
-
-
             var licenOnlys = await _context.LicenseOnlys.AsNoTracking()
-                    .Where(x => x.License_Number == dto.LicenseNumberLong.Replace("**", "/") &&
+                    .Where(x => x.License_Number == dto.LicenseNumberLong &&
                                 x.NRC_Number == dto.NRC_Number)
                     .OrderByDescending(x => x.CreatedDate)
                     .FirstOrDefaultAsync();
@@ -3093,8 +3091,7 @@ namespace DOTP_BE.Repositories
                 #region *** generate new Transaction and Chalen ID ***
 
                 var checkTandC = await _context.Temp_Tables.AsNoTracking()
-                        .Where(x => x.LicenseNumberLong == dto.LicenseNumberLong &&
-                                    x.CreatedDate.Date == DateTime.Now.Date 
+                        .Where(x => x.LicenseNumberLong == dto.LicenseNumberLong 
                                     //&& x.Status == ConstantValue.Status_Pending // only for after paid and wanna two transaction_id (no need at the moment)
                                     ) 
                         .Select(x => new { x.Transaction_Id, x.ChalenNumber })
@@ -4048,38 +4045,91 @@ namespace DOTP_BE.Repositories
                 return false;
             }
         }
-        public async Task<(LicenseOnly?, string?)> LicenseDetailForOver2ton(string licenseNumberLong)
+
+        #region LicenseDetailForOver2ton_old
+        //public async Task<(LicenseOnly?, string?)> LicenseDetailForOver2ton(string licenseNumberLong)
+        //{
+        //    var vehicleObj = await _context.Vehicles
+        //           .AsNoTracking()
+        //           .Where(x => x.LicenseNumberLong == licenseNumberLong)
+        //           .Include(x => x.LicenseOnly).ThenInclude(x => x.RegistrationOffice)
+        //           .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
+        //          .OrderByDescending(x => x.ApplyDate)
+        //           .Select(x => new { x.NRC_Number, x.LicenseOnly, x.ExpiryDate})
+        //           .FirstOrDefaultAsync();
+        //           //.ToListAsync();
+
+        //    if (vehicleObj == null)
+        //        return (null, null);
+
+        //    if (vehicleObj.ExpiryDate.HasValue && vehicleObj.ExpiryDate.Value.Date < DateTime.Now.Date)
+        //        return (null, "လွဲယူမည့်သူ၏ လုပ်ငန်းလိုင်စင်သည် သက်တမ်းကုန်နေပါသည်။");
+        //    if (!vehicleObj.ExpiryDate.HasValue)
+        //        return (null, "လွဲယူမည့်သူ၏ လုပ်ငန်းလိုင်စင် သည် သက်တမ်းကုန်ဆုံးရက် မှားရွှင်းနေပါသည်။");
+
+        //    if (vehicleObj.LicenseOnly == null)
+        //    {
+        //        var licenseOnlyObj = await _context.LicenseOnlys.AsNoTracking()
+        //            .Where(x => x.License_Number == licenseNumberLong && x.NRC_Number == vehicleObj.NRC_Number)
+        //            .OrderByDescending(x => x.CreatedDate)
+        //            .FirstOrDefaultAsync();
+
+        //        if (licenseOnlyObj != null)
+        //            return (null, null);
+        //        return (licenseOnlyObj, null);
+        //    }
+        //    return (vehicleObj.LicenseOnly, null);
+
+        //}
+        #endregion
+        public async Task<(LicenseDetailForOver2tonVM?, string?)> LicenseDetailForOver2ton(string nrc_number)
         {
             var vehicleObj = await _context.Vehicles
                    .AsNoTracking()
-                   .Where(x => x.LicenseNumberLong == licenseNumberLong)
+                   .Where(x => x.NRC_Number == nrc_number)
                    .Include(x => x.LicenseOnly).ThenInclude(x => x.RegistrationOffice)
                    .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
                   .OrderByDescending(x => x.ApplyDate)
-                   .Select(x => new { x.NRC_Number, x.LicenseOnly, x.ExpiryDate})
+                   .Select(x => new { x.NRC_Number,x.LicenseNumberLong, x.LicenseOnly, x.ExpiryDate })
                    .FirstOrDefaultAsync();
-                   //.ToListAsync();
+            //.ToListAsync();
 
             if (vehicleObj == null)
                 return (null, null);
 
-            if (vehicleObj.ExpiryDate.HasValue && vehicleObj.ExpiryDate.Value.Date < DateTime.Now.Date)
-                return (null, "လွဲယူမည့်သူ၏ လုပ်ငန်းလိုင်စင်သည် သက်တမ်းကုန်နေပါသည်။");
-            if (!vehicleObj.ExpiryDate.HasValue)
-                return (null, "လွဲယူမည့်သူ၏ လုပ်ငန်းလိုင်စင် သည် သက်တမ်းကုန်ဆုံးရက် မှားရွှင်းနေပါသည်။");
+            //if (vehicleObj.ExpiryDate.HasValue && vehicleObj.ExpiryDate.Value.Date < DateTime.Now.Date)
+            //    return (null, "လွဲယူမည့်သူ၏ လုပ်ငန်းလိုင်စင်သည် သက်တမ်းကုန်နေပါသည်။");
+            //if (!vehicleObj.ExpiryDate.HasValue)
+            //    return (null, "လွဲယူမည့်သူ၏ လုပ်ငန်းလိုင်စင် သည် သက်တမ်းကုန်ဆုံးရက် မှားရွှင်းနေပါသည်။");
+            //List<LicenseOnly> licenseOnlyObj = new List<LicenseOnly>() ;
+            //foreach (var veh in vehicleObj)
+            //{
 
+            //    else
+            //    {
+            //        licenseOnlyObj.Add(veh.LicenseOnly);
+            //    }
+            //}
+            LicenseDetailForOver2tonVM vmLincDet = new LicenseDetailForOver2tonVM();
+            
             if (vehicleObj.LicenseOnly == null)
             {
-                var licenseOnlyObj = await _context.LicenseOnlys.AsNoTracking()
-                    .Where(x => x.License_Number == licenseNumberLong && x.NRC_Number == vehicleObj.NRC_Number)
+                vmLincDet.LicenseOnly = await _context.LicenseOnlys.AsNoTracking()
+                    .Where(x => x.NRC_Number == nrc_number && x.NRC_Number == vehicleObj.NRC_Number)
                     .OrderByDescending(x => x.CreatedDate)
                     .FirstOrDefaultAsync();
-
-                if (licenseOnlyObj != null)
+                vmLincDet.LicenseNumberLong = vehicleObj.LicenseNumberLong;
+                if (vmLincDet.LicenseOnly != null)
                     return (null, null);
-                return (licenseOnlyObj, null);
+                return (vmLincDet, null);
             }
-            return (vehicleObj.LicenseOnly, null);
+            else
+            {
+                vmLincDet.LicenseOnly = vehicleObj.LicenseOnly;
+                vmLincDet.LicenseNumberLong=vehicleObj.LicenseNumberLong;
+            }
+
+            return (vmLincDet, null);
 
         }
 
