@@ -5,6 +5,7 @@
        public OperatorDetailHead  operatorDetailHead { get; set; }
        public List<CarObject>? carObjects { get; set; }
         public int totalCarCount { get; set; }
+        public int totalPage { get; set; }
     }
 
     public class OperatorDetailHead

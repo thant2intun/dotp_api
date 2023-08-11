@@ -589,7 +589,8 @@ namespace DOTP_BE.Repositories
                             });
                             cars.Add(a);
                         }
-                        var pageCount = cars.Count() / opGetReq.countPerPage;
+                        var pageCount = (cars.Count() + opGetReq.countPerPage - 1) / opGetReq.countPerPage;
+                        opVM.totalPage = pageCount;
                         opVM.carObjects = cars.Skip((opGetReq.page - 1) * opGetReq.countPerPage)
                                       .Take(opGetReq.countPerPage)
                                       .ToList();
