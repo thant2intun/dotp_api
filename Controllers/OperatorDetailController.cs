@@ -907,7 +907,7 @@ namespace DOTP_BE.Controllers
         }
 
         [HttpPost("all_operation_done")]
-        public async Task<IActionResult> AllOperationDoneProcess(AllOperationDoneVM allOperationDoneVM)
+        public async Task<IActionResult> AllOperationDoneProcess(List<AllOperationDoneVM> allOperationDoneVM)
         {
             bool oky = await _iopeartorDetail.AllOperationDoneProcess(allOperationDoneVM);
             return Ok(allOperationDoneVM);

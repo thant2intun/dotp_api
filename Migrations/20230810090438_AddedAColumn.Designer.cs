@@ -4,6 +4,7 @@ using DOTP_BE.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DOTP_BE.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230810090438_AddedAColumn")]
+    partial class AddedAColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1340,6 +1342,7 @@ namespace DOTP_BE.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Temp_Township_Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Temp_Triangle")
@@ -1348,11 +1351,8 @@ namespace DOTP_BE.Migrations
                     b.Property<string>("Temp_VehicleBrand")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Temp_VehicleLocation")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Temp_VehicleOwnerAddress")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Temp_VehicleOwnerNRC")

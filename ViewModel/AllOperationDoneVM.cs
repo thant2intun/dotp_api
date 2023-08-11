@@ -4,6 +4,7 @@
     {
         public string LicenseNumberLong { get; set; }
         public string TransactionId { get; set; }
-        public List<string> FormModes { get; set; }
+        public string FormModes { get; set; }
+        public DateTime CreatedDate { get; set; }
     }
 }

@@ -43,7 +43,7 @@ namespace DOTP_BE.Interfaces
         //Task<(string, string, string, DateTime)> CommonChangesProcess(CommonChangesVM dto);
         Task<(bool, bool, string?)> CommonChangesProcess(CommonChangesVM dto);
 
-        Task<bool> AllOperationDoneProcess(AllOperationDoneVM dto);
+        Task<bool> AllOperationDoneProcess(List<AllOperationDoneVM> dto);
 
         Task<(LicenseOnly?, string?)> LicenseDetailForOver2ton(string licenseNumberLong);
     }

@@ -15,6 +15,7 @@ namespace DOTP_BE.Model
         public string? VehicleOwnerAddress { get; set; }
         public bool? IsDeleted { get; set; }
         public int? PersonInformationId { get; set; }
+        public string Status { get; set; }
         public PersonInformation PersonInformation { get; set; }
         public List<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
     }

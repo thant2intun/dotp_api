@@ -8,8 +8,8 @@ namespace DOTP_BE.Interfaces
 
     {
         Task<List<Vehicle>> getVehicleList();
-        Task<List<Temp_Table>> getVehicleById(string formMode, string transactionId, string status);
-        //Task<List<Vehicle>> getVehicleById(string formMode, string transactionId, string status);
+        //Task<List<Temp_Table>> getVehicleById(string formMode, string transactionId, string status);
+        Task<List<ExtendLicenseDetailRepVM>> getVehicleById(string formMode, string transactionId, string status);
 
 
         Task<List<Vehicle>> getVehicleById(string transactionId, string status);

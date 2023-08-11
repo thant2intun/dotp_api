@@ -24,81 +24,142 @@ namespace DOTP_BE.Repositories
             return result;
         }
 
-        public async Task<List<Temp_Table>> getVehicleById(string formMode, string transactionId, string status)
-        {
-            //if(status == ConstantValue.Status_Pending)
-            //{
-                var vehicles = await _context.Temp_Tables
-                    .AsNoTracking()
-                    //.Include(x => x.OperatorDetail)
-                    .Include(x => x.CreateCar)
-                    //.Include(x => x.VehicleWeight)
-                    .Include(x => x.LicenseOnly).ThenInclude(x => x.RegistrationOffice)
-                    .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
-                    .Where(s => s.Transaction_Id == transactionId &&
-                                                   s.Status == status &&
-                                                   s.FormMode == formMode)
-                    .ToListAsync();
-
-                if (vehicles.Count > 0 && vehicles[0].LicenseOnly == null) //for licenseOnly include
-                {
-                    vehicles[0].LicenseOnly = await _context.LicenseOnlys.AsNoTracking()
-                                                            .Where(x => x.License_Number == vehicles[0].LicenseNumberLong)
-                                                            .FirstAsync();
-                }
-
-
-
-                //can't filter by Transaction_Id cause after admin approved new operator record with that transaction will add,
-                //here operator will not have and data yet so with only NRC Number
-                ////if can use include then don't need this one
-                //if (vehicles.Count > 0 && vehicles[0].OperatorDetail == null)
-                //{
-                //    //operatorDetail is use for only (email in extendOperatorLicense) currently found
-                //    var opObj = await _context.OperatorDetails.AsNoTracking()
-                //                                              .Where(x => x.NRC == vehicles[0].NRC_Number)
-                //                                              //.Select(x => x.Email)
-                //                                              .FirstAsync();
-                //    vehicles.ForEach(x => x.OperatorDetail = opObj); // include operator to every(OperatorDetail)
-                //}
-                return vehicles;
-            //}
-           
-        }
-
-        //public async Task<List<Vehicle>> getVehicleById(string formMode, string transactionId, string status)
+        //public async Task<List<Temp_Table>> getVehicleById(string formMode, string transactionId, string status)
         //{
-        //    var vehicles = await _context.Vehicles.AsNoTracking()
-        //                                .Include(x => x.OperatorDetail)
-        //                                .Include(x => x.CreateCar)
-        //                                .Include(x => x.VehicleWeight)
-        //                                .Include(x => x.LicenseOnly).ThenInclude(x => x.RegistrationOffice)
-        //                                .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
-        //                                .Where(s => s.Transaction_Id == transactionId &&
-        //                                            s.Status == status &&
-        //                                            s.FormMode == formMode)
-        //                                .ToListAsync();
-        //    if (vehicles.Count > 0 && vehicles[0].LicenseOnly == null) //for licenseOnly include
-        //    {
-        //        vehicles[0].LicenseOnly = await _context.LicenseOnlys.AsNoTracking()
-        //                                                .Where(x => x.License_Number == vehicles[0].LicenseNumberLong)
-        //                                                .FirstAsync();
-        //    }
-
-        //    //can't filter by Transaction_Id cause after admin approved new operator record with that transaction will add,
-        //    //here operator will not have and data yet so with only NRC Number
-        //    ////if can use include then don't need this one
-        //    //if (vehicles.Count > 0 && vehicles[0].OperatorDetail == null)
+        //    //if(status == ConstantValue.Status_Pending)
         //    //{
-        //    //    //operatorDetail is use for only (email in extendOperatorLicense) currently found
-        //    //    var opObj = await _context.OperatorDetails.AsNoTracking()
-        //    //                                              .Where(x => x.NRC == vehicles[0].NRC_Number)
-        //    //                                              //.Select(x => x.Email)
-        //    //                                              .FirstAsync();
-        //    //    vehicles.ForEach(x => x.OperatorDetail = opObj); // include operator to every(OperatorDetail)
+        //        var vehicles = await _context.Temp_Tables
+        //            .AsNoTracking()
+        //            //.Include(x => x.OperatorDetail)
+        //            .Include(x => x.CreateCar)
+        //            //.Include(x => x.VehicleWeight)
+        //            .Include(x => x.LicenseOnly).ThenInclude(x => x.RegistrationOffice)
+        //            .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
+        //            .Where(s => s.Transaction_Id == transactionId &&
+        //                                           s.Status == status &&
+        //                                           s.FormMode == formMode)
+        //            //.Select(x => new ExtendLicenseDetailRepVM
+        //            //{
+        //            //    License_NumberLong = x.LicenseNumberLong,
+        //            //    LicenseOwner = x.LicenseOnly.LicenseOwner,
+        //            //    OfficeLongName = x.LicenseOnly.RegistrationOffice.OfficeLongName,
+        //            //    NRC_Number = x.NRC_Number,
+        //            //    Phone = x.LicenseOnly.Phone,
+        //            //    Address = x.LicenseOnly.Address,
+        //            //    JourneyTypeLong = x.LicenseOnly.JourneyType.JourneyTypeLong,
+        //            //    Township_Name = x.LicenseOnly.Township_Name,
+        //            //    ExpiryDate = x.ExpiryDate,
+        //            //    AttachFile_NRC = x.AttachFile_NRC,
+        //            //    AttachFile_M10 = x.AttachFile_M10, 
+        //            //    AttachFile_OperatorLicense = x.AttachFile_OperatorLicense,
+        //            //    AttachFile_Part1 = x.AttachFile_Part1,
+        //            //    //l_O_Address = 
+        //            //})
+        //            .ToListAsync();
+
+        //        if (vehicles.Count > 0 && vehicles[0].LicenseOnly == null) //for licenseOnly include
+        //        {
+        //            vehicles[0].LicenseOnly = await _context.LicenseOnlys.AsNoTracking()
+        //                                                    .Where(x => x.License_Number == vehicles[0].LicenseNumberLong)
+        //                                                    .FirstAsync();
+        //        }
+
+
+
+
+        //        //can't filter by Transaction_Id cause after admin approved new operator record with that transaction will add,
+        //        //here operator will not have and data yet so with only NRC Number
+        //        ////if can use include then don't need this one
+        //        //if (vehicles.Count > 0 && vehicles[0].OperatorDetail == null)
+        //        //{
+        //        //    //operatorDetail is use for only (email in extendOperatorLicense) currently found
+        //        //    var opObj = await _context.OperatorDetails.AsNoTracking()
+        //        //                                              .Where(x => x.NRC == vehicles[0].NRC_Number)
+        //        //                                              //.Select(x => x.Email)
+        //        //                                              .FirstAsync();
+        //        //    vehicles.ForEach(x => x.OperatorDetail = opObj); // include operator to every(OperatorDetail)
+        //        //}
+        //        return vehicles;
         //    //}
-        //    return vehicles;
+
         //}
+
+        public async Task<List<ExtendLicenseDetailRepVM>> getVehicleById(string formMode, string transactionId, string status)
+        {
+            var vehicles = await _context.Vehicles.AsNoTracking()
+                                        //.Include(x => x.OperatorDetail)
+                                        .Include(x => x.CreateCar)
+                                        .Include(x => x.VehicleWeight)
+                                        .Include(x => x.LicenseOnly).ThenInclude(x => x.RegistrationOffice)
+                                        .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
+                                        .Where(s => s.Transaction_Id == transactionId &&
+                                                    s.Status == status &&
+                                                    s.FormMode == formMode)
+                                        .Select(x => new ExtendLicenseDetailRepVM
+                                        {
+                                            License_NumberLong = x.LicenseNumberLong,
+                                            LicenseOwner = x.LicenseOnly.LicenseOwner,
+                                            OfficeLongName = x.LicenseOnly.RegistrationOffice.OfficeLongName,
+                                            //TotalCar
+                                            //AddTotalCar
+                                            NRC_Number = x.NRC_Number,
+                                            Phone = x.LicenseOnly.Phone,
+                                            Address = x.LicenseOnly.Address,
+                                            JourneyTypeLong = x.LicenseOnly.JourneyType.JourneyTypeLong,
+                                            Township_Name = x.LicenseOnly.Township_Name,
+                                            ExpiryDate = x.ExpiryDate,
+                                            Temp_AttachFile_NRC = x.LicenseOnly.Temp_AttachFile_NRC,
+                                            Temp_AttachFile_M10 = x.LicenseOnly.Temp_AttachFile_M10,
+                                            Temp_AttachFile_OperatorLicense = x.LicenseOnly.Temp_AttachFile_OperatorLicense,
+                                            Temp_AttachFile_Part1 = x.LicenseOnly.Temp_AttachFile_Part1,
+                                            LAddress = x.LicenseOnly.Address,
+                                            Temp_LAddress = x.LicenseOnly.Temp_Address,
+                                            LTownship_Name = x.LicenseOnly.Township_Name,
+                                            Temp_LTownship_Name = x.LicenseOnly.Township_Name,
+                                            VehicleNumber = x.VehicleNumber,
+                                            VehicleOwnerAddress = x.CreateCar.VehicleOwnerAddress,
+                                            Temp_VehicleOwnerAddress = x.Temp_VehicleOwnerAddress,
+                                            VehicleLocation = x.CreateCar.VehicleLocation,
+                                            Temp_VehicleLocation = x.Temp_VehicleLocation,
+                                            VehicleOwnerName = x.CreateCar.VehicleOwnerName,
+                                            Temp_VehicleOwnerName = x.Temp_VehicleOwnerName,
+                                            VehicleOwnerNRC = x.CreateCar.VehicleOwnerNRC,
+                                            Temp_VehicleOwnerNRC = x.Temp_VehicleOwnerNRC,
+                                            VehicleType = x.CreateCar.VehicleType,
+                                            Temp_VehicleType = x.Temp_VehicleType,
+                                            VehicleBrand = x.CreateCar.VehicleBrand,
+                                            Temp_VehicleBrand = x.Temp_VehicleBrand,
+                                            VehicleWeight = x.CreateCar.VehicleWeight,
+                                            Temp_VehicleWeight = x.Temp_VehicleWeight,
+                                            Temp_Triangle = x.Temp_Triangle,
+                                            Temp_OwnerBook = x.Temp_OwnerBook,
+                                            Temp_AttachedFile1 = x.Temp_AttachedFile1,
+                                            Temp_AttachedFile2 = x.Temp_AttachedFile2,
+                                            AllowedVehicleWeight = x.VehicleWeight.VehicleType,
+                                            Status = x.Status
+                                        })
+                                        .ToListAsync();
+            //if (vehicles.Count > 0 && vehicles[0].LicenseOnly == null) //for licenseOnly include
+            //{
+            //    vehicles[0].LicenseOnly = await _context.LicenseOnlys.AsNoTracking()
+            //                                            .Where(x => x.License_Number == vehicles[0].LicenseNumberLong)
+            //                                            .FirstAsync();
+            //}
+
+            //can't filter by Transaction_Id cause after admin approved new operator record with that transaction will add,
+            //here operator will not have and data yet so with only NRC Number
+            ////if can use include then don't need this one
+            //if (vehicles.Count > 0 && vehicles[0].OperatorDetail == null)
+            //{
+            //    //operatorDetail is use for only (email in extendOperatorLicense) currently found
+            //    var opObj = await _context.OperatorDetails.AsNoTracking()
+            //                                              .Where(x => x.NRC == vehicles[0].NRC_Number)
+            //                                              //.Select(x => x.Email)
+            //                                              .FirstAsync();
+            //    vehicles.ForEach(x => x.OperatorDetail = opObj); // include operator to every(OperatorDetail)
+            //}
+            return vehicles;
+        }
 
         public async Task<List<Vehicle>> getVehicleById(string transactionId, string status)
         {
@@ -367,107 +428,50 @@ namespace DOTP_BE.Repositories
             //var fd = DateTime.Parse(dto.FromDate).Date;
             //var td = DateTime.Parse(dto.ToDate).Date;
             if (!DateTime.TryParse(dto.FromDate, out var fd) || !DateTime.TryParse(dto.ToDate, out var td))
-            {
-                // Handle invalid date format
-                // For example, return an error or default values
                 return (0, new ExtendLicenseDashBoardVMAdmin());
-            }
+                    
             fd = fd.Date; //no need for web but for mobile
             td = td.Date; //no need for web but for mobile
 
-            var filteredByDate = await _context.Temp_Tables.AsNoTracking()
+            var filteredByDate = await _context.Vehicles.AsNoTracking()
                 .Where(x => x.CreatedDate.Date >= fd && 
                             x.CreatedDate.Date <= td)
                 .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
                 .ToListAsync();
 
-            //for other status count
-            var otherStatus = await _context.Vehicles.AsNoTracking()
-                .Where(x => x.CreatedDate.Date >= fd &&
-                            x.CreatedDate.Date <= td)
-                .ToListAsync();
-
-            if (filteredByDate.Count == 0 && otherStatus.Count == 0)
+            if (filteredByDate.Count == 0)
                 return (0, new ExtendLicenseDashBoardVMAdmin());
 
             #region *** Filter by search parameters ***
             if (!string.IsNullOrWhiteSpace(dto.FormMode))
-            {
                 filteredByDate = filteredByDate.Where(x => x.FormMode == dto.FormMode).ToList();
-
-                //for other status
-                otherStatus = otherStatus.Where(x => x.FormMode == dto.FormMode).ToList();
-            }
             if (dto.JourneyType != 0)
             {
                 if (dto.JourneyType == 1)
-                {
                     filteredByDate = filteredByDate.Where(x => x.LicenseNumberLong.Contains(ConstantValue.Twin)).ToList();
-
-                    //for other status
-                    otherStatus = otherStatus.Where(x => x.LicenseNumberLong.Contains(ConstantValue.Twin)).ToList();
-                }
                 else if (dto.JourneyType == 2)
-                {
                     filteredByDate = filteredByDate.Where(x => x.LicenseNumberLong.Contains(ConstantValue.Kyaw)).ToList();
-
-                    //for other status
-                    otherStatus = otherStatus.Where(x => x.LicenseNumberLong.Contains(ConstantValue.Kyaw)).ToList();
-                }
             }
             if (dto.LicenseType != 0)
             {
                 if (dto.LicenseType == 1)
-                {
                     filteredByDate = filteredByDate.Where(x => x.LicenseTypeId == 1 ||
                                                                x.LicenseTypeId == 2 ||
                                                                x.LicenseTypeId == 3)
                                                     .ToList();
-
-                    //for other status
-                    otherStatus = otherStatus.Where(x => x.LicenseTypeId == 1 ||
-                                                               x.LicenseTypeId == 2 ||
-                                                               x.LicenseTypeId == 3)
-                                                    .ToList();
-                }
                 else if (dto.LicenseType == 4)
-                {
                     filteredByDate = filteredByDate.Where(x => x.LicenseTypeId == 4)
                                                    .ToList();
-
-                    //for other status
-                    otherStatus = otherStatus.Where(x => x.LicenseTypeId == 4)
-                                                   .ToList();
-                }
                 else if (dto.LicenseType == 5)
-                {
                     filteredByDate = filteredByDate.Where(x => x.LicenseTypeId == 5)
                                                    .ToList();
-
-                    //for other status
-                    otherStatus = otherStatus.Where(x => x.LicenseTypeId == 5)
-                                                   .ToList();
-                }
                 else if (dto.LicenseType == 6)
-                {
                     filteredByDate = filteredByDate.Where(x => x.LicenseTypeId == 6 ||
                                                                x.LicenseTypeId == 7)
-                                                   .ToList();
-
-                    //for other status
-                    otherStatus = otherStatus.Where(x => x.LicenseTypeId == 6 ||
-                                                               x.LicenseTypeId == 7)
-                                                   .ToList();
-                }                    
+                                                   .ToList();           
                 else if (dto.LicenseType == 8)
-                {
                     filteredByDate = filteredByDate.Where(x => x.LicenseTypeId == 8)
-                                                   .ToList();
-
-                    //for other status
-                    otherStatus = otherStatus.Where(x => x.LicenseTypeId == 8)
-                                                   .ToList();
-                }                    
+                                                   .ToList();        
             }
             #endregion
 
@@ -499,14 +503,9 @@ namespace DOTP_BE.Repositories
                                  .ToList();
 
             int pendingCount = CountByStatus(filteredByDate, ConstantValue.Status_Pending);
-            //int approvedCount = CountByStatus(filteredByDate, ConstantValue.Status_Approved);
-            //int rejectedCount = CountByStatus(filteredByDate, ConstantValue.Status_Rejected);
-            //int paidCount = CountByStatus(filteredByDate, ConstantValue.Status_Paid);
-
-            //for other status
-            int approvedCount = CountByStatus_Other(otherStatus, ConstantValue.Status_Approved);
-            int rejectedCount = CountByStatus_Other(otherStatus, ConstantValue.Status_Rejected);
-            int paidCount = CountByStatus_Other(otherStatus, ConstantValue.Status_Paid);
+            int approvedCount = CountByStatus(filteredByDate, ConstantValue.Status_Approved);
+            int rejectedCount = CountByStatus(filteredByDate, ConstantValue.Status_Rejected);
+            int paidCount = CountByStatus(filteredByDate, ConstantValue.Status_Paid);
 
             #region *** Not Use ***
             int totalCount = 0;
@@ -529,7 +528,7 @@ namespace DOTP_BE.Repositories
 
             ExtendLicenseDashBoardVMAdmin result = new ExtendLicenseDashBoardVMAdmin
             {
-                PendingCount = extendLicenseVMs.Count(),
+                PendingCount = pendingCount,
                 //PendingCount = pendingCount,
                 ApprovedCount = approvedCount,
                 PaidCount = paidCount,
@@ -678,7 +677,7 @@ namespace DOTP_BE.Repositories
                                  .Take(dto.PageSize)
                                  .ToList();
 
-            int pendingCount = CountByStatus(filteredByDate, ConstantValue.Status_Pending);
+            //int pendingCount = CountByStatus(filteredByDate, ConstantValue.Status_Pending);
             //int approvedCount = CountByStatus(filteredByDate, ConstantValue.Status_Approved);
             //int rejectedCount = CountByStatus(filteredByDate, ConstantValue.Status_Rejected);
             //int paidCount = CountByStatus(filteredByDate, ConstantValue.Status_Paid);
@@ -690,21 +689,21 @@ namespace DOTP_BE.Repositories
 
             #region *** Not Use ***
             int totalCount = 0;
-            switch (dto.Status)
-            {
-                case ConstantValue.Status_Pending:
-                    totalCount = CountByStatus(filteredByDate, ConstantValue.Status_Pending);
-                    break;
-                case ConstantValue.Status_Approved:
-                    totalCount = CountByStatus(filteredByDate, ConstantValue.Status_Approved);
-                    break;
-                case ConstantValue.Status_Rejected:
-                    totalCount = CountByStatus(filteredByDate, ConstantValue.Status_Rejected);
-                    break;
-                case ConstantValue.Status_Paid:
-                    totalCount = CountByStatus(filteredByDate, ConstantValue.Status_Paid);
-                    break;
-            }
+            //switch (dto.Status)
+            //{
+            //    case ConstantValue.Status_Pending:
+            //        totalCount = CountByStatus(filteredByDate, ConstantValue.Status_Pending);
+            //        break;
+            //    case ConstantValue.Status_Approved:
+            //        totalCount = CountByStatus(filteredByDate, ConstantValue.Status_Approved);
+            //        break;
+            //    case ConstantValue.Status_Rejected:
+            //        totalCount = CountByStatus(filteredByDate, ConstantValue.Status_Rejected);
+            //        break;
+            //    case ConstantValue.Status_Paid:
+            //        totalCount = CountByStatus(filteredByDate, ConstantValue.Status_Paid);
+            //        break;
+            //}
             #endregion
 
             ExtendLicenseDashBoardVMAdmin result = new ExtendLicenseDashBoardVMAdmin
@@ -2342,7 +2341,7 @@ namespace DOTP_BE.Repositories
         //    return true;
         //}        
 
-        private int CountByStatus(IEnumerable<Temp_Table> temp_Tables, string status)
+        private int CountByStatus(IEnumerable<Vehicle> temp_Tables, string status)
         {
             return temp_Tables
                 .Where(x => x.Status == status)

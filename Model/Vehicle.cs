@@ -43,5 +43,25 @@ namespace DOTP_BE.Model
         public LicenseOnly LicenseOnly { get; set; }
         public int? OperatorId { get; set; }
         public OperatorDetail OperatorDetail { get; set; }
+
+
+        //Change Vehicle Owner Address
+        public string? Temp_VehicleOwnerAddress { get; set; } //temp
+        public string? Temp_Township_Name { get; set; } //temp
+        public string Temp_VehicleLocation { get; set; }
+
+
+        //Change Vehicle Type
+        public string? Temp_VehicleType { get; set; }
+        public string? Temp_VehicleBrand { get; set; }
+        public string? Temp_VehicleWeight { get; set; }
+        public string? Temp_Triangle { get; set; }
+        public string? Temp_OwnerBook { get; set; }
+        public string? Temp_AttachedFile1 { get; set; }
+        public string? Temp_AttachedFile2 { get; set; }
+
+        //Change Vehicle Owner Name Change
+        public string? Temp_VehicleOwnerName { get; set; }
+        public string? Temp_VehicleOwnerNRC { get; set; }
     }
 }
