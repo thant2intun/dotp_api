@@ -3090,10 +3090,11 @@ namespace DOTP_BE.Repositories
             {
                 #region *** generate new Transaction and Chalen ID ***
 
-                var checkTandC = await _context.Temp_Tables.AsNoTracking()
-                        .Where(x => x.LicenseNumberLong == dto.LicenseNumberLong 
+                var checkTandC = await _context.Vehicles.AsNoTracking()
+                        .Where(x => x.LicenseNumberLong == dto.LicenseNumberLong &&
+                                    x.CreatedDate.Date == DateTime.Now.Date
                                     //&& x.Status == ConstantValue.Status_Pending // only for after paid and wanna two transaction_id (no need at the moment)
-                                    ) 
+                                    )
                         .Select(x => new { x.Transaction_Id, x.ChalenNumber })
                         .FirstOrDefaultAsync();
 
