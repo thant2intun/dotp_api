@@ -1087,7 +1087,7 @@ namespace DOTP_BE.Controllers
         public async Task<IActionResult> AllOperationDoneProcess(List<AllOperationDoneVM> allOperationDoneVM)
         {
             bool oky = await _iopeartorDetail.AllOperationDoneProcess(allOperationDoneVM);
-            return Ok(allOperationDoneVM);
+            return Ok(oky);
         }
     }
 }
