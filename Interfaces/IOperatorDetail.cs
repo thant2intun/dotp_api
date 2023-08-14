@@ -45,6 +45,6 @@ namespace DOTP_BE.Interfaces
 
         Task<bool> AllOperationDoneProcess(List<AllOperationDoneVM> dto);
 
-        Task<(LicenseOnly?, string?)> LicenseDetailForOver2ton(string licenseNumberLong);
+        Task<(LicenseDetailForOver2tonVM, string?)> LicenseDetailForOver2ton(string nrc_number);
     }
 }
