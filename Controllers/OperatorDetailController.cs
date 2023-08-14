@@ -870,7 +870,7 @@ namespace DOTP_BE.Controllers
                     new
                     {
                         Status = false,
-                        Message = $"လူကြီးမင်၏ {dto.LicenseNumberLong}ဖြင့် လုပ်ငန်းလိုင်စင်သတ်တမ်းတိုးခြင်း ပြုလုပ်ထားသည်မှာ တစ်ကြိမ်ထက်မကတွေ့ရှိပါဖြင့် နှစ်ခုထဲမှ တစ်ခုကိုရွေးပါ။"
+                        Message = $"လူကြီးမင်၏ {dto.LicenseNumberLong}ဖြင့် 'လုပ်ငန်းလိုင်စင်သတ်တမ်းတိုးခြင်း' ပြုလုပ်ထားသည်မှာ တစ်ကြိမ်ထက်မကတွေ့ရှိပါဖြင့် နှစ်ခုထဲမှ တစ်ခုကိုရွေးပါ။"
                     }
                 ) ;
             }
@@ -899,6 +899,16 @@ namespace DOTP_BE.Controllers
                 });
             }
             var response = await _iopeartorDetail.CommonChangesProcess(dto);
+            if (response.Item1 == false && response.Item2 == true && response.Item3 == null)
+            {
+                return Ok(
+                new
+                {
+                    Status = false,
+                    Message = $"လူကြီးမင်၏ {dto.LicenseNumberLong}ဖြင့် 'ယာဉ်လိုင်စင်သက်တမ်းတိုးခြင်း' ပြုလုပ်ထားသည်မှာ တစ်ကြိမ်ထက်မကတွေ့ရှိပါဖြင့် နှစ်ခုထဲမှ တစ်ခုကိုရွေးပါ။"
+                }
+            );
+            }
             return Ok(
                 new
                 {
@@ -926,6 +936,16 @@ namespace DOTP_BE.Controllers
                 });
             }
             var response = await _iopeartorDetail.CommonChangesProcess(dto);
+            if (response.Item1 == false && response.Item2 == true && response.Item3 == null)
+            {
+                return Ok(
+                new
+                {
+                    Status = false,
+                    Message = $"လူကြီးမင်၏ {dto.LicenseNumberLong}ဖြင့် 'လုပ်ငန်းလိုင်စင်ရရှိသူ၏ နေရပ်လိပ်စာ‌ပြောင်းလဲခြင်း' ပြုလုပ်ထားသည်မှာ တစ်ကြိမ်ထက်မကတွေ့ရှိပါဖြင့် နှစ်ခုထဲမှ တစ်ခုကိုရွေးပါ။"
+                }
+            );
+            }
             return Ok(
                 new
                 {
@@ -951,6 +971,16 @@ namespace DOTP_BE.Controllers
                 });
             }
             var response = await _iopeartorDetail.CommonChangesProcess(dto);
+            if (response.Item1 == false && response.Item2 == true && response.Item3 == null)
+            {
+                return Ok(
+                new
+                {
+                    Status = false,
+                    Message = $"လူကြီးမင်၏ {dto.LicenseNumberLong}ဖြင့် 'ယာဉ်ပိုင်ရှင်နေရပ်လိပ်စာပြောင်းလဲခြင်း' ပြုလုပ်ထားသည်မှာ တစ်ကြိမ်ထက်မကတွေ့ရှိပါဖြင့် နှစ်ခုထဲမှ တစ်ခုကိုရွေးပါ။"
+                }
+            );
+            }
             return Ok(
                 new
                 {
@@ -976,6 +1006,17 @@ namespace DOTP_BE.Controllers
                 });
             }
             var response = await _iopeartorDetail.CommonChangesProcess(dto);
+            if (response.Item1 == false && response.Item2 == true && response.Item3 == null)
+            {
+                return Ok(
+                new
+                {
+                    Status = false,
+                    Message = $"လူကြီးမင်၏ {dto.LicenseNumberLong}ဖြင့် 'ယာဉ်အမျိုးအစားပြောင်းလဲခြင်း' ပြုလုပ်ထားသည်မှာ တစ်ကြိမ်ထက်မကတွေ့ရှိပါဖြင့် နှစ်ခုထဲမှ တစ်ခုကိုရွေးပါ။"
+                }
+            );
+            }
+            
             return Ok(
                 new
                 {
@@ -1001,6 +1042,16 @@ namespace DOTP_BE.Controllers
                 });
             }
             var response = await _iopeartorDetail.CommonChangesProcess(dto);
+            if (response.Item1 == false && response.Item2 == true && response.Item3 == null)
+            {
+                return Ok(
+                new
+                {
+                    Status = false,
+                    Message = $"လူကြီးမင်၏ {dto.LicenseNumberLong}ဖြင့် 'ယာဉ်ပိုင်ရှင်အမည်ပြောင်းလဲခြင်း' ပြုလုပ်ထားသည်မှာ တစ်ကြိမ်ထက်မကတွေ့ရှိပါဖြင့် နှစ်ခုထဲမှ တစ်ခုကိုရွေးပါ။"
+                }
+            );
+            }
             return Ok(
                 new
                 {
@@ -1026,6 +1077,16 @@ namespace DOTP_BE.Controllers
                 });
             }
             var response = await _iopeartorDetail.CommonChangesProcess(dto);
+            if (response.Item1 == false && response.Item2 == true && response.Item3 == null)
+            {
+                return Ok(
+                new
+                {
+                    Status = false,
+                    Message = $"လူကြီးမင်၏ {dto.LicenseNumberLong}ဖြင့် 'ယာဉ်အင်အားတိုးခြင်း' ပြုလုပ်ထားသည်မှာ တစ်ကြိမ်ထက်မကတွေ့ရှိပါဖြင့် နှစ်ခုထဲမှ တစ်ခုကိုရွေးပါ။"
+                }
+            );
+            }
             return Ok(
                 new
                 {
@@ -1051,6 +1112,17 @@ namespace DOTP_BE.Controllers
                 });
             }
             var response = await _iopeartorDetail.CommonChangesProcess(dto);
+            if (response.Item1 == false && response.Item2 == true && response.Item3 == null)
+            {
+                return Ok(
+                new
+                {
+                    Status = false,
+                    Message = $"လူကြီးမင်၏ {dto.LicenseNumberLong}ဖြင့် 'ယာဉ်အင်အားလျှော့ခြင်း' ပြုလုပ်ထားသည်မှာ တစ်ကြိမ်ထက်မကတွေ့ရှိပါဖြင့် နှစ်ခုထဲမှ တစ်ခုကိုရွေးပါ။"
+                }
+            );
+            }
+            
             return Ok(
                 new
                 {
