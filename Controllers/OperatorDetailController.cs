@@ -864,6 +864,16 @@ namespace DOTP_BE.Controllers
                 });
             }
             var response = await _iopeartorDetail.CommonChangesProcess(dto);
+            if(response.Item1 == false && response.Item2 == true && response.Item3 == null)
+            {
+                    return Ok(
+                    new
+                    {
+                        Status = false,
+                        Message = $"လူကြီးမင်၏ {dto.LicenseNumberLong}ဖြင့် လုပ်ငန်းလိုင်စင်သတ်တမ်းတိုးခြင်း ပြုလုပ်ထားသည်မှာ တစ်ကြိမ်ထက်မကတွေ့ရှိပါဖြင့် နှစ်ခုထဲမှ တစ်ခုကိုရွေးပါ။"
+                    }
+                ) ;
+            }
             return Ok(
                 new
                 {
@@ -1079,7 +1089,8 @@ namespace DOTP_BE.Controllers
         [HttpGet("LicenseDetailForOver2ton/{dto}")]
         public async Task<IActionResult> LicenseDetailForOver2ton(string dto)
         {
-            var resp = await _iopeartorDetail.LicenseDetailForOver2ton(dto.Replace("*","/"));
+
+            var resp = await _iopeartorDetail.LicenseDetailForOver2ton(dto.Replace("*","/").Replace("%2F","/"));
             return Ok(resp);
         }
 
