@@ -3058,7 +3058,7 @@ namespace DOTP_BE.Repositories
 
         public async Task<(bool, bool, string?)> CommonChangesProcess(CommonChangesVM dto)
         {
-            if (dto.TakeNewRecord != null && dto.TakeNewRecord == true)
+            if (dto.TakeNewRecord == true)
             {
                 var dataToDelete = await _context.Vehicles.AsNoTracking()
                     .Where(x => x.LicenseNumberLong == dto.LicenseNumberLong &&
@@ -3074,7 +3074,7 @@ namespace DOTP_BE.Repositories
                 bool checkFormModeDuplicate = await _context.Vehicles.AsNoTracking()
                            .AnyAsync(x => x.LicenseNumberLong == dto.LicenseNumberLong &&
                                           x.FormMode == dto.FormMode &&
-                                          //x.Status == ConstantValue.Status_Pending &&
+                                          (x.Status == ConstantValue.Status_Pending || x.Status ==  ConstantValue.Status_OperationPending) &&
                                           x.CreatedDate.Date == DateTime.Now.Date);
 
                 if (checkFormModeDuplicate)
