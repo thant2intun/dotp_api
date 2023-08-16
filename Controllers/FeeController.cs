@@ -24,6 +24,13 @@ namespace DOTP_BE.Controllers
             return Ok(fees);
         }
 
+        [HttpGet("GetAllFee")]
+        public async Task<IActionResult> GetAllVehicleFee()
+        {
+            var fees = await _repo.getVehicleFeeList();
+            return Ok(fees);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetFeeById([FromRoute] int id)
         {

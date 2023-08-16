@@ -42,6 +42,22 @@ namespace DOTP_BE.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ExtendYear",
+                columns: table => new
+                {
+                    YearId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EngYear = table.Column<int>(type: "int", nullable: false),
+                    MyanYear = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExtendYear", x => x.YearId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "JourneyTypes",
                 columns: table => new
                 {
@@ -403,6 +419,7 @@ namespace DOTP_BE.Migrations
                     VehicleOwnerAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true),
                     PersonInformationId = table.Column<int>(type: "int", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -428,7 +445,9 @@ namespace DOTP_BE.Migrations
                     LicenseOwner = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NRC_Number = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Temp_Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Township_Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Temp_Township_Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Fax = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AllowBusinessTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -438,11 +457,17 @@ namespace DOTP_BE.Migrations
                     FormMode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true),
                     AttachFile_NRC = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Temp_AttachFile_NRC = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AttachFile_M10 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Temp_AttachFile_M10 = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AttachFile_OperatorLicense = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Temp_AttachFile_OperatorLicense = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AttachFile_Part1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Temp_AttachFile_Part1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AttachFile_RecommandDoc1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Temp_AttachFile_RecommandDoc1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AttachFile_RecommandDoc2 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Temp_AttachFile_RecommandDoc2 = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AttachFile_RecommandDoc3 = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AttachFile_RecommandDoc4 = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AttachFile_RecommandDoc5 = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -552,6 +577,18 @@ namespace DOTP_BE.Migrations
                     CreateCarId = table.Column<int>(type: "int", nullable: false),
                     LicenseOnlyId = table.Column<int>(type: "int", nullable: true),
                     OperatorId = table.Column<int>(type: "int", nullable: true),
+                    Temp_VehicleOwnerAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Temp_Township_Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Temp_VehicleLocation = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Temp_VehicleType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Temp_VehicleBrand = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Temp_VehicleWeight = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Temp_Triangle = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Temp_OwnerBook = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Temp_AttachedFile1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Temp_AttachedFile2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Temp_VehicleOwnerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Temp_VehicleOwnerNRC = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -864,6 +901,9 @@ namespace DOTP_BE.Migrations
         {
             migrationBuilder.DropTable(
                 name: "AdminUsers");
+
+            migrationBuilder.DropTable(
+                name: "ExtendYear");
 
             migrationBuilder.DropTable(
                 name: "Fees");

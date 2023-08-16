@@ -84,6 +84,7 @@ builder.Services.AddScoped<IMDYCars, MDYCarsRepo>();
 builder.Services.AddScoped<IKALA_YGNCars,KALA_YGNCarsRepo>();
 
 builder.Services.AddScoped<IOperatorDetail,OperatorDetailRepo>();
+builder.Services.AddScoped<IExtendYear,ExtendYearRepo>();
 
 builder.Services.AddScoped<IUser, UserRepo>();
 builder.Services.AddTransient<IPersonInformation, PersonInformationRepo>();
