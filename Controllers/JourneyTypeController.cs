@@ -9,7 +9,7 @@ namespace DOTP_BE.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] //comment by al 26_04_2023
+    /*[Authorize] *///comment by al 26_04_2023
     public class JourneyTypeController : ControllerBase
     {
         private readonly IJourneyType _ijourneyType;

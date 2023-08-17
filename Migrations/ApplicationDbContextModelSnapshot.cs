@@ -1525,6 +1525,31 @@ namespace DOTP_BE.Migrations
                     b.ToTable("VehicleWeightFees");
                 });
 
+            modelBuilder.Entity("DOTP_BE.Model.Years", b =>
+                {
+                    b.Property<int>("YearId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("YearId"), 1L, 1);
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EngYear")
+                        .HasColumnType("int");
+
+                    b.Property<string>("MyanYear")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("YearId");
+
+                    b.ToTable("ExtendYear");
+                });
+
             modelBuilder.Entity("DOTP_BE.Models.OperatorDetail", b =>
                 {
                     b.Property<int>("OperatorId")

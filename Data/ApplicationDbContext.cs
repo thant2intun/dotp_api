@@ -13,6 +13,7 @@ namespace DOTP_BE.Data
         public DbSet<VehicleWeight> VehicleWeights { get; set; }
         public DbSet<NRC> NRCs { get; set; }
 
+        public DbSet<Years> ExtendYear { get; set; }
         //al
         public DbSet<LicenseType> LicenseTypes { get; set; }
 

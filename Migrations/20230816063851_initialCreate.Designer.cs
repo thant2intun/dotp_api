@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DOTP_BE.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230811074136_addedSomeColumns")]
-    partial class addedSomeColumns
+    [Migration("20230816063851_initialCreate")]
+    partial class initialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -1491,6 +1491,31 @@ namespace DOTP_BE.Migrations
                     b.HasIndex("VehicleWeightId");
 
                     b.ToTable("VehicleWeightFees");
+                });
+
+            modelBuilder.Entity("DOTP_BE.Model.Years", b =>
+                {
+                    b.Property<int>("YearId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("YearId"), 1L, 1);
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EngYear")
+                        .HasColumnType("int");
+
+                    b.Property<string>("MyanYear")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("YearId");
+
+                    b.ToTable("ExtendYear");
                 });
 
             modelBuilder.Entity("DOTP_BE.Models.OperatorDetail", b =>

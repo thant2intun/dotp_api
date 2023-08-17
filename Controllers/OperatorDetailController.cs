@@ -870,7 +870,7 @@ namespace DOTP_BE.Controllers
                     new
                     {
                         Status = false,
-                        Message = $"လူကြီးမင်၏ {dto.LicenseNumberLong}ဖြင့် လုပ်ငန်းလိုင်စင်သတ်တမ်းတိုးခြင်း ပြုလုပ်ထားသည်မှာ တစ်ကြိမ်ထက်မကတွေ့ရှိပါဖြင့် နှစ်ခုထဲမှ တစ်ခုကိုရွေးပါ။"
+                        Message = $"လူကြီးမင်၏ {dto.LicenseNumberLong}ဖြင့် 'လုပ်ငန်းလိုင်စင်သတ်တမ်းတိုးခြင်း' ပြုလုပ်ထားသည်မှာ တစ်ကြိမ်ထက်မကတွေ့ရှိပါဖြင့် နှစ်ခုထဲမှ တစ်ခုကိုရွေးပါ။"
                     }
                 ) ;
             }
@@ -886,27 +886,37 @@ namespace DOTP_BE.Controllers
         [HttpPost("ExtendVehicleMobile")]
         public async Task<IActionResult> ExtendVehicleMobile([FromForm] CommonChangesVM dto)
         {
-            if (dto == null)
-            {
-                return BadRequest();
-            }
-            if (dto.FormMode == null || dto.NRC_Number == null || dto.LicenseNumberLong == null)
-            {
-                return BadRequest(new
-                {
-                    Status = false,
-                    Message = "Invalid Request!"
-                });
-            }
-            var response = await _iopeartorDetail.CommonChangesProcess(dto);
-            return Ok(
-                new
-                {
-                    Status = true,
-                    Message = "success"
-                }
-            );
-            //return Ok(dto); // for testing only
+            //if (dto == null)
+            //{
+            //    return BadRequest();
+            //}
+            //if (dto.FormMode == null || dto.NRC_Number == null || dto.LicenseNumberLong == null)
+            //{
+            //    return BadRequest(new
+            //    {
+            //        Status = false,
+            //        Message = "Invalid Request!"
+            //    });
+            //}
+            //var response = await _iopeartorDetail.CommonChangesProcess(dto);
+            //if (response.Item1 == false && response.Item2 == true && response.Item3 == null)
+            //{
+            //    return Ok(
+            //    new
+            //    {
+            //        Status = false,
+            //        Message = $"လူကြီးမင်၏ {dto.LicenseNumberLong}ဖြင့် 'ယာဉ်လိုင်စင်သက်တမ်းတိုးခြင်း' ပြုလုပ်ထားသည်မှာ တစ်ကြိမ်ထက်မကတွေ့ရှိပါဖြင့် နှစ်ခုထဲမှ တစ်ခုကိုရွေးပါ။"
+            //    }
+            //);
+            //}
+            //return Ok(
+            //    new
+            //    {
+            //        Status = true,
+            //        Message = "success"
+            //    }
+            //);
+            return Ok(dto); // for testing only
         }
         #endregion
         #region TZT_090823
@@ -917,23 +927,34 @@ namespace DOTP_BE.Controllers
             {
                 return BadRequest();
             }
-            if (dto.FormMode == null || dto.NRC_Number == null || dto.LicenseNumberLong == null)
-            {
-                return BadRequest(new
-                {
-                    Status = false,
-                    Message = "Invalid Request!"
-                });
-            }
-            var response = await _iopeartorDetail.CommonChangesProcess(dto);
-            return Ok(
-                new
-                {
-                    Status = true,
-                    Message = "success"
-                }
-            );
-            
+            //if (dto.FormMode == null || dto.NRC_Number == null || dto.LicenseNumberLong == null)
+            //{
+            //    return BadRequest(new
+            //    {
+            //        Status = false,
+            //        Message = "Invalid Request!"
+            //    });
+            //}
+            //var response = await _iopeartorDetail.CommonChangesProcess(dto);
+            //if (response.Item1 == false && response.Item2 == true && response.Item3 == null)
+            //{
+            //    return Ok(
+            //    new
+            //    {
+            //        Status = false,
+            //        Message = $"လူကြီးမင်၏ {dto.LicenseNumberLong}ဖြင့် 'လုပ်ငန်းလိုင်စင်ရရှိသူ၏ နေရပ်လိပ်စာ‌ပြောင်းလဲခြင်း' ပြုလုပ်ထားသည်မှာ တစ်ကြိမ်ထက်မကတွေ့ရှိပါဖြင့် နှစ်ခုထဲမှ တစ်ခုကိုရွေးပါ။"
+            //    }
+            //);
+            //}
+            //return Ok(
+            //    new
+            //    {
+            //        Status = true,
+            //        Message = "success"
+            //    }
+            //);
+
+            return Ok(dto); // for testing only
         }
         [HttpPost("ChangeVehicleAddressMobile")]
         public async Task<IActionResult> ChangeVehicleAddressMobile([FromForm] CommonChangesVM dto)
@@ -942,123 +963,177 @@ namespace DOTP_BE.Controllers
             {
                 return BadRequest();
             }
-            if (dto.FormMode == null || dto.NRC_Number == null || dto.LicenseNumberLong == null)
-            {
-                return BadRequest(new
-                {
-                    Status = false,
-                    Message = "Invalid Request!"
-                });
-            }
-            var response = await _iopeartorDetail.CommonChangesProcess(dto);
-            return Ok(
-                new
-                {
-                    Status = true,
-                    Message = "success"
-                }
-            );
+            //if (dto.FormMode == null || dto.NRC_Number == null || dto.LicenseNumberLong == null)
+            //{
+            //    return BadRequest(new
+            //    {
+            //        Status = false,
+            //        Message = "Invalid Request!"
+            //    });
+            //}
+            //var response = await _iopeartorDetail.CommonChangesProcess(dto);
+            //if (response.Item1 == false && response.Item2 == true && response.Item3 == null)
+            //{
+            //    return Ok(
+            //    new
+            //    {
+            //        Status = false,
+            //        Message = $"လူကြီးမင်၏ {dto.LicenseNumberLong}ဖြင့် 'ယာဉ်ပိုင်ရှင်နေရပ်လိပ်စာပြောင်းလဲခြင်း' ပြုလုပ်ထားသည်မှာ တစ်ကြိမ်ထက်မကတွေ့ရှိပါဖြင့် နှစ်ခုထဲမှ တစ်ခုကိုရွေးပါ။"
+            //    }
+            //);
+            //}
+            //return Ok(
+            //    new
+            //    {
+            //        Status = true,
+            //        Message = "success"
+            //    }
+            //);
+            return Ok(dto); //for testing only
 
         }
         [HttpPost("ChangeVehicleTypeMobile")]
         public async Task<IActionResult> ChangeVehicleTypeMobile([FromForm] CommonChangesVM dto)
         {
-            if (dto == null)
-            {
-                return BadRequest();
-            }
-            if (dto.FormMode == null || dto.NRC_Number == null || dto.LicenseNumberLong == null)
-            {
-                return BadRequest(new
-                {
-                    Status = false,
-                    Message = "Invalid Request!"
-                });
-            }
-            var response = await _iopeartorDetail.CommonChangesProcess(dto);
-            return Ok(
-                new
-                {
-                    Status = true,
-                    Message = "success"
-                }
-            );
+            //if (dto == null)
+            //{
+            //    return BadRequest();
+            //}
+            //if (dto.FormMode == null || dto.NRC_Number == null || dto.LicenseNumberLong == null)
+            //{
+            //    return BadRequest(new
+            //    {
+            //        Status = false,
+            //        Message = "Invalid Request!"
+            //    });
+            //}
+            //var response = await _iopeartorDetail.CommonChangesProcess(dto);
+            //if (response.Item1 == false && response.Item2 == true && response.Item3 == null)
+            //{
+            //    return Ok(
+            //    new
+            //    {
+            //        Status = false,
+            //        Message = $"လူကြီးမင်၏ {dto.LicenseNumberLong}ဖြင့် 'ယာဉ်အမျိုးအစားပြောင်းလဲခြင်း' ပြုလုပ်ထားသည်မှာ တစ်ကြိမ်ထက်မကတွေ့ရှိပါဖြင့် နှစ်ခုထဲမှ တစ်ခုကိုရွေးပါ။"
+            //    }
+            //);
+            //}
 
+            //return Ok(
+            //    new
+            //    {
+            //        Status = true,
+            //        Message = "success"
+            //    }
+            //);
+            return Ok();
         }
         [HttpPost("ChangeVehOwnerNameMobile")]
         public async Task<IActionResult> ChangeVehOwnerNameMobile([FromForm] CommonChangesVM dto)
         {
-            if (dto == null)
-            {
-                return BadRequest();
-            }
-            if (dto.FormMode == null || dto.NRC_Number == null || dto.LicenseNumberLong == null)
-            {
-                return BadRequest(new
-                {
-                    Status = false,
-                    Message = "Invalid Request!"
-                });
-            }
-            var response = await _iopeartorDetail.CommonChangesProcess(dto);
-            return Ok(
-                new
-                {
-                    Status = true,
-                    Message = "success"
-                }
-            );
+            //if (dto == null)
+            //{
+            //    return BadRequest();
+            //}
+            //if (dto.FormMode == null || dto.NRC_Number == null || dto.LicenseNumberLong == null)
+            //{
+            //    return BadRequest(new
+            //    {
+            //        Status = false,
+            //        Message = "Invalid Request!"
+            //    });
+            //}
+            //var response = await _iopeartorDetail.CommonChangesProcess(dto);
+            //if (response.Item1 == false && response.Item2 == true && response.Item3 == null)
+            //{
+            //    return Ok(
+            //    new
+            //    {
+            //        Status = false,
+            //        Message = $"လူကြီးမင်၏ {dto.LicenseNumberLong}ဖြင့် 'ယာဉ်ပိုင်ရှင်အမည်ပြောင်းလဲခြင်း' ပြုလုပ်ထားသည်မှာ တစ်ကြိမ်ထက်မကတွေ့ရှိပါဖြင့် နှစ်ခုထဲမှ တစ်ခုကိုရွေးပါ။"
+            //    }
+            //);
+            //}
+            //return Ok(
+            //    new
+            //    {
+            //        Status = true,
+            //        Message = "success"
+            //    }
+            //);
+            return Ok();
 
         }
         [HttpPost("AddNewCarMobile")]
         public async Task<IActionResult> AddNewCarMobile([FromForm] CommonChangesVM dto)
         {
-            if (dto == null)
-            {
-                return BadRequest();
-            }
-            if (dto.FormMode == null || dto.NRC_Number == null || dto.LicenseNumberLong == null)
-            {
-                return BadRequest(new
-                {
-                    Status = false,
-                    Message = "Invalid Request!"
-                });
-            }
-            var response = await _iopeartorDetail.CommonChangesProcess(dto);
-            return Ok(
-                new
-                {
-                    Status = true,
-                    Message = "success"
-                }
-            );
-
+            //if (dto == null)
+            //{
+            //    return BadRequest();
+            //}
+            //if (dto.FormMode == null || dto.NRC_Number == null || dto.LicenseNumberLong == null)
+            //{
+            //    return BadRequest(new
+            //    {
+            //        Status = false,
+            //        Message = "Invalid Request!"
+            //    });
+            //}
+            //var response = await _iopeartorDetail.CommonChangesProcess(dto);
+            //if (response.Item1 == false && response.Item2 == true && response.Item3 == null)
+            //{
+            //    return Ok(
+            //    new
+            //    {
+            //        Status = false,
+            //        Message = $"လူကြီးမင်၏ {dto.LicenseNumberLong}ဖြင့် 'ယာဉ်အင်အားတိုးခြင်း' ပြုလုပ်ထားသည်မှာ တစ်ကြိမ်ထက်မကတွေ့ရှိပါဖြင့် နှစ်ခုထဲမှ တစ်ခုကိုရွေးပါ။"
+            //    }
+            //);
+            //}
+            //return Ok(
+            //    new
+            //    {
+            //        Status = true,
+            //        Message = "success"
+            //    }
+            //);
+            return Ok();
         }
         [HttpPost("DecreaseCarMobile")]
         public async Task<IActionResult> DecreaseCarMobile([FromForm] CommonChangesVM dto)
         {
-            if (dto == null)
-            {
-                return BadRequest();
-            }
-            if (dto.FormMode == null || dto.NRC_Number == null || dto.LicenseNumberLong == null)
-            {
-                return BadRequest(new
-                {
-                    Status = false,
-                    Message = "Invalid Request!"
-                });
-            }
-            var response = await _iopeartorDetail.CommonChangesProcess(dto);
-            return Ok(
-                new
-                {
-                    Status = true,
-                    Message = "success"
-                }
-            );
+            //if (dto == null)
+            //{
+            //    return BadRequest();
+            //}
+            //if (dto.FormMode == null || dto.NRC_Number == null || dto.LicenseNumberLong == null)
+            //{
+            //    return BadRequest(new
+            //    {
+            //        Status = false,
+            //        Message = "Invalid Request!"
+            //    });
+            //}
+            //var response = await _iopeartorDetail.CommonChangesProcess(dto);
+            //if (response.Item1 == false && response.Item2 == true && response.Item3 == null)
+            //{
+            //    return Ok(
+            //    new
+            //    {
+            //        Status = false,
+            //        Message = $"လူကြီးမင်၏ {dto.LicenseNumberLong}ဖြင့် 'ယာဉ်အင်အားလျှော့ခြင်း' ပြုလုပ်ထားသည်မှာ တစ်ကြိမ်ထက်မကတွေ့ရှိပါဖြင့် နှစ်ခုထဲမှ တစ်ခုကိုရွေးပါ။"
+            //    }
+            //);
+            //}
 
+            //return Ok(
+            //    new
+            //    {
+            //        Status = true,
+            //        Message = "success"
+            //    }
+            //);
+            return Ok();
         }
         [HttpGet("LicenseDetailForOver2tonMobile/{dto}")]
         public async Task<IActionResult> LicenseDetailForOver2tonMobile(string dto)

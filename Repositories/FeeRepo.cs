@@ -18,6 +18,13 @@ namespace DOTP_BE.Repositories
             var result = await _context.Fees.ToListAsync();
             return result;
         }
+
+        public async Task<List<Fee>> getVehicleFeeList()
+        {
+            var data = await _context.Fees.Include(fee => fee.JourneyType).Include(w => w.VehicleWeight).ToListAsync();
+            var result = await _context.Fees.ToListAsync();
+            return result;
+        }
         public async Task<Fee> getFeeById(int id)
         {
             var fee= await _context.Fees.Where(s => s.FeesId == id).FirstOrDefaultAsync();
