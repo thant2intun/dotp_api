@@ -864,7 +864,7 @@ namespace DOTP_BE.Controllers
                 });
             }
             var response = await _iopeartorDetail.CommonChangesProcess(dto);
-            if(response.Item1 == false && response.Item2 == true && response.Item3 == null)
+            if(response.Item1 == false && response.Item2 == true)
             {
                     return Ok(
                     new
@@ -1066,31 +1066,37 @@ namespace DOTP_BE.Controllers
             if (dto == "" || dto == null)
                 return BadRequest();
             var resp = await _iopeartorDetail.LicenseDetailForOver2ton(dto.Replace("*", "/"));
-            if(resp.Item2 == null)
-            {
-                return Ok(new
-                {
-                    Status = true,
-                    Message = "success",
-                    Data = resp
-                }); ;
-            }
-            else
-            {
-                return BadRequest(new
-                {
-                    Status = false,
-                    Message = resp.Item2
-                }); ;
-            }
-            
+            //if(resp.Item2 == null)
+            //{
+            //    return Ok(new
+            //    {
+            //        Status = true,
+            //        Message = "success",
+            //        Data = resp
+            //    }); ;
+            //}
+            //else
+            //{
+            //    return BadRequest(new
+            //    {
+            //        Status = false,
+            //        Message = resp.Item2
+            //    }); ;
+            //}
+            return Ok(resp);
         }
         #endregion
         [HttpGet("LicenseDetailForOver2ton/{dto}")]
         public async Task<IActionResult> LicenseDetailForOver2ton(string dto)
         {
+            var resp = await _iopeartorDetail.LicenseDetailForOver2ton(dto.Replace("**","/"));
+            return Ok(resp);
+        }
 
-            var resp = await _iopeartorDetail.LicenseDetailForOver2ton(dto.Replace("*","/").Replace("%2F","/"));
+        [HttpGet("get_licenseNumberLong_by_nrc/{nrc}")]
+        public async Task<IActionResult> GetLicenseNumberLongByNrc(string nrc)
+        {
+            var resp = await _iopeartorDetail.GetLicenseNumberLongByNrc(nrc);
             return Ok(resp);
         }
 
@@ -1099,6 +1105,20 @@ namespace DOTP_BE.Controllers
         {
             bool oky = await _iopeartorDetail.AllOperationDoneProcess(allOperationDoneVM);
             return Ok(oky);
+        }
+
+        [HttpGet("check_application_status")]
+        public async Task<IActionResult> CheckApplicationStatus()
+        {
+            var resp = await _iopeartorDetail.CheckApplicationStatus();
+            return Ok(resp);
+        }
+
+        [HttpGet("get_summary_data/{userId}")]
+        public async Task<IActionResult> getSummaryData(int userId)
+        {
+            var resp = await _iopeartorDetail.GetSummariesData(userId);
+            return Ok(resp);
         }
     }
 }

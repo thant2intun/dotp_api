@@ -24,6 +24,7 @@ namespace DOTP_BE.Data
         public DbSet<KALA_YGNCars> Kala_YgnCars { get; set; }
         public DbSet<OperatorDetail> OperatorDetails { get; set; }
         public DbSet<Temp_Table> Temp_Tables { get; set; }
+        public DbSet<Summary> Summaries { get; set; }
 
         //tzt
         public DbSet<PersonInformation> PersonInformations { get; set; }

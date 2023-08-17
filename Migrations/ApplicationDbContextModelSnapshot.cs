@@ -805,6 +805,40 @@ namespace DOTP_BE.Migrations
                     b.ToTable("Roles");
                 });
 
+            modelBuilder.Entity("DOTP_BE.Model.Summary", b =>
+                {
+                    b.Property<int>("SId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SId"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FormMode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LicenseNumberLong")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TotalCar")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TransactionId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("SId");
+
+                    b.ToTable("Summaries");
+                });
+
             modelBuilder.Entity("DOTP_BE.Model.Temp_Table", b =>
                 {
                     b.Property<int>("Temp_Id")

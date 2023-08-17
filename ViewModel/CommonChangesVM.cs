@@ -9,6 +9,7 @@ namespace DOTP_BE.ViewModel
         public string NRC_Number { get; set; }
         public string FormMode { get; set; }
         public bool? TakeNewRecord { get; set; }
+        public int UserId { get; set; } //for summary page
 
         //for vehicle owner address change
         public List<ChangeVOwnerAddress_Sub1>? ChangeVehicleAddress { get; set; }

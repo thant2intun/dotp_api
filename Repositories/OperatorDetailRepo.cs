@@ -5,6 +5,7 @@ using DOTP_BE.Interfaces;
 using DOTP_BE.Model;
 using DOTP_BE.Models;
 using DOTP_BE.ViewModel;
+using DOTP_BE.ViewModel.AdminResponses;
 using DOTP_BE.ViewModel.ReportResponses;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
@@ -3056,7 +3057,7 @@ namespace DOTP_BE.Repositories
 
         #endregion
 
-        public async Task<(bool, bool, string?)> CommonChangesProcess(CommonChangesVM dto)
+        public async Task<(bool, bool)> CommonChangesProcess(CommonChangesVM dto)
         {
             if (dto.TakeNewRecord != null && dto.TakeNewRecord == true)
             {
@@ -3078,7 +3079,7 @@ namespace DOTP_BE.Repositories
                                           x.CreatedDate.Date == DateTime.Now.Date);
 
                 if (checkFormModeDuplicate)
-                    return (false, true, null); //duplicate formMode in one single day (not done, duplicate)
+                    return (false, true); //duplicate formMode in one single day (not done, duplicate)
             }
             var licenOnlys = await _context.LicenseOnlys.AsNoTracking()
                     .Where(x => x.License_Number == dto.LicenseNumberLong &&
@@ -3224,6 +3225,12 @@ namespace DOTP_BE.Repositories
                 _context.LicenseOnlys.Update(licenOnlys);
                 #endregion
 
+                Summary summary = new Summary(); //for all operation done or not
+                summary.LicenseNumberLong = dto.LicenseNumberLong;
+                summary.FormMode = dto.FormMode;
+                summary.TransactionId = TransactionIdN;
+                summary.UserId = dto.UserId;
+                summary.CreatedDate = DateTime.Now;
 
                 #region *** for License Address change ***
                 if (dto.FormMode == ConstantValue.ChangeLOwnerAddress && dto.ChangeLicenseAddress != null)
@@ -3253,6 +3260,7 @@ namespace DOTP_BE.Repositories
 
                         await _context.Vehicles.AddAsync(vehicleObjN);
                     }
+                    summary.TotalCar = dto.ChangeLicenseAddress.vehicleIdList.Count;
                 }
                 #endregion
 
@@ -3287,6 +3295,7 @@ namespace DOTP_BE.Repositories
 
                         await _context.Vehicles.AddAsync(vehicleObjN);
                     }
+                    summary.TotalCar = dto.ChangeVehicleAddress.Count;
                 }
                 #endregion
 
@@ -3387,6 +3396,7 @@ namespace DOTP_BE.Repositories
 
                         await _context.Vehicles.AddAsync(vehicleObjN);
                     }
+                    summary.TotalCar = dto.ChangeVehicleType.Count;
                 }
                 #endregion
 
@@ -3422,6 +3432,7 @@ namespace DOTP_BE.Repositories
 
                         await _context.Vehicles.AddAsync(vehicleObjN);
                     }
+                    summary.TotalCar = dto.ChangeVehicleOwnerName.Count;
                 }
                 #endregion
 
@@ -3533,6 +3544,7 @@ namespace DOTP_BE.Repositories
                         };
                         await _context.Vehicles.AddAsync(newVehicle);
                     }
+                    summary.TotalCar = dto.AddNewCars.Count;
                 }
                 #endregion
 
@@ -3617,7 +3629,10 @@ namespace DOTP_BE.Repositories
                         vehicleObjN.Temp_OwnerBook = pathOwnerBookFile;
                         vehicleObjN.Temp_Triangle = pathTriangelFile;
                         vehicleObjN.Temp_AttachedFile2 = pathAttachedFile2;
+
+                        await _context.Vehicles.AddAsync(vehicleObjN);
                     }
+                    summary.TotalCar = dto.DecreaseCars.Count;
                 }
                 #endregion
 
@@ -3705,6 +3720,7 @@ namespace DOTP_BE.Repositories
 
                         await _context.Vehicles.AddAsync(vehicleObjN);
                     }
+                    summary.TotalCar = dto.DecreaseCarsOver2ton.Count;
                 }
                 #endregion
 
@@ -3792,6 +3808,7 @@ namespace DOTP_BE.Repositories
                             await _context.Vehicles.AddAsync(vehicleObjN);
                         }
                     }
+                    summary.TotalCar = dto.ExtendOperatorLicense.Count;
                 }
                 #endregion
 
@@ -3880,15 +3897,17 @@ namespace DOTP_BE.Repositories
                             await _context.Vehicles.AddAsync(vehicleObjN);
                         }
                     }
-
+                    summary.TotalCar = dto.ExtendVehicleLicense.Count;
                 }
                 #endregion
 
+                await _context.Summaries.AddAsync(summary);
+
                 await _context.SaveChangesAsync();
-                return (true, false, TransactionIdN); // (done, not duplicate)
+                return (true, false); // (done, not duplicate)
             }
 
-            return (false, false, null); //(not done, not duplicate)
+            return (false, false); //(not done, not duplicate)
         }
 
         public async Task<bool> AllOperationDoneProcess(List<AllOperationDoneVM> dto)
@@ -3953,106 +3972,203 @@ namespace DOTP_BE.Repositories
         #region LicenseDetailForOver2ton_old
         //public async Task<(LicenseOnly?, string?)> LicenseDetailForOver2ton(string licenseNumberLong)
         //{
+        //    #region *** old ***
         //    var vehicleObj = await _context.Vehicles
         //           .AsNoTracking()
         //           .Where(x => x.LicenseNumberLong == licenseNumberLong)
         //           .Include(x => x.LicenseOnly).ThenInclude(x => x.RegistrationOffice)
         //           .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
         //          .OrderByDescending(x => x.ApplyDate)
-        //           .Select(x => new { x.NRC_Number, x.LicenseOnly, x.ExpiryDate})
+        //           .Select(x => new { x.NRC_Number, x.LicenseOnly, x.ExpiryDate })
         //           .FirstOrDefaultAsync();
-        //           //.ToListAsync();
+        //    //.ToListAsync();
+
+        //    //if (vehicleObj == null)
+        //    //    return (null, null);
+
+        //    //if (vehicleObj.ExpiryDate.HasValue && vehicleObj.ExpiryDate.Value.Date < DateTime.Now.Date)
+        //    //    return (null, "လွဲယူမည့်သူ၏ လုပ်ငန်းလိုင်စင်သည် သက်တမ်းကုန်နေပါသည်။");
+        //    //if (!vehicleObj.ExpiryDate.HasValue)
+        //    //    return (null, "လွဲယူမည့်သူ၏ လုပ်ငန်းလိုင်စင် သည် သက်တမ်းကုန်ဆုံးရက် မှားရွှင်းနေပါသည်။");
+
+        //    //if (vehicleObj.LicenseOnly == null)
+        //    //{
+        //    //    var licenseOnlyObj = await _context.LicenseOnlys.AsNoTracking()
+        //    //        .Where(x => x.License_Number == licenseNumberLong && x.NRC_Number == vehicleObj.NRC_Number)
+        //    //        .OrderByDescending(x => x.CreatedDate)
+        //    //        .FirstOrDefaultAsync();
+
+        //    //    if (licenseOnlyObj != null)
+        //    //        return (null, null);
+        //    //    return (licenseOnlyObj, null);
+        //    //}
+        //    //return (vehicleObj.LicenseOnly, null);
+        //    #endregion
+
+        //    var vehicle = await _context.Vehicles.AsNoTracking()
+        //            .Where(x => x.LicenseNumberLong == licenseNumberLong && x.Status == ConstantValue.Status_Approved)
+        //            .OrderByDescending(x => x.ExpiryDate)
+        //            .Include(x => x.LicenseOnly)
+        //            .Select(x => new { x.LicenseOnly, x.NRC_Number })
+        //            .FirstOrDefaultAsync();
+        //    if(vehicle != null && vehicle.LicenseOnly == null)
+        //    {
+        //        var licenseOnly = await _context.LicenseOnlys.AsNoTracking()
+        //                .Where(x => x.License_Number == licenseNumberLong && x.NRC_Number == vehicle.NRC_Number)
+        //                .OrderByDescending(x => x.CreatedDate)
+        //                .FirstOrDefaultAsync();
+
+        //    }
+
+        //}
+        #endregion
+        //public async Task<(LicenseDetailForOver2tonVM?, string?)> LicenseDetailForOver2ton(string nrc_number)
+        //{
+        //    var vehicleObj = await _context.Vehicles
+        //           .AsNoTracking()
+        //           .Where(x => x.NRC_Number == nrc_number)
+        //           .Include(x => x.LicenseOnly).ThenInclude(x => x.RegistrationOffice)
+        //           .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
+        //          .OrderByDescending(x => x.ApplyDate)
+        //           .Select(x => new { x.NRC_Number,x.LicenseNumberLong, x.LicenseOnly, x.ExpiryDate })
+        //           .FirstOrDefaultAsync();
+        //    //.ToListAsync();
 
         //    if (vehicleObj == null)
         //        return (null, null);
 
-        //    if (vehicleObj.ExpiryDate.HasValue && vehicleObj.ExpiryDate.Value.Date < DateTime.Now.Date)
-        //        return (null, "လွဲယူမည့်သူ၏ လုပ်ငန်းလိုင်စင်သည် သက်တမ်းကုန်နေပါသည်။");
-        //    if (!vehicleObj.ExpiryDate.HasValue)
-        //        return (null, "လွဲယူမည့်သူ၏ လုပ်ငန်းလိုင်စင် သည် သက်တမ်းကုန်ဆုံးရက် မှားရွှင်းနေပါသည်။");
+        //    //if (vehicleObj.ExpiryDate.HasValue && vehicleObj.ExpiryDate.Value.Date < DateTime.Now.Date)
+        //    //    return (null, "လွဲယူမည့်သူ၏ လုပ်ငန်းလိုင်စင်သည် သက်တမ်းကုန်နေပါသည်။");
+        //    //if (!vehicleObj.ExpiryDate.HasValue)
+        //    //    return (null, "လွဲယူမည့်သူ၏ လုပ်ငန်းလိုင်စင် သည် သက်တမ်းကုန်ဆုံးရက် မှားရွှင်းနေပါသည်။");
+        //    //List<LicenseOnly> licenseOnlyObj = new List<LicenseOnly>() ;
+        //    //foreach (var veh in vehicleObj)
+        //    //{
+
+        //    //    else
+        //    //    {
+        //    //        licenseOnlyObj.Add(veh.LicenseOnly);
+        //    //    }
+        //    //}
+        //    LicenseDetailForOver2tonVM vmLincDet = new LicenseDetailForOver2tonVM();
 
         //    if (vehicleObj.LicenseOnly == null)
         //    {
-        //        var licenseOnlyObj = await _context.LicenseOnlys.AsNoTracking()
-        //            .Where(x => x.License_Number == licenseNumberLong && x.NRC_Number == vehicleObj.NRC_Number)
+        //        vmLincDet.LicenseOnly = await _context.LicenseOnlys.AsNoTracking()
+        //            .Where(x => x.NRC_Number == nrc_number && x.NRC_Number == vehicleObj.NRC_Number)
         //            .OrderByDescending(x => x.CreatedDate)
         //            .FirstOrDefaultAsync();
-
-        //        if (licenseOnlyObj != null)
+        //        vmLincDet.LicenseNumberLong = vehicleObj.LicenseNumberLong;
+        //        if (vmLincDet.LicenseOnly != null)
         //            return (null, null);
-        //        return (licenseOnlyObj, null);
+        //        return (vmLincDet, null);
         //    }
-        //    return (vehicleObj.LicenseOnly, null);
+        //    else
+        //    {
+        //        vmLincDet.LicenseOnly = vehicleObj.LicenseOnly;
+        //        vmLincDet.LicenseNumberLong=vehicleObj.LicenseNumberLong;
+        //    }
+
+        //    return (vmLincDet, null);
 
         //}
-        #endregion
-        public async Task<(LicenseDetailForOver2tonVM?, string?)> LicenseDetailForOver2ton(string nrc_number)
+
+        public async Task<LicenseOnly?> LicenseDetailForOver2ton(string licenseNumberLong)
         {
-            var vehicleObj = await _context.Vehicles
-                   .AsNoTracking()
-                   .Where(x => x.NRC_Number == nrc_number)
-                   .Include(x => x.LicenseOnly).ThenInclude(x => x.RegistrationOffice)
-                   .Include(x => x.LicenseOnly).ThenInclude(x => x.JourneyType)
-                  .OrderByDescending(x => x.ApplyDate)
-                   .Select(x => new { x.NRC_Number,x.LicenseNumberLong, x.LicenseOnly, x.ExpiryDate })
-                   .FirstOrDefaultAsync();
-            //.ToListAsync();
-
-            if (vehicleObj == null)
-                return (null, null);
-
-            //if (vehicleObj.ExpiryDate.HasValue && vehicleObj.ExpiryDate.Value.Date < DateTime.Now.Date)
-            //    return (null, "လွဲယူမည့်သူ၏ လုပ်ငန်းလိုင်စင်သည် သက်တမ်းကုန်နေပါသည်။");
-            //if (!vehicleObj.ExpiryDate.HasValue)
-            //    return (null, "လွဲယူမည့်သူ၏ လုပ်ငန်းလိုင်စင် သည် သက်တမ်းကုန်ဆုံးရက် မှားရွှင်းနေပါသည်။");
-            //List<LicenseOnly> licenseOnlyObj = new List<LicenseOnly>() ;
-            //foreach (var veh in vehicleObj)
-            //{
-
-            //    else
-            //    {
-            //        licenseOnlyObj.Add(veh.LicenseOnly);
-            //    }
-            //}
-            LicenseDetailForOver2tonVM vmLincDet = new LicenseDetailForOver2tonVM();
-            
-            if (vehicleObj.LicenseOnly == null)
-            {
-                vmLincDet.LicenseOnly = await _context.LicenseOnlys.AsNoTracking()
-                    .Where(x => x.NRC_Number == nrc_number && x.NRC_Number == vehicleObj.NRC_Number)
-                    .OrderByDescending(x => x.CreatedDate)
+            var vehicle = await _context.Vehicles.AsNoTracking()
+                    .Where(x => x.LicenseNumberLong == licenseNumberLong && x.Status == ConstantValue.Status_Approved)
+                    .OrderByDescending(x => x.ExpiryDate)
+                    .Include(x => x.LicenseOnly)
+                    .Select(x => new { x.LicenseOnly, x.NRC_Number })
                     .FirstOrDefaultAsync();
-                vmLincDet.LicenseNumberLong = vehicleObj.LicenseNumberLong;
-                if (vmLincDet.LicenseOnly != null)
-                    return (null, null);
-                return (vmLincDet, null);
-            }
-            else
+
+            if (vehicle == null)
+                return null;
+
+            if (vehicle.LicenseOnly == null)
             {
-                vmLincDet.LicenseOnly = vehicleObj.LicenseOnly;
-                vmLincDet.LicenseNumberLong=vehicleObj.LicenseNumberLong;
+                var licenseOnly = await _context.LicenseOnlys.AsNoTracking()
+                        .Where(x => x.License_Number == licenseNumberLong && x.NRC_Number == vehicle.NRC_Number)
+                        .OrderByDescending(x => x.CreatedDate)
+                        .FirstOrDefaultAsync();
+                return licenseOnly;
             }
-
-            return (vmLincDet, null);
-
+            return vehicle.LicenseOnly;
         }
 
-        //public Temp_Table DeepCopy(Temp_Table dto)
-        //{
-        //    return new Temp_Table
-        //    {
-        //        LicenseOnlyId = dto.LicenseOnlyId,
-        //        Transaction_Id = dto.Transaction_Id,
-        //        LicenseNumberLong = dto.LicenseNumberLong,
-        //        NRC_Number = dto.NRC_Number,
-        //        AttachFile_NRC = dto.AttachFile_NRC,
-        //        AttachFile_M10 = dto.AttachFile_M10,
-        //        AttachFile_Part1 = dto.AttachFile_Part1,
-        //        AttachFile_RecommandDoc1 = dto.AttachFile_RecommandDoc1,
-        //        AttachFile_RecommandDoc2 = dto.AttachFile_RecommandDoc2,
-        //        FormMode = dto.FormMode,
-        //        CreatedDate = dto.CreatedDate
-        //    };
-        //}
+        public async Task<List<ExtendLicenseVMAdmin>> CheckApplicationStatus()
+        {
+            var days = DateTime.Now.Date.AddDays(-365);
+
+            var vehicles = await _context.Vehicles.AsNoTracking()
+                    .Where(x => x.CreatedDate.Date >= DateTime.Now.Date.AddDays(-365) &&
+                                x.Status != ConstantValue.Status_OperationPending)
+                    .OrderByDescending(x => x.CreatedDate)
+                    .GroupBy(x => new { x.Status, x.LicenseNumberLong })
+                    .Select(x => new ExtendLicenseVMAdmin
+                    {
+                        FormMode = x.Select(g => g.FormMode).Distinct().ToList(),
+                        LicenseNumberLong = x.First().LicenseNumberLong,
+                        JourneyTypeLong = x.First().LicenseOnly.JourneyType.JourneyTypeLong,
+                        TotalCar = x.Count(),
+                        CreatedDate = x.First().CreatedDate,
+                        UpdatedDate = x.First().UpdatedDate,
+                        ExpireDate = DateTime.Now,
+                        Status = x.First().Status,
+                        TransactionId = x.First().Transaction_Id,
+                        LicenseTypeId = x.First().LicenseTypeId
+                    })
+                    .ToListAsync();
+
+            return vehicles;
+        }
+
+        public async Task<List<Summary>> GetSummariesData(int userId)
+        {
+            var summaries = await _context.Summaries.AsNoTracking()
+                .Where(x => x.UserId == userId)
+                .ToListAsync();
+            return summaries;
+        }
+
+        public async Task<List<(string, DateTime?)>> GetLicenseNumberLongByNrc(string nrc_number)
+        {
+            nrc_number = nrc_number.Replace("*", "/");
+            //var licenseNumberLongs = await _context.OperatorDetails.AsNoTracking()
+            //    .Where(x => x.NRC == nrc_number)
+            //    .Select(x => x.LicenseHolderType)
+            //    .ToListAsync();
+
+            var distNRCs = await _context.OperatorDetails.AsNoTracking()
+                .Include(x => x.Vehicle)
+                .Where(x => x.NRC == nrc_number)
+                .ToListAsync(); //get all data 'Creae New' and 'ExtendOperatorLicense'
+
+            distNRCs = distNRCs.GroupBy(d => d.ApplyLicenseType)
+                               .Select(g => g.OrderByDescending(d => d.ApplyDate).First())
+                               .ToList(); // group by and select greatest date
+
+            List<(string, DateTime?)> result = new List<(string, DateTime?)>();
+            foreach (var item in distNRCs)
+            {
+                string licenseNumberLong = string.Empty;
+                if (item.Vehicle == null)
+                {
+                    var lObj = await _context.Vehicles.AsNoTracking()
+                        .Where(x => x.Transaction_Id == item.Transaction_Id)
+                        .Select(x => x.LicenseNumberLong)
+                        .FirstOrDefaultAsync();
+
+                    licenseNumberLong = lObj != null ? lObj : string.Empty;
+                }
+                else
+                {
+                    licenseNumberLong = item.Vehicle.LicenseNumberLong;
+                }
+                var temp = (licenseNumberLong, item.ExpiredDate);
+                result.Add(temp);
+            }
+            return result;
+        }
     }
 }

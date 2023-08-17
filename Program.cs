@@ -177,9 +177,11 @@ app.UseStaticFiles(new StaticFileOptions
 //    app.UseSwaggerUI();
 //}
 
+
 app.UseSwagger();
 // app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "TestWebApi"); 
 app.UseSwaggerUI();
+
 
 app.UseCors(builder =>
 {

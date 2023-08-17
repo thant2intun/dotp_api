@@ -1,6 +1,7 @@
 ﻿using DOTP_BE.Model;
 using DOTP_BE.Models;
 using DOTP_BE.ViewModel;
+using DOTP_BE.ViewModel.AdminResponses;
 
 namespace DOTP_BE.Interfaces
 {
@@ -41,10 +42,17 @@ namespace DOTP_BE.Interfaces
 
         //commented to make same T&C From BE
         //Task<(string, string, string, DateTime)> CommonChangesProcess(CommonChangesVM dto);
-        Task<(bool, bool, string?)> CommonChangesProcess(CommonChangesVM dto);
+        Task<(bool, bool)> CommonChangesProcess(CommonChangesVM dto);
 
         Task<bool> AllOperationDoneProcess(List<AllOperationDoneVM> dto);
 
-        Task<(LicenseDetailForOver2tonVM, string?)> LicenseDetailForOver2ton(string nrc_number);
+        //Task<(LicenseDetailForOver2tonVM, string?)> LicenseDetailForOver2ton(string nrc_number);
+        Task<LicenseOnly> LicenseDetailForOver2ton(string nrc_number);
+
+        Task<List<ExtendLicenseVMAdmin>> CheckApplicationStatus();
+
+        Task<List<Summary>> GetSummariesData(int userId);
+
+        Task<List<(string, DateTime?)>> GetLicenseNumberLongByNrc(string  nrc_number);
     }
 }
