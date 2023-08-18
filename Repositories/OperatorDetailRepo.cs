@@ -3958,7 +3958,16 @@ namespace DOTP_BE.Repositories
                         vehicle.Status = ConstantValue.Status_Pending;
                     }
                     _context.Vehicles.UpdateRange(vehicleOperationStatus);
+
+                    var summeries = await _context.Summaries
+                        .Where(x => x.CreatedDate.Date == item.CreatedDate.Date &&
+                                    x.TransactionId == item.TransactionId &&
+                                    x.LicenseNumberLong == item.LicenseNumberLong &&
+                                    x.FormMode == item.FormModes)
+                        .ToListAsync();
+                    _context.Summaries.RemoveRange(summeries);
                 }
+
                 await _context.SaveChangesAsync();
                 return true;
             }
@@ -4096,7 +4105,7 @@ namespace DOTP_BE.Repositories
             return vehicle.LicenseOnly;
         }
 
-        public async Task<List<ExtendLicenseVMAdmin>> CheckApplicationStatus()
+        public async Task<List<ExtendLicenseVMAdmin>> CheckApplicationStatus(GetApplicationDataVM searchDto)
         {
             var days = DateTime.Now.Date.AddDays(-365);
 

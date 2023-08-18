@@ -49,7 +49,7 @@ namespace DOTP_BE.Interfaces
         //Task<(LicenseDetailForOver2tonVM, string?)> LicenseDetailForOver2ton(string nrc_number);
         Task<LicenseOnly> LicenseDetailForOver2ton(string nrc_number);
 
-        Task<List<ExtendLicenseVMAdmin>> CheckApplicationStatus();
+        Task<List<ExtendLicenseVMAdmin>> CheckApplicationStatus(GetApplicationDataVM searchDto);
 
         Task<List<Summary>> GetSummariesData(int userId);
 

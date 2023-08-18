@@ -1182,10 +1182,10 @@ namespace DOTP_BE.Controllers
             return Ok(oky);
         }
 
-        [HttpGet("check_application_status")]
-        public async Task<IActionResult> CheckApplicationStatus()
+        [HttpPost("get_application_data")]
+        public async Task<IActionResult> CheckApplicationStatus(GetApplicationDataVM searchDto)
         {
-            var resp = await _iopeartorDetail.CheckApplicationStatus();
+            var resp = await _iopeartorDetail.CheckApplicationStatus(searchDto);
             return Ok(resp);
         }
 

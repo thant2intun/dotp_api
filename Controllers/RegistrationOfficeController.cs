@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace DOTP_BE.Controllers
 {
     //[Authorize]
-    [Route("/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class RegistrationOfficeController : ControllerBase
     {
